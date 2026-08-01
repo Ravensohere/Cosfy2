@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Receipt, Plus, Users, Target } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -57,10 +57,10 @@ export default async function HomePage() {
       </div>
 
       <div className="grid grid-cols-4 gap-2 mt-6">
-        <QuickActionLink href="/scan/edit-items" icon={Receipt} label="Split bill" />
-        <QuickActionAddExpense icon={Plus} label="Add" />
-        <QuickActionLink href="/groups" icon={Users} label="Groups" />
-        <QuickActionLink href="/goals" icon={Target} label="Goals" />
+        <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
+        <QuickActionAddExpense icon="Plus" label="Add" />
+        <QuickActionLink href="/groups" icon="Users" label="Groups" />
+        <QuickActionLink href="/goals" icon="Target" label="Goals" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">
