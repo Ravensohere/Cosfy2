@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String   @id
+  onboardingGoal       String?
+  lifeStage            String?
+  onboardingCompleted  Boolean  @default(false)
+  notificationsEnabled Boolean  @default(true)
+  createdAt            DateTime @default(now())
+
+  transactions Transaction[]
+  groups       Group[]
+  budgets      Budget[]
+  goals        Goal[]
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  description String
+  category    String
+  paymentMode String
+  date        DateTime @default(now())
+  source      String   @default("manual")
+  createdAt   DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model Group {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  name         String
+  type         String
+  defaultSplit String   @default("Equal")
+  isOneTime    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  members    GroupMember[]
+  expenses   GroupExpense[]
+  settlements Settlement[]
+
+  @@index([userId])
+}
+
+model GroupMember {
+  id            String   @id @default(cuid())
+  groupId       String
+  group         Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name          String
+  isCurrentUser Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  paidExpenses GroupExpense[]  @relation("PaidBy")
+  splits       ExpenseSplit[]
+  settlementsFrom Settlement[] @relation("SettleFrom")
+  settlementsTo   Settlement[] @relation("SettleTo")
+
+  @@index([groupId])
+}
+
+model GroupExpense {
+  id            String       @id @default(cuid())
+  groupId       String
+  group         Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  description   String
+  totalAmount   Float
+  paidByMemberId String
+  paidByMember  GroupMember  @relation("PaidBy", fields: [paidByMemberId], references: [id])
+  splitType     String       @default("Equal")
+  createdAt     DateTime     @default(now())
+
+  splits ExpenseSplit[]
+
+  @@index([groupId])
+}
+
+model ExpenseSplit {
+  id             String       @id @default(cuid())
+  groupExpenseId String
+  groupExpense   GroupExpense @relation(fields: [groupExpenseId], references: [id], onDelete: Cascade)
+  memberId       String
+  member         GroupMember  @relation(fields: [memberId], references: [id])
+  shareAmount    Float
+
+  @@index([groupExpenseId])
+}
+
+model Settlement {
+  id             String      @id @default(cuid())
+  groupId        String
+  group          Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromMemberId   String
+  fromMember     GroupMember @relation("SettleFrom", fields: [fromMemberId], references: [id])
+  toMemberId     String
+  toMember       GroupMember @relation("SettleTo", fields: [toMemberId], references: [id])
+  amount         Float
+  note           String?
+  createdAt      DateTime    @default(now())
+
+  @@index([groupId])
+}
+
+model Budget {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  type           String
+  category       String?
+  amount         Float
+  alertThreshold Int      @default(80)
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Goal {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  type         String
+  name         String
+  targetAmount Float
+  targetDate   DateTime?
+  createdAt    DateTime  @default(now())
+
+  contributions GoalContribution[]
+
+  @@index([userId])
+}
+
+model GoalContribution {
+  id        String   @id @default(cuid())
+  goalId    String
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  amount    Float
+  createdAt DateTime @default(now())
+
+  @@index([goalId])
+}

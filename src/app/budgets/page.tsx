@@ -1,0 +1,88 @@
+import { Plus, Wallet } from "lucide-react";
+import { getCurrentUser } from "@/lib/current-user";
+import { db } from "@/lib/db";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { HeroCard } from "@/components/ui/HeroCard";
+import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { BudgetCard } from "@/components/finance/BudgetCard";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
+
+export default async function BudgetsPage() {
+  const user = await getCurrentUser();
+  const budgets = await db.budget.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" } });
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  async function spentFor(budget: (typeof budgets)[number]) {
+    if (budget.type === "Weekly") {
+      const rows = await db.transaction.findMany({
+        where: { userId: user.id, amount: { lt: 0 }, date: { gte: weekStart, lte: now } },
+      });
+      return rows.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    }
+    const rows = await db.transaction.findMany({
+      where: {
+        userId: user.id,
+        amount: { lt: 0 },
+        date: { gte: monthStart, lt: monthEnd },
+        ...(budget.type === "Category" ? { category: budget.category ?? undefined } : {}),
+      },
+    });
+    return rows.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  }
+
+  const monthlyBudget = budgets.find((b) => b.type === "Monthly");
+  const otherBudgets = budgets.filter((b) => b.id !== monthlyBudget?.id);
+
+  const monthlySpent = monthlyBudget ? await spentFor(monthlyBudget) : 0;
+  const otherSpent = await Promise.all(otherBudgets.map((b) => spentFor(b)));
+
+  return (
+    <PageContainer
+      title="Budgets"
+      action={
+        <PrimaryButton href="/budgets/create" className="h-9 px-4 text-[12px]">
+          <Plus size={16} /> New
+        </PrimaryButton>
+      }
+    >
+      {budgets.length === 0 ? (
+        <EmptyState
+          icon={Wallet}
+          title="No budgets set"
+          description="Add your first budget."
+          action={<PrimaryButton href="/budgets/create">Add budget</PrimaryButton>}
+        />
+      ) : (
+        <div className="space-y-3">
+          {monthlyBudget && (
+            <HeroCard>
+              <p className="text-[13px] text-white/70 mb-1">Monthly budget</p>
+              <div className="flex items-baseline justify-between mb-3">
+                <MoneyAmount amount={monthlySpent} size="hero" className="text-white" />
+                <span className="text-[13px] text-white/70">
+                  of {new Intl.NumberFormat("en-IN").format(monthlyBudget.amount)}
+                </span>
+              </div>
+              <ProgressBar value={monthlySpent} max={monthlyBudget.amount} trackClassName="bg-white/15" />
+            </HeroCard>
+          )}
+          {otherBudgets.map((b, i) => (
+            <BudgetCard
+              key={b.id}
+              title={b.type === "Category" ? `${b.category}` : "Weekly budget"}
+              category={b.category}
+              spent={otherSpent[i]}
+              limit={b.amount}
+            />
+          ))}
+        </div>
+      )}
+    </PageContainer>
+  );
+}

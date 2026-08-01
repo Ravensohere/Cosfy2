@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --cosfy-bg: #F6F3EC;
+  --cosfy-bg-deep: #EBE7DA;
+  --cosfy-card: #FFFFFF;
+  --cosfy-card-soft: #F1EDE2;
+  --cosfy-ink: #22221C;
+  --cosfy-ink-soft: #4A4A40;
+  --cosfy-muted: #8C887C;
+  --cosfy-border: #E2DDCC;
+  --cosfy-border-strong: #D2CBB4;
+  --cosfy-lime: #C3E04A;
+  --cosfy-lime-soft: #EAF4B6;
+  --cosfy-lime-pale: #F0F6DA;
+  --cosfy-lime-ink: #445214;
+  --cosfy-lime-deep: #8FAE1F;
+  --cosfy-dark-card: #1F2119;
+  --cosfy-dark-card-text: #FFFFFF;
+  --cosfy-green: #3C7A3E;
+  --cosfy-green-soft: #E8F1DF;
+  --cosfy-red: #B23B3B;
+  --cosfy-red-soft: #F6E7E2;
+  --cosfy-amber: #A66A1B;
+  --cosfy-amber-soft: #F4EAD4;
+  --cosfy-blue: #33588A;
+  --cosfy-blue-soft: #E4EBF3;
+  --cosfy-violet: #5E5790;
+}
+
+@theme inline {
+  --color-cosfy-bg: var(--cosfy-bg);
+  --color-cosfy-bg-deep: var(--cosfy-bg-deep);
+  --color-cosfy-card: var(--cosfy-card);
+  --color-cosfy-card-soft: var(--cosfy-card-soft);
+  --color-cosfy-ink: var(--cosfy-ink);
+  --color-cosfy-ink-soft: var(--cosfy-ink-soft);
+  --color-cosfy-muted: var(--cosfy-muted);
+  --color-cosfy-border: var(--cosfy-border);
+  --color-cosfy-border-strong: var(--cosfy-border-strong);
+  --color-cosfy-lime: var(--cosfy-lime);
+  --color-cosfy-lime-soft: var(--cosfy-lime-soft);
+  --color-cosfy-lime-pale: var(--cosfy-lime-pale);
+  --color-cosfy-lime-ink: var(--cosfy-lime-ink);
+  --color-cosfy-lime-deep: var(--cosfy-lime-deep);
+  --color-cosfy-dark-card: var(--cosfy-dark-card);
+  --color-cosfy-dark-card-text: var(--cosfy-dark-card-text);
+  --color-cosfy-green: var(--cosfy-green);
+  --color-cosfy-green-soft: var(--cosfy-green-soft);
+  --color-cosfy-red: var(--cosfy-red);
+  --color-cosfy-red-soft: var(--cosfy-red-soft);
+  --color-cosfy-amber: var(--cosfy-amber);
+  --color-cosfy-amber-soft: var(--cosfy-amber-soft);
+  --color-cosfy-blue: var(--cosfy-blue);
+  --color-cosfy-blue-soft: var(--cosfy-blue-soft);
+  --color-cosfy-violet: var(--cosfy-violet);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --radius-card: 18px;
+  --radius-input: 13px;
+  --radius-button: 15px;
+  --radius-sheet: 24px;
+
+  --shadow-soft: 0 12px 32px rgba(34, 34, 28, 0.08);
+}
+
+body {
+  background: var(--cosfy-bg);
+  color: var(--cosfy-ink);
+  font-family: var(--font-sans);
+}
