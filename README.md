@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cosfy
 
-## Getting Started
+Personal finance app for India — expense tracking, budgets, bill splitting, goals, and an AI-powered layer on top, without ever needing bank login or SMS permissions.
 
-First, run the development server:
+## Features
+
+- **Expenses & income** — quick-add with a text parser (`"chai 40"`, `"salary 50000"`), category/payment-mode chips, monthly budgets.
+- **Bill splitting** — scan a receipt, split by item or evenly across a group, settle up.
+- **Goals** — savings goals with contributions.
+- **Credit card tracker** — statement/due dates, amount owed, due-date reminders on the card list.
+- **Salary tax calculator** — old vs new regime (FY2025-26 slabs), 80C, effective rate, which regime saves more.
+- **Import expenses** (`/import`) — four ways in, all reviewed before saving:
+  - Paste a bank SMS — regex-parsed for amount/merchant/category.
+  - Upload a payment screenshot — parsed via OpenAI vision.
+  - Upload/record a voice note — transcribed via Whisper, parsed same as quick-add text.
+  - Upload a bank statement (CSV or PDF) — bulk-reviewed, then imported.
+- **AI insights** (`/insights`) — category spend this month vs last, plus a short LLM-written summary of what changed.
+- **Ask AI chat** (`/chat`) — general finance Q&A; pulls live headlines from Alpha Vantage for market/news questions, always shown with a "not financial advice" label.
+- **Share-to-Cosfy** — once installed as a PWA on Android/Chrome, Cosfy appears in the OS share sheet; sharing an SMS or notification text lands you in the import flow pre-filled. (No Web Share Target support on iOS — Apple hasn't shipped it.)
+
+## Setup
 
 ```bash
+npm install
+npx prisma migrate deploy   # or `prisma migrate dev` locally
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`DATABASE_URL` / `DATABASE_URL_UNPOOLED` — Postgres (Neon), required.
 
-## Learn More
+AI features need an OpenAI key. Either set it once in `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+```
+OPENAI_API_KEY=""
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+or have each user paste their own key in **Profile → OpenAI API key** — that's checked first, env var is the fallback.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For live finance headlines in chat/insights, set a free Alpha Vantage key:
 
-## Deploy on Vercel
+```
+ALPHAVANTAGE_API_KEY=""
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+(free tier at alphavantage.co/support/#api-key, 25 requests/day)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Stack
+
+Next.js (App Router) + Prisma + Postgres (Neon) + Tailwind. No auth — a guest cookie identifies each device/browser.

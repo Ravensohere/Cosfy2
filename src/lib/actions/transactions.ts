@@ -46,6 +46,35 @@ export async function createTransaction(input: CreateTransactionInput) {
   return { ok: true as const };
 }
 
+const bulkRowSchema = z.object({
+  amount: z.number().refine((n) => n !== 0, "Amount can't be zero"),
+  description: z.string().trim().min(1).max(120),
+  category: z.enum(CATEGORIES),
+  paymentMode: z.enum(PAYMENT_MODES),
+});
+
+export async function createTransactionsBulk(rows: z.infer<typeof bulkRowSchema>[]) {
+  const parsedRows = rows.map((r) => bulkRowSchema.safeParse(r)).filter((r) => r.success);
+  if (parsedRows.length === 0) {
+    return { ok: false as const, error: "No valid rows to import" };
+  }
+
+  const user = await getCurrentUser();
+  await db.transaction.createMany({
+    data: parsedRows.map((r) => ({
+      userId: user.id,
+      amount: r.data!.amount,
+      description: r.data!.description,
+      category: r.data!.category,
+      paymentMode: r.data!.paymentMode,
+      source: "import",
+    })),
+  });
+
+  revalidateMoneyScreens();
+  return { ok: true as const, count: parsedRows.length };
+}
+
 export async function deleteTransaction(id: string) {
   const user = await getCurrentUser();
   await db.transaction.deleteMany({ where: { id, userId: user.id } });

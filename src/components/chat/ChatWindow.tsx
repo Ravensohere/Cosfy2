@@ -1,0 +1,136 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { Send, TriangleAlert } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import { cn } from "@/lib/cn";
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  usedLiveData?: boolean;
+  sources?: { title: string; url: string }[];
+};
+
+export function ChatWindow() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: "Ask me about budgeting, saving, or finance news. I'm a helper, not a financial advisor — double check anything important.",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  async function handleSend() {
+    const text = input.trim();
+    if (!text || isSending) return;
+
+    const nextMessages: Message[] = [...messages, { role: "user", content: text }];
+    setMessages(nextMessages);
+    setInput("");
+    setIsSending(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: nextMessages.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessages((prev) => [...prev, { role: "assistant", content: data.error ?? "Something went wrong." }]);
+        return;
+      }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.reply, usedLiveData: data.usedLiveData, sources: data.sources },
+      ]);
+    } catch {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Couldn't reach the server. Try again." }]);
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 overflow-y-auto space-y-3 pb-4">
+        {messages.map((m, i) => (
+          <ChatBubble key={i} message={m} />
+        ))}
+        {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} /> : null}
+        <div ref={bottomRef} />
+      </div>
+      <div className="flex gap-2 pt-2 border-t border-cosfy-border">
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSend();
+          }}
+          placeholder="e.g. How much should I save monthly?"
+          disabled={isSending}
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={isSending || !input.trim()}
+          aria-label="Send"
+          className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-lime text-cosfy-lime-ink flex items-center justify-center disabled:opacity-40"
+        >
+          <Send size={18} strokeWidth={2.5} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChatBubble({ message }: { message: Message }) {
+  const isUser = message.role === "user";
+  return (
+    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+      <div
+        className={cn(
+          "max-w-[85%] rounded-card px-4 py-3 text-[14px] leading-relaxed",
+          isUser ? "bg-cosfy-lime text-cosfy-lime-ink" : "bg-cosfy-card border border-cosfy-border text-cosfy-ink"
+        )}
+      >
+        <p className="whitespace-pre-wrap">{message.content}</p>
+        {!isUser && message.content !== "Thinking…" ? (
+          <div className="mt-2 pt-2 border-t border-cosfy-border flex items-start gap-1.5 text-[11px] text-cosfy-amber">
+            <TriangleAlert size={13} className="mt-[1px] shrink-0" />
+            <span>
+              {message.usedLiveData
+                ? "Based on recent headlines — not financial advice. Verify before acting on it."
+                : "Not financial advice — verify before acting on it."}
+            </span>
+          </div>
+        ) : null}
+        {message.sources && message.sources.length > 0 ? (
+          <ul className="mt-2 space-y-1">
+            {message.sources.slice(0, 3).map((s, i) => (
+              <li key={i}>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] text-cosfy-blue underline underline-offset-2 line-clamp-1"
+                >
+                  {s.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </div>
+  );
+}

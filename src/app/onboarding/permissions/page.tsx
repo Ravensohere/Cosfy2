@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { ChevronLeft, Bell, Camera, MessageSquareOff } from "lucide-react";
+import { ChevronLeft, Bell, Camera, MessageSquareText } from "lucide-react";
 import { completeOnboarding } from "@/lib/actions/onboarding";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
@@ -53,15 +53,12 @@ export default function OnboardingPermissionsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4 opacity-70">
-          <IconTile icon={MessageSquareOff} tone="soft" size={44} />
+        <div className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
+          <IconTile icon={MessageSquareText} tone="lime" size={44} />
           <div className="flex-1">
-            <p className="font-bold text-[14px] text-cosfy-ink">SMS auto-tracking</p>
-            <p className="text-[12px] text-cosfy-muted">Available later in the Android app</p>
+            <p className="font-bold text-[14px] text-cosfy-ink">Import expenses</p>
+            <p className="text-[12px] text-cosfy-muted">Paste SMS, or add via screenshot, voice note, or statement</p>
           </div>
-          <span className="text-[10px] font-bold text-cosfy-muted bg-cosfy-card-soft px-2 py-1 rounded-full">
-            Mobile only
-          </span>
         </div>
       </div>
 

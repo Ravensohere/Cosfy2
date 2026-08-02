@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Receipt } from "lucide-react";
+import { Receipt, ChevronRight, Calculator, MessageSquareText, CreditCard, Sparkles, type LucideIcon } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -41,7 +41,7 @@ export default async function HomePage() {
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:pb-16 md:max-w-2xl md:mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[13px] text-cosfy-muted">Hi there 👋</p>
+          <p className="text-[13px] text-cosfy-muted">Hi there</p>
           <p className="text-[18px] font-extrabold text-cosfy-ink">Welcome to Cosfy</p>
         </div>
       </div>
@@ -56,11 +56,12 @@ export default async function HomePage() {
         <StatCard label="Monthly surplus" amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-4 gap-2 mt-6">
+      <div className="grid grid-cols-5 gap-2 mt-6">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
         <QuickActionAddExpense icon="Plus" label="Add" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
         <QuickActionLink href="/goals" icon="Target" label="Goals" />
+        <QuickActionLink href="/chat" icon="MessageCircle" label="Ask AI" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">
@@ -69,6 +70,16 @@ export default async function HomePage() {
             ? "Add your first expense to get personalised insights."
             : `You've logged ${monthTransactions.length} transaction${monthTransactions.length === 1 ? "" : "s"} this month.`}
         </p>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
+        <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
+          <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
+          <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
+          <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />
+          <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
+        </div>
       </div>
 
       <div className="mt-6">
@@ -98,5 +109,15 @@ export default async function HomePage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ToolLink({ href, icon: Icon, label }: { href: string; icon: LucideIcon; label: string }) {
+  return (
+    <Link href={href} className="flex items-center gap-3 px-4 h-14">
+      <Icon size={18} className="text-cosfy-ink-soft shrink-0" strokeWidth={2} />
+      <span className="flex-1 text-[14px] font-semibold text-cosfy-ink">{label}</span>
+      <ChevronRight size={16} className="text-cosfy-muted shrink-0" />
+    </Link>
   );
 }

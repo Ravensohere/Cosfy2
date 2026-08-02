@@ -10,16 +10,33 @@ datasource db {
 
 model User {
   id                   String   @id
-  onboardingGoal       String?
+  onboardingGoals      String[] @default([])
   lifeStage            String?
   onboardingCompleted  Boolean  @default(false)
   notificationsEnabled Boolean  @default(true)
+  openaiApiKey         String?
   createdAt            DateTime @default(now())
 
   transactions Transaction[]
   groups       Group[]
   budgets      Budget[]
   goals        Goal[]
+  creditCards  CreditCard[]
+}
+
+model CreditCard {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  name         String
+  bank         String?
+  last4        String?
+  statementDay Int
+  dueDay       Int
+  currentDue   Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Transaction {

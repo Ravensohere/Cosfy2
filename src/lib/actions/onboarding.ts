@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 
-export async function saveOnboardingGoal(goal: string) {
+export async function saveOnboardingGoals(goals: string[]) {
   const user = await getCurrentUser();
-  await db.user.update({ where: { id: user.id }, data: { onboardingGoal: goal } });
+  await db.user.update({ where: { id: user.id }, data: { onboardingGoals: goals } });
 }
 
 export async function saveLifeStage(lifeStage: string) {
