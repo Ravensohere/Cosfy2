@@ -1,4 +1,4 @@
-import { Home, Wallet, Target, User, MessageCircle } from "lucide-react";
+import { Home, Wallet, Target, User } from "lucide-react";
 
 export const CORE_NAV_PREFIXES = [
   "/home",
@@ -15,11 +15,13 @@ export const CORE_NAV_PREFIXES = [
   "/insights",
 ];
 
-export const NAV_LINKS = [
+export const LEFT_NAV_ITEMS = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/budgets", label: "Expenses", icon: Wallet },
+];
+
+export const RIGHT_NAV_ITEMS = [
   { href: "/goals", label: "Goals", icon: Target },
-  { href: "/chat", label: "Ask AI", icon: MessageCircle },
   { href: "/profile", label: "Profile", icon: User },
 ];
 

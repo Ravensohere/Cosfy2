@@ -1,14 +1,9 @@
 "use client";
 
-import * as Icons from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { IconTile } from "@/components/ui/IconTile";
 import { useQuickAdd } from "@/components/quick-add/QuickAddContext";
-
-function resolveIcon(name: string): LucideIcon {
-  return (Icons[name as keyof typeof Icons] as LucideIcon) ?? Icons.Circle;
-}
+import { resolveIcon } from "@/lib/resolve-icon";
 
 export function QuickActionLink({ href, icon, label }: { href: string; icon: string; label: string }) {
   return (

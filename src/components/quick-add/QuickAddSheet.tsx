@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Pencil } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Input } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { CATEGORIES, PAYMENT_MODES, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
+import { CATEGORIES, PAYMENT_MODES, CATEGORY_ICON, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
 import { createTransaction } from "@/lib/actions/transactions";
 import { parseQuickAdd } from "@/lib/quick-add-parser";
+import { resolveIcon } from "@/lib/resolve-icon";
 
 const EXPENSE_CATEGORIES = CATEGORIES.filter((c) => c !== "Income");
 type EntryType = "expense" | "income";
@@ -19,10 +21,15 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
   const [paymentMode, setPaymentMode] = useState<PaymentModeValue | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const parsed = useMemo(() => parseQuickAdd(text), [text]);
   const effectiveCategory = type === "income" ? "Income" : category ?? parsed.category;
   const effectivePaymentMode = paymentMode ?? parsed.paymentMode;
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
 
   function reset() {
     setType("expense");
@@ -33,8 +40,8 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
   }
 
   function handleClose() {
-    reset();
     onClose();
+    setTimeout(reset, 300);
   }
 
   function selectType(next: EntryType) {
@@ -75,42 +82,48 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
             Income
           </PillChip>
         </div>
-        <Input
-          autoFocus
-          placeholder={type === "income" ? 'Try "salary 50000" or "freelance 8000"' : 'Try "chai 40" or "petrol 1000 cash"'}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+
+        <div className="relative">
+          <Pencil size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-cosfy-muted pointer-events-none" />
+          <Input
+            ref={inputRef}
+            placeholder={type === "income" ? 'Try "salary 50000" or "freelance 8000"' : 'Try "chai 40" or "petrol 1000 cash"'}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
         {type === "expense" ? (
-          <div>
-            <p className="text-[12px] font-semibold text-cosfy-ink-soft mb-2">Category</p>
-            <div className="flex flex-wrap gap-2">
-              {EXPENSE_CATEGORIES.map((c) => (
+          <div className="flex flex-wrap gap-2">
+            {EXPENSE_CATEGORIES.map((c) => {
+              const Icon = resolveIcon(CATEGORY_ICON[c]);
+              return (
                 <PillChip
                   key={c}
                   variant={effectiveCategory === c ? "active" : "inactive"}
                   onClick={() => setCategory(c)}
                 >
+                  <Icon size={14} />
                   {c}
                 </PillChip>
-              ))}
-            </div>
+              );
+            })}
           </div>
         ) : null}
-        <div>
-          <p className="text-[12px] font-semibold text-cosfy-ink-soft mb-2">Payment mode</p>
-          <div className="flex flex-wrap gap-2">
-            {PAYMENT_MODES.map((m) => (
-              <PillChip
-                key={m}
-                variant={effectivePaymentMode === m ? "active" : "inactive"}
-                onClick={() => setPaymentMode(m)}
-              >
-                {m}
-              </PillChip>
-            ))}
-          </div>
+
+        <div className="flex flex-wrap gap-2">
+          {PAYMENT_MODES.map((m) => (
+            <PillChip
+              key={m}
+              variant={effectivePaymentMode === m ? "strong" : "inactive"}
+              onClick={() => setPaymentMode(m)}
+            >
+              {m}
+            </PillChip>
+          ))}
         </div>
+
         {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
         <PrimaryButton fullWidth type="button" disabled={isPending} onClick={handleSubmit}>
           {isPending ? "Adding…" : type === "income" ? "Add income" : "Add expense"}

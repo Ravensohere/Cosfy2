@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { IconTile } from "@/components/ui/IconTile";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ApiKeySettings } from "@/components/profile/ApiKeySettings";
 import { ProfileSettings } from "./ProfileSettings";
 
@@ -21,10 +22,19 @@ export default async function ProfilePage() {
     <PageContainer title="Profile">
       <div className="rounded-[22px] bg-cosfy-dark-card text-white p-5 mb-4 flex items-center gap-4">
         <IconTile icon={User} tone="lime" size={56} />
-        <div>
-          <p className="font-extrabold text-[17px]">Cosfy guest</p>
-          <p className="text-[12px] text-white/60">Local guest account</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-extrabold text-[17px] truncate">
+            {user.displayName || user.email || user.phoneNumber || "Cosfy guest"}
+          </p>
+          <p className="text-[12px] text-white/60 truncate">
+            {user.email || user.phoneNumber || "Local guest account"}
+          </p>
         </div>
+        {!user.firebaseUid ? (
+          <PrimaryButton href="/sign-in" className="h-9 px-4 text-[13px] shrink-0">
+            Sign in
+          </PrimaryButton>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-6">

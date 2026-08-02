@@ -29,8 +29,8 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
   }
 
   function handleClose() {
-    reset();
     setOpen(false);
+    setTimeout(reset, 300);
   }
 
   function handleSubmit() {
