@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
+import { friendlyOpenAIError } from "@/lib/openai-error";
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
@@ -37,8 +38,7 @@ export async function POST(req: Request) {
   });
 
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    return NextResponse.json({ error: `OpenAI request failed: ${detail.slice(0, 200)}` }, { status: 502 });
+    return NextResponse.json({ error: await friendlyOpenAIError(res) }, { status: 502 });
   }
 
   const data = await res.json();

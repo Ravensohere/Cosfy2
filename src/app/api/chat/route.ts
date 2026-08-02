@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchFinanceNews, wantsLiveNews } from "@/lib/finance-news";
 import { getCurrentUser } from "@/lib/current-user";
+import { friendlyOpenAIError } from "@/lib/openai-error";
 
 const SYSTEM_PROMPT = `You are Cosfy's finance assistant, built into a personal budgeting app for India.
 Answer questions about budgeting, saving, spending habits, credit, taxes, and general market/finance concepts in short, plain language.
@@ -58,8 +59,7 @@ export async function POST(req: Request) {
   });
 
   if (!openaiRes.ok) {
-    const detail = await openaiRes.text().catch(() => "");
-    return NextResponse.json({ error: `OpenAI request failed: ${detail.slice(0, 200)}` }, { status: 502 });
+    return NextResponse.json({ error: await friendlyOpenAIError(openaiRes) }, { status: 502 });
   }
 
   const data = await openaiRes.json();

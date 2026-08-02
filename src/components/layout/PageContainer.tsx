@@ -16,7 +16,7 @@ export function PageContainer({
   navSpace?: boolean;
 }) {
   return (
-    <div className={`px-5 pt-6 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto ${navSpace ? "pb-28 md:pb-16" : "pb-8"}`}>
+    <div className={`px-5 pt-6 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto ${navSpace ? "pb-28" : "pb-8"}`}>
       {(title || backHref) && (
         <div className="flex items-center justify-between mb-5 md:mb-7 min-h-[36px]">
           <div className="flex items-center gap-3">

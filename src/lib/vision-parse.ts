@@ -1,3 +1,5 @@
+import { friendlyOpenAIError } from "@/lib/openai-error";
+
 export type VisionExpense = {
   amount: number;
   merchant: string;
@@ -32,7 +34,7 @@ export async function extractExpenseFromImage(apiKey: string, dataUrl: string): 
     }),
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await friendlyOpenAIError(res));
   const data = await res.json();
   const content = data?.choices?.[0]?.message?.content ?? "{}";
 

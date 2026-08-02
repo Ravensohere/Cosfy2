@@ -38,7 +38,7 @@ export default async function HomePage() {
   const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(now);
 
   return (
-    <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:pb-16 md:max-w-2xl md:mx-auto">
+    <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-[13px] text-cosfy-muted">Hi there</p>

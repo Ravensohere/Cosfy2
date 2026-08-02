@@ -1,3 +1,5 @@
+import { friendlyOpenAIError } from "@/lib/openai-error";
+
 export async function transcribeAudio(apiKey: string, file: File): Promise<string> {
   const form = new FormData();
   form.append("file", file);
@@ -9,7 +11,7 @@ export async function transcribeAudio(apiKey: string, file: File): Promise<strin
     body: form,
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await friendlyOpenAIError(res));
   const data = await res.json();
   return typeof data?.text === "string" ? data.text : "";
 }
