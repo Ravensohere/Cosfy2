@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Receipt } from "lucide-react";
+import { Receipt, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -7,18 +7,38 @@ import { StatCard } from "@/components/ui/StatCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
-import { QuickActionLink, QuickActionAddExpense } from "@/components/home/QuickActionButton";
+import { QuickActionLink } from "@/components/home/QuickActionButton";
 import Link from "next/link";
 
-export default async function HomePage() {
+function parseMonthParam(m: string | undefined) {
+  if (m && /^\d{4}-\d{2}$/.test(m)) {
+    const [year, month] = m.split("-").map(Number);
+    return new Date(year, month - 1, 1);
+  }
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
+function monthParam(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user.onboardingCompleted) {
     redirect("/onboarding/goal");
   }
 
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const { m } = await searchParams;
+  const monthStart = parseMonthParam(m);
+  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+  const isCurrentMonth = monthParam(monthStart) === monthParam(new Date());
+  const prevMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() - 1, 1);
+  const nextMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
 
   const [monthTransactions, recentTransactions] = await Promise.all([
     db.transaction.findMany({
@@ -35,7 +55,7 @@ export default async function HomePage() {
   const spent = monthTransactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const surplus = income - spent;
 
-  const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(now);
+  const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(monthStart);
 
   return (
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
@@ -46,8 +66,30 @@ export default async function HomePage() {
         </div>
       </div>
 
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <Link
+          href={`/home?m=${monthParam(prevMonth)}`}
+          aria-label="Previous month"
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-cosfy-card-soft text-cosfy-muted"
+        >
+          <ChevronLeft size={16} />
+        </Link>
+        <span className="text-[12px] font-semibold text-cosfy-muted min-w-[9ch] text-center">{monthLabel}</span>
+        {isCurrentMonth ? (
+          <span className="w-7 h-7" />
+        ) : (
+          <Link
+            href={`/home?m=${monthParam(nextMonth)}`}
+            aria-label="Next month"
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-cosfy-card-soft text-cosfy-muted"
+          >
+            <ChevronRight size={16} />
+          </Link>
+        )}
+      </div>
+
       <HeroCard>
-        <p className="text-[13px] text-white/70 mb-1">This month&apos;s spending · {monthLabel}</p>
+        <p className="text-[13px] text-white/70 mb-1">This month&apos;s spending</p>
         <MoneyAmount amount={spent} size="hero" className="text-white" />
       </HeroCard>
 
@@ -56,12 +98,9 @@ export default async function HomePage() {
         <StatCard label="Monthly surplus" amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-5 gap-2 mt-6">
+      <div className="grid grid-cols-2 gap-2 mt-6 max-w-[220px] mx-auto">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
-        <QuickActionAddExpense icon="Plus" label="Add" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
-        <QuickActionLink href="/goals" icon="Target" label="Goals" />
-        <QuickActionLink href="/chat" icon="MessageCircle" label="Ask AI" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">

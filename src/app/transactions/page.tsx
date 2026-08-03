@@ -4,18 +4,41 @@ import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
+import { MonthFilter } from "@/components/finance/MonthFilter";
 
-export default async function TransactionsPage() {
+export default async function TransactionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ m?: string }>;
+}) {
   const user = await getCurrentUser();
-  const transactions = await db.transaction.findMany({
+  const { m } = await searchParams;
+
+  const allTransactions = await db.transaction.findMany({
     where: { userId: user.id },
     orderBy: { date: "desc" },
   });
 
+  const months = Array.from(
+    new Set(allTransactions.map((t) => `${t.date.getFullYear()}-${String(t.date.getMonth() + 1).padStart(2, "0")}`))
+  ).sort((a, b) => (a < b ? 1 : -1));
+
+  const selectedMonth = m && months.includes(m) ? m : null;
+  const transactions = selectedMonth
+    ? allTransactions.filter(
+        (t) => `${t.date.getFullYear()}-${String(t.date.getMonth() + 1).padStart(2, "0")}` === selectedMonth
+      )
+    : allTransactions;
+
   return (
     <PageContainer title="Transactions" backHref="/home">
+      {months.length > 0 && <MonthFilter months={months} selected={selectedMonth} />}
       {transactions.length === 0 ? (
-        <EmptyState icon={Receipt} title="No transactions yet" description="Tap + on Home to add your first expense." />
+        <EmptyState
+          icon={Receipt}
+          title={selectedMonth ? "No transactions this month" : "No transactions yet"}
+          description="Tap + on Home to add your first expense."
+        />
       ) : (
         <div className="space-y-2.5">
           {transactions.map((t) => (
