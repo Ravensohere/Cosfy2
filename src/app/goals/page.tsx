@@ -1,4 +1,4 @@
-import { Plus, Target } from "lucide-react";
+import { Plus, Target, Calculator, MessageSquareText, CreditCard, Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -7,6 +7,7 @@ import { HeroCard } from "@/components/ui/HeroCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { GoalCard } from "@/components/finance/GoalCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { ToolLink } from "@/components/ui/ToolLink";
 
 export default async function GoalsPage() {
   const user = await getCurrentUser();
@@ -62,6 +63,16 @@ export default async function GoalsPage() {
           ))}
         </div>
       )}
+
+      <div className="mt-6">
+        <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
+        <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
+          <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
+          <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
+          <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />
+          <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
+        </div>
+      </div>
     </PageContainer>
   );
 }

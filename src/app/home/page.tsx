@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Receipt, ChevronRight, Calculator, MessageSquareText, CreditCard, Sparkles, type LucideIcon } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -73,16 +73,6 @@ export default async function HomePage() {
       </div>
 
       <div className="mt-6">
-        <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
-        <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
-          <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
-          <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
-          <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />
-          <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
-        </div>
-      </div>
-
-      <div className="mt-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-[15px] font-extrabold text-cosfy-ink">Recent activity</h2>
           {recentTransactions.length > 0 && (
@@ -94,7 +84,7 @@ export default async function HomePage() {
         {recentTransactions.length === 0 ? (
           <EmptyState icon={Receipt} title="No expenses yet" description="Tap + to add your first." />
         ) : (
-          <div className="divide-y divide-cosfy-border">
+          <div className="space-y-2.5">
             {recentTransactions.map((t) => (
               <TransactionRow
                 key={t.id}
@@ -109,15 +99,5 @@ export default async function HomePage() {
         )}
       </div>
     </div>
-  );
-}
-
-function ToolLink({ href, icon: Icon, label }: { href: string; icon: LucideIcon; label: string }) {
-  return (
-    <Link href={href} className="flex items-center gap-3 px-4 h-14">
-      <Icon size={18} className="text-cosfy-ink-soft shrink-0" strokeWidth={2} />
-      <span className="flex-1 text-[14px] font-semibold text-cosfy-ink">{label}</span>
-      <ChevronRight size={16} className="text-cosfy-muted shrink-0" />
-    </Link>
   );
 }

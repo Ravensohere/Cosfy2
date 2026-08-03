@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { QuickAddProvider } from "@/components/quick-add/QuickAddContext";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AppSplash } from "@/components/layout/AppSplash";
+import { FloatingChatButton } from "@/components/layout/FloatingChatButton";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="min-h-dvh bg-cosfy-bg">
         <AppSplash />
         {children}
+        <FloatingChatButton />
         <BottomNav />
       </div>
     </QuickAddProvider>

@@ -17,7 +17,7 @@ export default async function TransactionsPage() {
       {transactions.length === 0 ? (
         <EmptyState icon={Receipt} title="No transactions yet" description="Tap + on Home to add your first expense." />
       ) : (
-        <div className="divide-y divide-cosfy-border">
+        <div className="space-y-2.5">
           {transactions.map((t) => (
             <TransactionRow
               key={t.id}
