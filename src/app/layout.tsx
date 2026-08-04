@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
@@ -12,6 +12,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "cosfy",
   description: "Track spending, split bills, and build better money habits — built for India.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#C3E04A",
 };
 
 export default function RootLayout({
