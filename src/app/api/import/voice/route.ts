@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/current-user";
 import { transcribeAudio } from "@/lib/voice-transcribe";
 import { parseQuickAdd } from "@/lib/quick-add-parser";
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  const apiKey = user.openaiApiKey || process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Add your OpenAI API key in Profile to use voice import." },
+      { error: "Voice import isn't set up yet. Set GEMINI_API_KEY on the server." },
       { status: 503 }
     );
   }

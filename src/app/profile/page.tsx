@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { IconTile } from "@/components/ui/IconTile";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { ApiKeySettings } from "@/components/profile/ApiKeySettings";
 import { ProfileSettings } from "./ProfileSettings";
 
 export default async function ProfilePage() {
@@ -41,10 +40,6 @@ export default async function ProfilePage() {
         <StatTile label="Bills scanned" value={billsScanned} />
         <StatTile label="Groups" value={groupsCount} />
         <StatTile label="Added to goals" value={`₹${new Intl.NumberFormat("en-IN").format(Math.round(addedToGoals))}`} />
-      </div>
-
-      <div className="mb-3">
-        <ApiKeySettings keyPreview={user.openaiApiKey ? `sk-...${user.openaiApiKey.slice(-4)}` : null} />
       </div>
 
       <ProfileSettings notificationsEnabled={user.notificationsEnabled} />

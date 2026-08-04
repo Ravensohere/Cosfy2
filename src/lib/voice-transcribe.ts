@@ -1,17 +1,9 @@
-import { friendlyOpenAIError } from "@/lib/openai-error";
+import { callGeminiTranscribe } from "@/lib/gemini";
 
 export async function transcribeAudio(apiKey: string, file: File): Promise<string> {
-  const form = new FormData();
-  form.append("file", file);
-  form.append("model", "whisper-1");
+  const arrayBuffer = await file.arrayBuffer();
+  const base64Data = Buffer.from(arrayBuffer).toString("base64");
+  const mimeType = file.type || "audio/webm";
 
-  const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}` },
-    body: form,
-  });
-
-  if (!res.ok) throw new Error(await friendlyOpenAIError(res));
-  const data = await res.json();
-  return typeof data?.text === "string" ? data.text : "";
+  return callGeminiTranscribe({ apiKey, mimeType, base64Data });
 }

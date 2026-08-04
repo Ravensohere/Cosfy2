@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/current-user";
 import { extractExpenseFromImage } from "@/lib/vision-parse";
 import { guessCategory, guessPaymentMode } from "@/lib/quick-add-parser";
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  const apiKey = user.openaiApiKey || process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Add your OpenAI API key in Profile to use screenshot import." },
+      { error: "Screenshot import isn't set up yet. Set GEMINI_API_KEY on the server." },
       { status: 503 }
     );
   }
