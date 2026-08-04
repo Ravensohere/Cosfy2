@@ -41,7 +41,7 @@ async function fetchOneFeed(feed: { url: string; source: string }): Promise<News
   try {
     const res = await fetch(feed.url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; CosfyNewsBot/1.0)" },
-      next: { revalidate: 900 },
+      next: { revalidate: 1200 },
     });
     if (!res.ok) return [];
     const xml = await res.text();
