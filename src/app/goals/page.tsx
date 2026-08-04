@@ -1,4 +1,4 @@
-import { Plus, Target, Calculator, MessageSquareText, CreditCard, Sparkles } from "lucide-react";
+import { Plus, Target, Calculator, MessageSquareText, CreditCard, Sparkles, Newspaper } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -71,6 +71,7 @@ export default async function GoalsPage() {
           <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
           <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />
           <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
+          <ToolLink href="/news" icon={Newspaper} label="Finance news" />
         </div>
       </div>
     </PageContainer>

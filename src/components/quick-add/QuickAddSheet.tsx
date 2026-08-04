@@ -59,7 +59,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
     startTransition(async () => {
       const result = await createTransaction({
         amount: parsed.amount,
-        description: parsed.description,
+        description: parsed.description || (type === "income" ? "Income" : "Expense"),
         category: effectiveCategory,
         paymentMode: effectivePaymentMode,
       });

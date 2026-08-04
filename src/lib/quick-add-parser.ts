@@ -37,7 +37,7 @@ export function parseQuickAdd(text: string) {
 
   return {
     amount,
-    description: description || "Expense",
+    description,
     category: guessCategory(text),
     paymentMode: guessPaymentMode(text),
   };

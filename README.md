@@ -32,13 +32,15 @@ Open [http://localhost:3000](http://localhost:3000).
 
 `DATABASE_URL` / `DATABASE_URL_UNPOOLED` — Postgres (Neon), required.
 
-AI features need an OpenAI key. Either set it once in `.env.local`:
+Ask AI runs on **Google Gemini Flash** by default — set a free key once in `.env.local`:
 
 ```
-OPENAI_API_KEY=""
+GEMINI_API_KEY=""
 ```
 
-or have each user paste their own key in **Profile → OpenAI API key** — that's checked first, env var is the fallback.
+(free key at aistudio.google.com/apikey)
+
+If a user pastes their own key in **Profile → OpenAI API key**, that account's chats use OpenAI (`gpt-4o-mini`) instead. `OPENAI_API_KEY` in `.env.local` is an optional last-resort fallback if neither of the above is set.
 
 For live finance headlines in chat/insights, set a free Alpha Vantage key:
 

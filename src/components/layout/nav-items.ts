@@ -13,6 +13,7 @@ export const CORE_NAV_PREFIXES = [
   "/import",
   "/credit-cards",
   "/insights",
+  "/news",
 ];
 
 export const LEFT_NAV_ITEMS = [

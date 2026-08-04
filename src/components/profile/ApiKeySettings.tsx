@@ -37,7 +37,9 @@ export function ApiKeySettings({ keyPreview }: { keyPreview: string | null }) {
         <IconTile icon={KeyRound} tone="lime" size={44} />
         <div className="flex-1">
           <p className="font-bold text-[14px] text-cosfy-ink">OpenAI API key</p>
-          <p className="text-[12px] text-cosfy-muted">Powers the Ask AI chatbot. Stored on your account only.</p>
+          <p className="text-[12px] text-cosfy-muted">
+            Optional — Ask AI runs on Gemini Flash by default. Add your own OpenAI key to switch to GPT. Stored on your account only.
+          </p>
         </div>
       </div>
 

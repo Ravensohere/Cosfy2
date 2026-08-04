@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Receipt, ChevronLeft, ChevronRight } from "lucide-react";
+import { Receipt, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -8,6 +8,7 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
 import { QuickActionLink } from "@/components/home/QuickActionButton";
+import { fetchFinanceHeadlines } from "@/lib/news-feed";
 import Link from "next/link";
 
 function parseMonthParam(m: string | undefined) {
@@ -40,7 +41,7 @@ export default async function HomePage({
   const prevMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() - 1, 1);
   const nextMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
 
-  const [monthTransactions, recentTransactions] = await Promise.all([
+  const [monthTransactions, recentTransactions, headlines] = await Promise.all([
     db.transaction.findMany({
       where: { userId: user.id, date: { gte: monthStart, lt: monthEnd } },
     }),
@@ -49,6 +50,7 @@ export default async function HomePage({
       orderBy: { date: "desc" },
       take: 5,
     }),
+    fetchFinanceHeadlines(3),
   ]);
 
   const income = monthTransactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
@@ -137,6 +139,34 @@ export default async function HomePage({
           </div>
         )}
       </div>
+
+      {headlines.length > 0 && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-[15px] font-extrabold text-cosfy-ink">Finance news</h2>
+            <Link href="/news" className="text-[12px] font-semibold text-cosfy-lime-deep">
+              See all
+            </Link>
+          </div>
+          <div className="space-y-2.5">
+            {headlines.map((h, i) => (
+              <a
+                key={i}
+                href={h.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start justify-between gap-2 rounded-card bg-cosfy-card border border-cosfy-border p-3.5"
+              >
+                <div>
+                  <p className="text-[13px] font-semibold text-cosfy-ink leading-snug">{h.title}</p>
+                  <p className="text-[11px] text-cosfy-muted mt-1">{h.source}</p>
+                </div>
+                <ExternalLink size={14} className="text-cosfy-muted shrink-0 mt-0.5" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
