@@ -1,4 +1,4 @@
-const GEMINI_MODEL = "gemini-flash-latest";
+const GEMINI_MODEL = "gemini-3.5-flash-lite";
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
@@ -40,7 +40,7 @@ export async function callGemini({
   const data = await generate(apiKey, {
     systemInstruction: { parts: [{ text: systemPrompt }] },
     contents,
-    generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
+    generationConfig: { temperature: 0.4, maxOutputTokens: 600 },
   });
 
   return extractText(data) || "Sorry, I couldn't generate a reply.";
@@ -61,7 +61,7 @@ export async function callGeminiJSON({
 
   const data = await generate(apiKey, {
     contents: [{ role: "user", parts }],
-    generationConfig: { temperature: 0.2, maxOutputTokens: 200, responseMimeType: "application/json" },
+    generationConfig: { temperature: 0.2, maxOutputTokens: 300, responseMimeType: "application/json" },
   });
 
   return extractText(data) || "{}";
