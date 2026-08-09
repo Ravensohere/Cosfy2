@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sparkles, TriangleAlert } from "lucide-react";
+import { FormattedAIText } from "@/components/ui/FormattedAIText";
 
 export function InsightsPanel({
   thisMonth,
@@ -50,7 +51,7 @@ export function InsightsPanel({
 
       {isLoading ? <p className="text-[13px] text-white/70">Analysing your spending…</p> : null}
       {error ? <p className="text-[13px] text-white/70">{error}</p> : null}
-      {insights ? <p className="text-[13px] text-white/90 whitespace-pre-line leading-relaxed">{insights}</p> : null}
+      {insights ? <FormattedAIText text={insights} className="text-[13px] text-white/90" /> : null}
 
       {insights ? (
         <div className="mt-3 pt-3 border-t border-white/10 flex items-start gap-1.5 text-[11px] text-cosfy-lime">

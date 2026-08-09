@@ -81,8 +81,19 @@ export default async function HomePage({
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-[13px] text-cosfy-muted">{t("home.greeting")}</p>
-          <p className="text-[18px] font-extrabold text-cosfy-ink">{t("home.welcome")}</p>
+          {user.preferredName ? (
+            <>
+              <p className="text-[13px] text-cosfy-muted">{t("home.welcomeBack")}</p>
+              <p className="text-[18px] font-extrabold text-cosfy-ink">
+                {t("home.greetingNamed").replace("{name}", user.preferredName)}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[13px] text-cosfy-muted">{t("home.greeting")}</p>
+              <p className="text-[18px] font-extrabold text-cosfy-ink">{t("home.welcome")}</p>
+            </>
+          )}
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, TriangleAlert } from "lucide-react";
 import { Input } from "@/components/ui/Input";
+import { FormattedAIText } from "@/components/ui/FormattedAIText";
 import { cn } from "@/lib/cn";
 
 type Message = {
@@ -103,7 +104,7 @@ function ChatBubble({ message }: { message: Message }) {
           isUser ? "bg-cosfy-lime text-cosfy-lime-ink" : "bg-cosfy-card border border-cosfy-border text-cosfy-ink"
         )}
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        {isUser ? <p className="whitespace-pre-wrap">{message.content}</p> : <FormattedAIText text={message.content} />}
         {!isUser && message.content !== "Thinking…" ? (
           <div className="mt-2 pt-2 border-t border-cosfy-border flex items-start gap-1.5 text-[11px] text-cosfy-amber">
             <TriangleAlert size={13} className="mt-[1px] shrink-0" />

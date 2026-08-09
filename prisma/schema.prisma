@@ -39,6 +39,10 @@ model User {
   // language preference
   language String @default("en")
 
+  // post-login personalization
+  preferredName String?
+  age           Int?
+
   transactions      Transaction[]
   groups            Group[]
   budgets           Budget[]

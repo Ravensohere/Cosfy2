@@ -8,6 +8,7 @@ import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { RoundUpSettingsCard } from "@/components/profile/RoundUpSettingsCard";
 import { AppLockSettingsCard } from "@/components/profile/AppLockSettingsCard";
 import { LanguageSettingsCard } from "@/components/profile/LanguageSettingsCard";
+import { PersonalizationSettingsCard } from "@/components/profile/PersonalizationSettingsCard";
 import { updateNotificationsPref, deleteAccount } from "@/lib/actions/profile";
 
 export function ProfileSettings({
@@ -17,6 +18,8 @@ export function ProfileSettings({
   roundUpGoalId,
   goals,
   appLockEnabled,
+  preferredName,
+  age,
 }: {
   notificationsEnabled: boolean;
   roundUpEnabled: boolean;
@@ -24,6 +27,8 @@ export function ProfileSettings({
   roundUpGoalId: string | null;
   goals: { id: string; name: string }[];
   appLockEnabled: boolean;
+  preferredName: string | null;
+  age: number | null;
 }) {
   const [notifications, setNotifications] = useState(notificationsEnabled);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -40,6 +45,8 @@ export function ProfileSettings({
 
   return (
     <div className="space-y-3">
+      <PersonalizationSettingsCard preferredName={preferredName} age={age} />
+
       <div className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
         <IconTile icon={Bell} tone="lime" size={44} />
         <div className="flex-1">

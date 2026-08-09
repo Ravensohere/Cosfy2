@@ -23,7 +23,7 @@ export default async function ProfilePage() {
         <IconTile icon={User} tone="lime" size={56} />
         <div className="flex-1 min-w-0">
           <p className="font-extrabold text-[17px] truncate">
-            {user.displayName || user.email || user.phoneNumber || "Cosfy guest"}
+            {user.preferredName || user.displayName || user.email || user.phoneNumber || "Cosfy guest"}
           </p>
           <p className="text-[12px] text-white/60 truncate">
             {user.email || user.phoneNumber || "Local guest account"}
@@ -49,6 +49,8 @@ export default async function ProfilePage() {
         roundUpGoalId={user.roundUpGoalId}
         goals={goals.map((g) => ({ id: g.id, name: g.name }))}
         appLockEnabled={user.appLockEnabled}
+        preferredName={user.preferredName}
+        age={user.age}
       />
     </PageContainer>
   );

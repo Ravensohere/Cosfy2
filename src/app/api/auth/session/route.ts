@@ -26,6 +26,8 @@ export async function POST(req: Request) {
   }
 
   const user = await getCurrentUser();
+  const needsPersonalization = !user.preferredName;
+
   await db.user.update({
     where: { id: user.id },
     data: {
@@ -37,5 +39,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, needsPersonalization });
 }

@@ -9,6 +9,8 @@ const en = {
 
   "home.greeting": "Hi there",
   "home.welcome": "Welcome to Cosfy",
+  "home.welcomeBack": "Welcome back",
+  "home.greetingNamed": "Hi, {name}",
   "home.spending": "This month's spending",
   "home.income": "Income",
   "home.surplus": "Monthly surplus",
@@ -33,6 +35,8 @@ const hi: Record<keyof typeof en, string> = {
 
   "home.greeting": "नमस्ते",
   "home.welcome": "Cosfy में आपका स्वागत है",
+  "home.welcomeBack": "वापसी पर स्वागत है",
+  "home.greetingNamed": "नमस्ते, {name}",
   "home.spending": "इस महीने का खर्च",
   "home.income": "आय",
   "home.surplus": "मासिक बचत",
