@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
+import { friendlyFirebaseError } from "@/lib/firebase-error";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 
 export function GoogleSignInButton() {
@@ -35,8 +36,8 @@ export function GoogleSignInButton() {
       }
       router.push("/home");
       router.refresh();
-    } catch {
-      setError("Google sign-in was cancelled or failed.");
+    } catch (err) {
+      setError(friendlyFirebaseError(err, "Google sign-in was cancelled or failed."));
     } finally {
       setIsPending(false);
     }

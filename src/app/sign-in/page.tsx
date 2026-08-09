@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
+import { friendlyFirebaseError } from "@/lib/firebase-error";
 import { Input } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -57,8 +58,8 @@ export default function SignInPage() {
       }
       router.push("/home");
       router.refresh();
-    } catch {
-      setError(mode === "signin" ? "Wrong email or password." : "Couldn't create that account.");
+    } catch (err) {
+      setError(friendlyFirebaseError(err, mode === "signin" ? "Wrong email or password." : "Couldn't create that account."));
     } finally {
       setIsPending(false);
     }

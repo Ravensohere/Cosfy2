@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
+import { friendlyFirebaseError } from "@/lib/firebase-error";
 import { Input } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { OtpInput } from "@/components/auth/OtpInput";
@@ -36,8 +37,8 @@ export function PhoneSignInFlow() {
       const fullNumber = `+91${digits.slice(-10)}`;
       confirmationRef.current = await signInWithPhoneNumber(auth, fullNumber, verifier);
       setStep("otp");
-    } catch {
-      setError("Couldn't send the code. Check the number and try again.");
+    } catch (err) {
+      setError(friendlyFirebaseError(err, "Couldn't send the code. Check the number and try again."));
     } finally {
       setIsPending(false);
     }
@@ -66,8 +67,8 @@ export function PhoneSignInFlow() {
       }
       router.push("/home");
       router.refresh();
-    } catch {
-      setError("That code didn't match. Try again.");
+    } catch (err) {
+      setError(friendlyFirebaseError(err, "That code didn't match. Try again."));
     } finally {
       setIsPending(false);
     }
