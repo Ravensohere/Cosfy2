@@ -6,18 +6,42 @@ import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel, Select } from "@/components/ui/Input";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { BUDGET_TYPES, CATEGORIES, type CategoryValue } from "@/lib/constants";
+import { BUDGET_TYPES, CATEGORIES, BUDGET_PRESETS, type CategoryValue } from "@/lib/constants";
 import { createBudget } from "@/lib/actions/budgets";
 
 const ALERT_THRESHOLDS = [50, 80, 100];
+
+function toDateInput(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
 
 export default function CreateBudgetPage() {
   const [type, setType] = useState<(typeof BUDGET_TYPES)[number]>("Monthly");
   const [category, setCategory] = useState<CategoryValue>("Food");
   const [amount, setAmount] = useState("");
   const [alertThreshold, setAlertThreshold] = useState(80);
+  const [preset, setPreset] = useState<(typeof BUDGET_PRESETS)[number]["value"] | "none">("none");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  function applyPreset(value: (typeof BUDGET_PRESETS)[number]["value"]) {
+    setPreset(value);
+    const config = BUDGET_PRESETS.find((p) => p.value === value);
+    if (!config || value === "custom") {
+      setStartDate(toDateInput(new Date()));
+      const custom = new Date();
+      custom.setMonth(custom.getMonth() + 1);
+      setEndDate(toDateInput(custom));
+      return;
+    }
+    const start = new Date();
+    const end = new Date();
+    end.setMonth(end.getMonth() + config.months);
+    setStartDate(toDateInput(start));
+    setEndDate(toDateInput(end));
+  }
 
   function handleSave() {
     setError(null);
@@ -32,6 +56,8 @@ export default function CreateBudgetPage() {
         category: type === "Category" ? category : undefined,
         amount: numericAmount,
         alertThreshold,
+        startDate: preset !== "none" && startDate ? new Date(startDate) : undefined,
+        endDate: preset !== "none" && endDate ? new Date(endDate) : undefined,
       });
       if (result && !result.ok) {
         setError(result.error);
@@ -86,6 +112,32 @@ export default function CreateBudgetPage() {
               </PillChip>
             ))}
           </div>
+        </div>
+
+        <div>
+          <FieldLabel>Seasonal budget (optional)</FieldLabel>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <PillChip variant={preset === "none" ? "active" : "inactive"} onClick={() => setPreset("none")}>
+              Open-ended
+            </PillChip>
+            {BUDGET_PRESETS.map((p) => (
+              <PillChip key={p.value} variant={preset === p.value ? "active" : "inactive"} onClick={() => applyPreset(p.value)}>
+                {p.label}
+              </PillChip>
+            ))}
+          </div>
+          {preset !== "none" ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <FieldLabel>Starts</FieldLabel>
+                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              </div>
+              <div>
+                <FieldLabel>Ends</FieldLabel>
+                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4 opacity-60">

@@ -13,6 +13,8 @@ const createBudgetSchema = z
     category: z.enum(CATEGORIES).optional(),
     amount: z.number().positive("Enter an amount greater than 0"),
     alertThreshold: z.number().int().min(1).max(100).default(80),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
   })
   .refine((data) => data.type !== "Category" || !!data.category, {
     message: "Pick a category",
@@ -28,7 +30,7 @@ export async function createBudget(input: CreateBudgetInput) {
   }
 
   const user = await getCurrentUser();
-  const { type, category, amount, alertThreshold } = parsed.data;
+  const { type, category, amount, alertThreshold, startDate, endDate } = parsed.data;
 
   await db.budget.create({
     data: {
@@ -37,6 +39,8 @@ export async function createBudget(input: CreateBudgetInput) {
       category: type === "Category" ? category : null,
       amount,
       alertThreshold,
+      startDate,
+      endDate,
     },
   });
 

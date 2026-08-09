@@ -13,6 +13,12 @@ export async function updateNotificationsPref(enabled: boolean) {
   revalidatePath("/profile");
 }
 
+export async function updateLanguagePref(language: "en" | "hi") {
+  const user = await getCurrentUser();
+  await db.user.update({ where: { id: user.id }, data: { language } });
+  revalidatePath("/", "layout");
+}
+
 export async function deleteAccount() {
   const user = await getCurrentUser();
 
@@ -20,6 +26,11 @@ export async function deleteAccount() {
   await db.budget.deleteMany({ where: { userId: user.id } });
   await db.goal.deleteMany({ where: { userId: user.id } });
   await db.group.deleteMany({ where: { userId: user.id } });
+  await db.creditCard.deleteMany({ where: { userId: user.id } });
+  await db.loan.deleteMany({ where: { userId: user.id } });
+  await db.insurancePolicy.deleteMany({ where: { userId: user.id } });
+  await db.subscription.deleteMany({ where: { userId: user.id } });
+  await db.goldHolding.deleteMany({ where: { userId: user.id } });
   await db.user.delete({ where: { id: user.id } });
 
   const cookieStore = await cookies();

@@ -22,39 +22,126 @@ model User {
   authProvider         String?
   createdAt            DateTime @default(now())
 
-  transactions Transaction[]
-  groups       Group[]
-  budgets      Budget[]
-  goals        Goal[]
-  creditCards  CreditCard[]
+  // net worth — manual inputs (no live account-aggregation integration)
+  bankBalance      Float?
+  otherInvestments Float?
+  epfBalance       Float?
+
+  // round-up savings
+  roundUpEnabled   Boolean @default(false)
+  roundUpIncrement Int     @default(10)
+  roundUpGoalId    String?
+
+  // app lock
+  appLockEnabled Boolean @default(false)
+  appLockPinHash String?
+
+  // language preference
+  language String @default("en")
+
+  transactions      Transaction[]
+  groups            Group[]
+  budgets           Budget[]
+  goals             Goal[]
+  creditCards       CreditCard[]
+  loans             Loan[]
+  insurancePolicies InsurancePolicy[]
+  subscriptions     Subscription[]
+  goldHoldings      GoldHolding[]
 }
 
 model CreditCard {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  name         String
-  bank         String?
-  last4        String?
-  statementDay Int
-  dueDay       Int
-  currentDue   Float    @default(0)
-  createdAt    DateTime @default(now())
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  name                String
+  bank                String?
+  last4               String?
+  statementDay        Int
+  dueDay              Int
+  currentDue          Float    @default(0)
+  rewardPointsBalance Int?
+  cashbackYtd         Float?
+  createdAt           DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Loan {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id])
+  name                 String
+  lender               String?
+  principal            Float
+  interestRate         Float
+  tenureMonths         Int
+  emiAmount            Float
+  startDate            DateTime
+  dueDay               Int
+  outstandingPrincipal Float
+  createdAt            DateTime @default(now())
+
+  @@index([userId])
+}
+
+model InsurancePolicy {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  type            String
+  provider        String?
+  policyName      String
+  premiumAmount   Float
+  frequency       String
+  nextRenewalDate DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  name            String
+  amount          Float
+  cycle           String
+  category        String?
+  nextRenewalDate DateTime
+  source          String   @default("manual")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+model GoldHolding {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  type          String
+  grams         Float
+  purchasePrice Float
+  purchaseDate  DateTime
+  currentValue  Float
+  createdAt     DateTime @default(now())
 
   @@index([userId])
 }
 
 model Transaction {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  amount      Float
-  description String
-  category    String
-  paymentMode String
-  date        DateTime @default(now())
-  source      String   @default("manual")
-  createdAt   DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  amount         Float
+  description    String
+  category       String
+  paymentMode    String
+  date           DateTime @default(now())
+  source         String   @default("manual")
+  roundUpClaimed Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
   @@index([userId, date])
 }
@@ -69,8 +156,8 @@ model Group {
   isOneTime    Boolean  @default(false)
   createdAt    DateTime @default(now())
 
-  members    GroupMember[]
-  expenses   GroupExpense[]
+  members     GroupMember[]
+  expenses    GroupExpense[]
   settlements Settlement[]
 
   @@index([userId])
@@ -84,24 +171,24 @@ model GroupMember {
   isCurrentUser Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  paidExpenses GroupExpense[]  @relation("PaidBy")
-  splits       ExpenseSplit[]
-  settlementsFrom Settlement[] @relation("SettleFrom")
-  settlementsTo   Settlement[] @relation("SettleTo")
+  paidExpenses    GroupExpense[] @relation("PaidBy")
+  splits          ExpenseSplit[]
+  settlementsFrom Settlement[]   @relation("SettleFrom")
+  settlementsTo   Settlement[]   @relation("SettleTo")
 
   @@index([groupId])
 }
 
 model GroupExpense {
-  id            String       @id @default(cuid())
-  groupId       String
-  group         Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  description   String
-  totalAmount   Float
+  id             String      @id @default(cuid())
+  groupId        String
+  group          Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  description    String
+  totalAmount    Float
   paidByMemberId String
-  paidByMember  GroupMember  @relation("PaidBy", fields: [paidByMemberId], references: [id])
-  splitType     String       @default("Equal")
-  createdAt     DateTime     @default(now())
+  paidByMember   GroupMember @relation("PaidBy", fields: [paidByMemberId], references: [id])
+  splitType      String      @default("Equal")
+  createdAt      DateTime    @default(now())
 
   splits ExpenseSplit[]
 
@@ -120,29 +207,31 @@ model ExpenseSplit {
 }
 
 model Settlement {
-  id             String      @id @default(cuid())
-  groupId        String
-  group          Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  fromMemberId   String
-  fromMember     GroupMember @relation("SettleFrom", fields: [fromMemberId], references: [id])
-  toMemberId     String
-  toMember       GroupMember @relation("SettleTo", fields: [toMemberId], references: [id])
-  amount         Float
-  note           String?
-  createdAt      DateTime    @default(now())
+  id           String      @id @default(cuid())
+  groupId      String
+  group        Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromMemberId String
+  fromMember   GroupMember @relation("SettleFrom", fields: [fromMemberId], references: [id])
+  toMemberId   String
+  toMember     GroupMember @relation("SettleTo", fields: [toMemberId], references: [id])
+  amount       Float
+  note         String?
+  createdAt    DateTime    @default(now())
 
   @@index([groupId])
 }
 
 model Budget {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   userId         String
-  user           User     @relation(fields: [userId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
   type           String
   category       String?
   amount         Float
-  alertThreshold Int      @default(80)
-  createdAt      DateTime @default(now())
+  alertThreshold Int       @default(80)
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime  @default(now())
 
   @@index([userId])
 }

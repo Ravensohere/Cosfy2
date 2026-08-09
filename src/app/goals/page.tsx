@@ -1,4 +1,18 @@
-import { Plus, Target, Calculator, MessageSquareText, CreditCard, Sparkles, Newspaper } from "lucide-react";
+import {
+  Plus,
+  Target,
+  Calculator,
+  MessageSquareText,
+  CreditCard,
+  Sparkles,
+  Newspaper,
+  Landmark,
+  ShieldCheck,
+  Repeat,
+  Coins,
+  TrendingUp,
+  CalendarDays,
+} from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -8,6 +22,8 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { GoalCard } from "@/components/finance/GoalCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ToolLink } from "@/components/ui/ToolLink";
+import { SweepRoundUpsCard } from "@/components/profile/SweepRoundUpsCard";
+import { getUnclaimedRoundUpTotal } from "@/lib/actions/round-up";
 
 export default async function GoalsPage() {
   const user = await getCurrentUser();
@@ -18,6 +34,12 @@ export default async function GoalsPage() {
   });
 
   const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
+
+  const sweepTargetGoal = goals.find((g) => g.id === user.roundUpGoalId) ?? goals[0];
+  const unclaimedRoundUp =
+    user.roundUpEnabled && sweepTargetGoal
+      ? await getUnclaimedRoundUpTotal(user.id, user.roundUpIncrement)
+      : null;
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -64,9 +86,25 @@ export default async function GoalsPage() {
         </div>
       )}
 
+      {unclaimedRoundUp && sweepTargetGoal ? (
+        <div className="mt-4">
+          <SweepRoundUpsCard
+            goalId={sweepTargetGoal.id}
+            goalName={sweepTargetGoal.name}
+            unclaimedTotal={unclaimedRoundUp.total}
+          />
+        </div>
+      ) : null}
+
       <div className="mt-6">
         <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
         <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
+          <ToolLink href="/net-worth" icon={TrendingUp} label="Net worth" />
+          <ToolLink href="/calendar" icon={CalendarDays} label="Cash-flow calendar" />
+          <ToolLink href="/loans" icon={Landmark} label="Loans & EMIs" />
+          <ToolLink href="/insurance" icon={ShieldCheck} label="Insurance" />
+          <ToolLink href="/subscriptions" icon={Repeat} label="Subscriptions" />
+          <ToolLink href="/gold" icon={Coins} label="Gold" />
           <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
           <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
           <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />

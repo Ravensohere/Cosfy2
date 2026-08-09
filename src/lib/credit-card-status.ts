@@ -16,8 +16,8 @@ function startOfDay(date: Date): Date {
 
 export type DueUrgency = "overdue" | "soon" | "upcoming" | "paid";
 
-export function dueUrgency(daysLeft: number, currentDue: number): DueUrgency {
-  if (currentDue <= 0) return "paid";
+export function dueUrgency(daysLeft: number, amountDue: number): DueUrgency {
+  if (amountDue <= 0) return "paid";
   if (daysLeft < 0) return "overdue";
   if (daysLeft <= 3) return "soon";
   return "upcoming";

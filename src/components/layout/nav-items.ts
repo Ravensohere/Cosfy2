@@ -14,16 +14,22 @@ export const CORE_NAV_PREFIXES = [
   "/credit-cards",
   "/insights",
   "/news",
+  "/loans",
+  "/insurance",
+  "/subscriptions",
+  "/gold",
+  "/net-worth",
+  "/calendar",
 ];
 
 export const LEFT_NAV_ITEMS = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/budgets", label: "Expenses", icon: Wallet },
+  { href: "/home", labelKey: "nav.home" as const, icon: Home },
+  { href: "/budgets", labelKey: "nav.expenses" as const, icon: Wallet },
 ];
 
 export const RIGHT_NAV_ITEMS = [
-  { href: "/goals", label: "Goals", icon: Target },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/goals", labelKey: "nav.goals" as const, icon: Target },
+  { href: "/profile", labelKey: "nav.profile" as const, icon: User },
 ];
 
 export function isCoreRoute(pathname: string) {

@@ -8,12 +8,16 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { BudgetCard } from "@/components/finance/BudgetCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { PastBudgetsToggle } from "@/components/finance/PastBudgetsToggle";
 
 export default async function BudgetsPage() {
   const user = await getCurrentUser();
-  const budgets = await db.budget.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" } });
+  const allBudgets = await db.budget.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" } });
 
   const now = new Date();
+  const budgets = allBudgets.filter((b) => !b.endDate || b.endDate >= now);
+  const pastBudgets = allBudgets.filter((b) => b.endDate && b.endDate < now);
+
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -79,10 +83,31 @@ export default async function BudgetsPage() {
               category={b.category}
               spent={otherSpent[i]}
               limit={b.amount}
+              dateRangeLabel={
+                b.startDate && b.endDate
+                  ? `${b.startDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} – ${b.endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`
+                  : undefined
+              }
             />
           ))}
         </div>
       )}
+
+      {pastBudgets.length > 0 ? (
+        <div className="mt-6">
+          <PastBudgetsToggle
+            budgets={pastBudgets.map((b) => ({
+              id: b.id,
+              title: b.type === "Category" ? `${b.category}` : b.type === "Weekly" ? "Weekly budget" : "Monthly budget",
+              amount: b.amount,
+              dateRangeLabel:
+                b.startDate && b.endDate
+                  ? `${b.startDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} – ${b.endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`
+                  : "",
+            }))}
+          />
+        </div>
+      ) : null}
     </PageContainer>
   );
 }

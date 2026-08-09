@@ -10,11 +10,13 @@ export function BudgetCard({
   category,
   spent,
   limit,
+  dateRangeLabel,
 }: {
   title: string;
   category?: string | null;
   spent: number;
   limit: number;
+  dateRangeLabel?: string;
 }) {
   const iconName = category ? CATEGORY_ICON[category as CategoryValue] : "Wallet";
   const Icon = (Icons[iconName as keyof typeof Icons] ?? Icons.Wallet) as LucideIcon;
@@ -24,7 +26,10 @@ export function BudgetCard({
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 shadow-soft">
       <div className="flex items-center gap-3 mb-3">
         <IconTile icon={Icon} tone="soft" size={40} />
-        <p className="font-bold text-[14px] text-cosfy-ink flex-1">{title}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-[14px] text-cosfy-ink truncate">{title}</p>
+          {dateRangeLabel ? <p className="text-[11px] text-cosfy-lime-deep font-semibold">{dateRangeLabel}</p> : null}
+        </div>
       </div>
       <div className="flex items-baseline justify-between mb-2">
         <MoneyAmount amount={spent} size="md" className={overBudget ? "text-cosfy-red" : undefined} />

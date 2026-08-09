@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import { useQuickAdd } from "@/components/quick-add/QuickAddContext";
 import { LEFT_NAV_ITEMS, RIGHT_NAV_ITEMS, isCoreRoute } from "@/components/layout/nav-items";
+import { useT } from "@/lib/i18n/LanguageProvider";
 import { cn } from "@/lib/cn";
 
 export function BottomNav() {
   const pathname = usePathname();
   const { openQuickAdd } = useQuickAdd();
+  const { t } = useT();
 
   if (!isCoreRoute(pathname)) return null;
 
@@ -17,7 +19,13 @@ export function BottomNav() {
     <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm mb-[env(safe-area-inset-bottom)]">
       <div className="flex items-end justify-between bg-cosfy-card rounded-full shadow-soft border border-cosfy-border px-3 pb-2.5 h-[70px]">
         {LEFT_NAV_ITEMS.map((item) => (
-          <NavLink key={item.href} {...item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={t(item.labelKey)}
+            active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+          />
         ))}
 
         <button
@@ -30,7 +38,13 @@ export function BottomNav() {
         </button>
 
         {RIGHT_NAV_ITEMS.map((item) => (
-          <NavLink key={item.href} {...item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={t(item.labelKey)}
+            active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+          />
         ))}
       </div>
     </nav>

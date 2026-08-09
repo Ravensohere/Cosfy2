@@ -10,6 +10,7 @@ import { CATEGORIES, PAYMENT_MODES, CATEGORY_ICON, type CategoryValue, type Paym
 import { createTransaction } from "@/lib/actions/transactions";
 import { parseQuickAdd } from "@/lib/quick-add-parser";
 import { resolveIcon } from "@/lib/resolve-icon";
+import { useT } from "@/lib/i18n/LanguageProvider";
 
 const EXPENSE_CATEGORIES = CATEGORIES.filter((c) => c !== "Income");
 type EntryType = "expense" | "income";
@@ -22,6 +23,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useT();
 
   const parsed = useMemo(() => parseQuickAdd(text), [text]);
   const effectiveCategory = type === "income" ? "Income" : category ?? parsed.category;
@@ -72,14 +74,14 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
   }
 
   return (
-    <BottomSheet open={open} onClose={handleClose} title={type === "income" ? "Add income" : "Add expense"}>
+    <BottomSheet open={open} onClose={handleClose} title={type === "income" ? t("quickAdd.addIncome") : t("quickAdd.addExpense")}>
       <div className="space-y-4">
         <div className="flex gap-2">
           <PillChip variant={type === "expense" ? "active" : "inactive"} onClick={() => selectType("expense")}>
-            Expense
+            {t("quickAdd.expense")}
           </PillChip>
           <PillChip variant={type === "income" ? "active" : "inactive"} onClick={() => selectType("income")}>
-            Income
+            {t("quickAdd.income")}
           </PillChip>
         </div>
 
@@ -126,7 +128,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
 
         {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
         <PrimaryButton fullWidth type="button" disabled={isPending} onClick={handleSubmit}>
-          {isPending ? "Adding…" : type === "income" ? "Add income" : "Add expense"}
+          {isPending ? t("quickAdd.adding") : type === "income" ? t("quickAdd.addIncome") : t("quickAdd.addExpense")}
         </PrimaryButton>
       </div>
     </BottomSheet>

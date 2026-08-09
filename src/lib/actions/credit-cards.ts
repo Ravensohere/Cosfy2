@@ -16,6 +16,8 @@ const createCardSchema = z.object({
   statementDay: z.number().int().min(1).max(31),
   dueDay: z.number().int().min(1).max(31),
   currentDue: z.number().min(0),
+  rewardPointsBalance: z.number().int().min(0).optional(),
+  cashbackYtd: z.number().min(0).optional(),
 });
 
 export type CreateCreditCardInput = z.infer<typeof createCardSchema>;
@@ -35,6 +37,16 @@ export async function createCreditCard(input: CreateCreditCardInput) {
 export async function updateCreditCardDue(id: string, currentDue: number) {
   const user = await getCurrentUser();
   await db.creditCard.updateMany({ where: { id, userId: user.id }, data: { currentDue } });
+  revalidatePath("/credit-cards");
+  return { ok: true as const };
+}
+
+export async function updateCreditCardRewards(id: string, rewardPointsBalance: number, cashbackYtd: number) {
+  const user = await getCurrentUser();
+  await db.creditCard.updateMany({
+    where: { id, userId: user.id },
+    data: { rewardPointsBalance, cashbackYtd },
+  });
   revalidatePath("/credit-cards");
   return { ok: true as const };
 }

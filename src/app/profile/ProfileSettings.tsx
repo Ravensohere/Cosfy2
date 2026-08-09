@@ -5,9 +5,26 @@ import { Bell, Trash2 } from "lucide-react";
 import { IconTile } from "@/components/ui/IconTile";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
+import { RoundUpSettingsCard } from "@/components/profile/RoundUpSettingsCard";
+import { AppLockSettingsCard } from "@/components/profile/AppLockSettingsCard";
+import { LanguageSettingsCard } from "@/components/profile/LanguageSettingsCard";
 import { updateNotificationsPref, deleteAccount } from "@/lib/actions/profile";
 
-export function ProfileSettings({ notificationsEnabled }: { notificationsEnabled: boolean }) {
+export function ProfileSettings({
+  notificationsEnabled,
+  roundUpEnabled,
+  roundUpIncrement,
+  roundUpGoalId,
+  goals,
+  appLockEnabled,
+}: {
+  notificationsEnabled: boolean;
+  roundUpEnabled: boolean;
+  roundUpIncrement: number;
+  roundUpGoalId: string | null;
+  goals: { id: string; name: string }[];
+  appLockEnabled: boolean;
+}) {
   const [notifications, setNotifications] = useState(notificationsEnabled);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -31,6 +48,17 @@ export function ProfileSettings({ notificationsEnabled }: { notificationsEnabled
         </div>
         <ToggleSwitch checked={notifications} onChange={handleToggle} />
       </div>
+
+      <RoundUpSettingsCard
+        roundUpEnabled={roundUpEnabled}
+        roundUpIncrement={roundUpIncrement}
+        roundUpGoalId={roundUpGoalId}
+        goals={goals}
+      />
+
+      <AppLockSettingsCard appLockEnabled={appLockEnabled} />
+
+      <LanguageSettingsCard />
 
       <div className="rounded-card bg-cosfy-red-soft border border-cosfy-red/20 p-4">
         <div className="flex items-center gap-3 mb-3">

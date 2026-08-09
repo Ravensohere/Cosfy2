@@ -15,6 +15,8 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
   const [statementDay, setStatementDay] = useState("1");
   const [dueDay, setDueDay] = useState("15");
   const [currentDue, setCurrentDue] = useState("");
+  const [rewardPointsBalance, setRewardPointsBalance] = useState("");
+  const [cashbackYtd, setCashbackYtd] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -25,6 +27,8 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
     setStatementDay("1");
     setDueDay("15");
     setCurrentDue("");
+    setRewardPointsBalance("");
+    setCashbackYtd("");
     setError(null);
   }
 
@@ -43,6 +47,8 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
         statementDay: parseInt(statementDay, 10) || 1,
         dueDay: parseInt(dueDay, 10) || 1,
         currentDue: parseFloat(currentDue) || 0,
+        rewardPointsBalance: rewardPointsBalance.trim() ? parseInt(rewardPointsBalance, 10) : undefined,
+        cashbackYtd: cashbackYtd.trim() ? parseFloat(cashbackYtd) : undefined,
       });
       if (!result.ok) {
         setError(result.error ?? "Couldn't add card");
@@ -98,6 +104,21 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
           <div>
             <FieldLabel>Current amount due (optional)</FieldLabel>
             <Input type="number" placeholder="0" value={currentDue} onChange={(e) => setCurrentDue(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <FieldLabel>Reward points (optional)</FieldLabel>
+              <Input
+                type="number"
+                placeholder="0"
+                value={rewardPointsBalance}
+                onChange={(e) => setRewardPointsBalance(e.target.value)}
+              />
+            </div>
+            <div>
+              <FieldLabel>Cashback YTD (optional)</FieldLabel>
+              <Input type="number" placeholder="0" value={cashbackYtd} onChange={(e) => setCashbackYtd(e.target.value)} />
+            </div>
           </div>
           {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
           <PrimaryButton fullWidth type="button" disabled={isPending || !name.trim()} onClick={handleSubmit}>

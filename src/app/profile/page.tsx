@@ -42,7 +42,14 @@ export default async function ProfilePage() {
         <StatTile label="Added to goals" value={`₹${new Intl.NumberFormat("en-IN").format(Math.round(addedToGoals))}`} />
       </div>
 
-      <ProfileSettings notificationsEnabled={user.notificationsEnabled} />
+      <ProfileSettings
+        notificationsEnabled={user.notificationsEnabled}
+        roundUpEnabled={user.roundUpEnabled}
+        roundUpIncrement={user.roundUpIncrement}
+        roundUpGoalId={user.roundUpGoalId}
+        goals={goals.map((g) => ({ id: g.id, name: g.name }))}
+        appLockEnabled={user.appLockEnabled}
+      />
     </PageContainer>
   );
 }

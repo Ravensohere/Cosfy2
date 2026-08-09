@@ -53,3 +53,17 @@ export const CATEGORY_ICON: Record<CategoryValue, string> = {
   Other: "Receipt",
   Income: "TrendingUp",
 };
+
+export const INSURANCE_TYPES = ["Life", "Health", "Vehicle", "Other"] as const;
+export const INSURANCE_FREQUENCIES = ["Monthly", "Quarterly", "HalfYearly", "Yearly"] as const;
+
+export const SUBSCRIPTION_CYCLES = ["Weekly", "Monthly", "Yearly"] as const;
+
+export const GOLD_TYPES = ["Physical", "Digital", "SGB"] as const;
+
+export const BUDGET_PRESETS = [
+  { value: "diwali", label: "Diwali season", months: 1 },
+  { value: "wedding", label: "Wedding season", months: 2 },
+  { value: "exam", label: "Exam season", months: 3 },
+  { value: "custom", label: "Custom range", months: 1 },
+] as const;

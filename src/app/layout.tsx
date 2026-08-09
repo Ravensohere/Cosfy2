@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
+import { AppLockGate } from "@/components/layout/AppLockGate";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import "./globals.css";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full">
         <ServiceWorkerRegister />
-        <AppShell>{children}</AppShell>
+        <AppLockGate>
+          <AppShell>{children}</AppShell>
+        </AppLockGate>
       </body>
     </html>
   );
