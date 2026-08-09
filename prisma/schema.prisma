@@ -164,12 +164,13 @@ model Group {
 }
 
 model GroupMember {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   groupId       String
-  group         Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group         Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   name          String
-  isCurrentUser Boolean  @default(false)
-  createdAt     DateTime @default(now())
+  isCurrentUser Boolean   @default(false)
+  removedAt     DateTime?
+  createdAt     DateTime  @default(now())
 
   paidExpenses    GroupExpense[] @relation("PaidBy")
   splits          ExpenseSplit[]
@@ -186,7 +187,7 @@ model GroupExpense {
   description    String
   totalAmount    Float
   paidByMemberId String
-  paidByMember   GroupMember @relation("PaidBy", fields: [paidByMemberId], references: [id])
+  paidByMember   GroupMember @relation("PaidBy", fields: [paidByMemberId], references: [id], onDelete: Cascade)
   splitType      String      @default("Equal")
   createdAt      DateTime    @default(now())
 
@@ -200,7 +201,7 @@ model ExpenseSplit {
   groupExpenseId String
   groupExpense   GroupExpense @relation(fields: [groupExpenseId], references: [id], onDelete: Cascade)
   memberId       String
-  member         GroupMember  @relation(fields: [memberId], references: [id])
+  member         GroupMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
   shareAmount    Float
 
   @@index([groupExpenseId])
@@ -211,9 +212,9 @@ model Settlement {
   groupId      String
   group        Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   fromMemberId String
-  fromMember   GroupMember @relation("SettleFrom", fields: [fromMemberId], references: [id])
+  fromMember   GroupMember @relation("SettleFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
   toMemberId   String
-  toMember     GroupMember @relation("SettleTo", fields: [toMemberId], references: [id])
+  toMember     GroupMember @relation("SettleTo", fields: [toMemberId], references: [id], onDelete: Cascade)
   amount       Float
   note         String?
   createdAt    DateTime    @default(now())

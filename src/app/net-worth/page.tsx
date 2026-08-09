@@ -47,7 +47,7 @@ export default async function NetWorthPage() {
         <h2 className="text-[13px] font-bold text-cosfy-ink mb-1">Liabilities</h2>
         <Row label="Credit card dues" amount={breakdown.creditCardDues} negative />
         <Row label="Loan outstanding" amount={breakdown.loanOutstanding} negative />
-        {breakdown.totalLiabilities === 0 ? <p className="text-[13px] text-cosfy-muted py-2">Nothing owed 🎉</p> : null}
+        {breakdown.totalLiabilities === 0 ? <p className="text-[13px] text-cosfy-muted py-2">Nothing owed</p> : null}
       </div>
 
       <NetWorthInputsForm

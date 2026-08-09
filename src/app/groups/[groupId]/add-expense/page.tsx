@@ -18,7 +18,9 @@ export default async function AddGroupExpensePage({ params }: { params: Promise<
     <PageContainer title="Add expense" backHref={`/groups/${group.id}`}>
       <AddExpenseForm
         groupId={group.id}
-        members={group.members.map((m) => ({ id: m.id, name: m.name, isCurrentUser: m.isCurrentUser }))}
+        members={group.members
+          .filter((m) => !m.removedAt)
+          .map((m) => ({ id: m.id, name: m.name, isCurrentUser: m.isCurrentUser }))}
       />
     </PageContainer>
   );

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { Plus } from "lucide-react";
+import Link from "next/link";
+import { Plus, Pencil } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -7,6 +8,8 @@ import { HeroCard } from "@/components/ui/HeroCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
+import { PillChip } from "@/components/ui/PillChip";
+import { ShareGroupUpdateButton } from "@/components/finance/ShareGroupUpdateButton";
 import { computeMemberBalances, simplifyDebts } from "@/lib/balances";
 import { GroupTabs } from "./GroupTabs";
 
@@ -24,6 +27,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ gr
 
   if (!group) notFound();
 
+  const activeMembers = group.members.filter((m) => !m.removedAt);
   const you = group.members.find((m) => m.isCurrentUser);
   const memberName = (id: string) => group.members.find((m) => m.id === id)?.name ?? "Unknown";
 
@@ -49,7 +53,27 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ gr
   }));
 
   return (
-    <PageContainer title={group.name} backHref="/groups">
+    <PageContainer
+      title={group.name}
+      backHref="/groups"
+      action={
+        <Link
+          href={`/groups/${group.id}/edit`}
+          aria-label="Edit group"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-cosfy-card-soft text-cosfy-ink-soft"
+        >
+          <Pencil size={16} />
+        </Link>
+      }
+    >
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {activeMembers.map((m) => (
+          <PillChip key={m.id} variant={m.isCurrentUser ? "strong" : "inactive"} className="pointer-events-none">
+            {m.name}
+          </PillChip>
+        ))}
+      </div>
+
       <HeroCard className="mb-4">
         <p className="text-[13px] text-white/70 mb-1">Total spent</p>
         <MoneyAmount amount={totalSpent} size="hero" className="text-white" />
@@ -72,6 +96,13 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ gr
           Settle up
         </SecondaryButton>
       </div>
+
+      <ShareGroupUpdateButton
+        groupName={group.name}
+        totalSpent={totalSpent}
+        memberBalances={activeMembers.map((m) => ({ name: m.name, balance: balances[m.id] ?? 0 }))}
+        className="block mb-5"
+      />
 
       <GroupTabs
         expenses={group.expenses.map((e) => ({

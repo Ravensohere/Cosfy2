@@ -88,7 +88,7 @@ export default async function GroupsPage({
                 id={group.id}
                 name={group.name}
                 type={group.type}
-                memberCount={group.members.length}
+                memberCount={group.members.filter((m) => !m.removedAt).length}
                 yourBalance={yourBalance}
               />
             ))}

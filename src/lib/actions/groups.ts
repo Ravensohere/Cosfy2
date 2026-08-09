@@ -6,7 +6,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { GROUP_TYPES, SPLIT_TYPES } from "@/lib/constants";
-import { splitEqually } from "@/lib/balances";
+import { splitEqually, computeMemberBalances } from "@/lib/balances";
+import { formatINR } from "@/lib/format";
 
 const createGroupSchema = z.object({
   name: z.string().trim().min(1, "Name your group").max(60),
@@ -123,4 +124,86 @@ export async function recordSettlement(input: z.infer<typeof settlementSchema>) 
   revalidatePath(`/groups/${parsed.data.groupId}/settle`);
   revalidatePath("/groups");
   return { ok: true as const };
+}
+
+const addMemberSchema = z.object({
+  groupId: z.string().min(1),
+  name: z.string().trim().min(1, "Enter a name").max(60),
+});
+
+export async function addGroupMember(input: z.infer<typeof addMemberSchema>) {
+  const parsed = addMemberSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const user = await getCurrentUser();
+  const group = await db.group.findFirst({ where: { id: parsed.data.groupId, userId: user.id } });
+  if (!group) return { ok: false as const, error: "Group not found" };
+
+  await db.groupMember.create({ data: { groupId: parsed.data.groupId, name: parsed.data.name, isCurrentUser: false } });
+
+  revalidatePath(`/groups/${parsed.data.groupId}`);
+  revalidatePath(`/groups/${parsed.data.groupId}/edit`);
+  revalidatePath("/groups");
+  return { ok: true as const };
+}
+
+export async function removeGroupMember(groupId: string, memberId: string) {
+  const user = await getCurrentUser();
+  const group = await db.group.findFirst({
+    where: { id: groupId, userId: user.id },
+    include: {
+      members: true,
+      expenses: { include: { splits: true } },
+      settlements: true,
+    },
+  });
+  if (!group) return { ok: false as const, error: "Group not found" };
+
+  const member = group.members.find((m) => m.id === memberId);
+  if (!member) return { ok: false as const, error: "Member not found" };
+  if (member.isCurrentUser) return { ok: false as const, error: "Can't remove yourself from the group" };
+  if (member.removedAt) return { ok: true as const };
+
+  const balances = computeMemberBalances(
+    group.members.map((m) => m.id),
+    group.expenses,
+    group.settlements
+  );
+  const balance = balances[memberId] ?? 0;
+  if (Math.abs(balance) > 0.01) {
+    return {
+      ok: false as const,
+      error: `Settle up before removing — ${member.name} has a balance of ${formatINR(Math.abs(balance))}`,
+    };
+  }
+
+  await db.groupMember.update({ where: { id: memberId }, data: { removedAt: new Date() } });
+
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}/edit`);
+  revalidatePath("/groups");
+  return { ok: true as const };
+}
+
+export async function renameGroup(groupId: string, name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) return { ok: false as const, error: "Name your group" };
+
+  const user = await getCurrentUser();
+  const result = await db.group.updateMany({ where: { id: groupId, userId: user.id }, data: { name: trimmed } });
+  if (result.count === 0) return { ok: false as const, error: "Group not found" };
+
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}/edit`);
+  revalidatePath("/groups");
+  return { ok: true as const };
+}
+
+export async function deleteGroup(groupId: string) {
+  const user = await getCurrentUser();
+  await db.group.deleteMany({ where: { id: groupId, userId: user.id } });
+  revalidatePath("/groups");
+  redirect("/groups");
 }
