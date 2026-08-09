@@ -1,8 +1,10 @@
 import { PageContainer } from "@/components/layout/PageContainer";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { DonutChart } from "@/components/ui/DonutChart";
 import { getCurrentUser } from "@/lib/current-user";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { NetWorthInputsForm } from "@/components/net-worth/NetWorthInputsForm";
+import { assignChartColors } from "@/lib/chart-colors";
 
 function Row({ label, amount, negative = false }: { label: string; amount: number; negative?: boolean }) {
   if (amount === 0) return null;
@@ -21,6 +23,18 @@ export default async function NetWorthPage() {
   const user = await getCurrentUser();
   const breakdown = await getNetWorthBreakdown(user.id);
 
+  const assetSegments = assignChartColors(
+    [
+      { label: "Bank balance", value: breakdown.bankBalance },
+      { label: "Other investments", value: breakdown.otherInvestments },
+      { label: "EPF / PF", value: breakdown.epfBalance },
+      { label: "Gold", value: breakdown.goldValue },
+      { label: "Goal savings", value: breakdown.goalSavings },
+    ]
+      .filter((s) => s.value > 0)
+      .sort((a, b) => b.value - a.value)
+  );
+
   return (
     <PageContainer title="Net worth" backHref="/home">
       <div className="rounded-card bg-cosfy-ink text-white p-5 mb-4">
@@ -30,6 +44,18 @@ export default async function NetWorthPage() {
           Estimate from manually entered balances plus what Cosfy tracks — not a live bank feed.
         </p>
       </div>
+
+      {assetSegments.length > 0 ? (
+        <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 mb-4">
+          <h2 className="text-[13px] font-bold text-cosfy-ink mb-3">Asset mix</h2>
+          <DonutChart segments={assetSegments} centerLabel={
+            <div className="text-center">
+              <p className="text-[11px] font-semibold text-cosfy-muted">Assets</p>
+              <MoneyAmount amount={breakdown.totalAssets} size="md" />
+            </div>
+          } />
+        </div>
+      ) : null}
 
       <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 mb-4">
         <h2 className="text-[13px] font-bold text-cosfy-ink mb-1">Assets</h2>

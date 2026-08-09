@@ -26,6 +26,18 @@
   --cosfy-blue: #33588A;
   --cosfy-blue-soft: #E4EBF3;
   --cosfy-violet: #5E5790;
+
+  /* chart categorical palette — validated via dataviz skill's validate_palette.js
+     against surface #FFFFFF: chroma/lightness/CVD/normal-vision checks all pass.
+     Fixed order — assign in sequence, never cycle or reorder per-chart. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+  --chart-6: #008300;
+  --chart-7: #4a3aa7;
+  --chart-grid: #E1E0D9;
 }
 
 @theme inline {
@@ -54,6 +66,15 @@
   --color-cosfy-blue: var(--cosfy-blue);
   --color-cosfy-blue-soft: var(--cosfy-blue-soft);
   --color-cosfy-violet: var(--cosfy-violet);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-grid: var(--chart-grid);
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
 
