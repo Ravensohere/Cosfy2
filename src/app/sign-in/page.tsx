@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Mail, Lock } from "lucide-react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  getRedirectResult,
 } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
 import { friendlyFirebaseError } from "@/lib/firebase-error";
+import { completeFirebaseSignIn } from "@/lib/complete-firebase-signin";
 import { Input } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -26,6 +28,25 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [checkingRedirect, setCheckingRedirect] = useState(firebaseConfigured);
+
+  useEffect(() => {
+    const auth = getFirebaseAuth();
+    if (!auth) return;
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (!result) return;
+        const outcome = await completeFirebaseSignIn(result.user);
+        if (!outcome.ok) {
+          setError(outcome.error);
+          return;
+        }
+        router.push("/home");
+        router.refresh();
+      })
+      .catch((err) => setError(friendlyFirebaseError(err, "Google sign-in failed.")))
+      .finally(() => setCheckingRedirect(false));
+  }, [router]);
 
   async function handleEmailSubmit() {
     setError(null);
@@ -45,15 +66,9 @@ export default function SignInPage() {
         mode === "signin"
           ? await signInWithEmailAndPassword(auth, email, password)
           : await createUserWithEmailAndPassword(auth, email, password);
-      const idToken = await result.user.getIdToken();
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Couldn't sign in.");
+      const outcome = await completeFirebaseSignIn(result.user);
+      if (!outcome.ok) {
+        setError(outcome.error);
         return;
       }
       router.push("/home");
@@ -63,6 +78,10 @@ export default function SignInPage() {
     } finally {
       setIsPending(false);
     }
+  }
+
+  if (checkingRedirect) {
+    return <div className="min-h-dvh flex items-center justify-center text-[13px] text-cosfy-muted">Signing in…</div>;
   }
 
   return (

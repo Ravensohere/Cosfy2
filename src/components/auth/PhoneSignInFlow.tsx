@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
 import { friendlyFirebaseError } from "@/lib/firebase-error";
+import { completeFirebaseSignIn } from "@/lib/complete-firebase-signin";
 import { Input } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { OtpInput } from "@/components/auth/OtpInput";
@@ -54,15 +55,9 @@ export function PhoneSignInFlow() {
     setIsPending(true);
     try {
       const result = await confirmationRef.current.confirm(code);
-      const idToken = await result.user.getIdToken();
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Couldn't verify that code.");
+      const outcome = await completeFirebaseSignIn(result.user);
+      if (!outcome.ok) {
+        setError(outcome.error);
         return;
       }
       router.push("/home");

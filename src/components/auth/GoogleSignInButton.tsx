@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { getFirebaseAuth, firebaseConfigured } from "@/lib/firebase-client";
 import { friendlyFirebaseError } from "@/lib/firebase-error";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 
 export function GoogleSignInButton() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -22,23 +20,11 @@ export function GoogleSignInButton() {
 
     setIsPending(true);
     try {
-      const result = await signInWithPopup(auth, new GoogleAuthProvider());
-      const idToken = await result.user.getIdToken();
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Couldn't sign in with Google.");
-        return;
-      }
-      router.push("/home");
-      router.refresh();
+      // Redirect, not popup — popups are unreliable on mobile browsers and PWAs.
+      // The browser navigates away here; result is picked up by getRedirectResult() on return.
+      await signInWithRedirect(auth, new GoogleAuthProvider());
     } catch (err) {
       setError(friendlyFirebaseError(err, "Google sign-in was cancelled or failed."));
-    } finally {
       setIsPending(false);
     }
   }
