@@ -16,8 +16,12 @@ const KNOWN_MESSAGES: Record<string, string> = {
   "auth/captcha-check-failed": "reCAPTCHA check failed — reload and try again.",
 };
 
+export function getFirebaseErrorCode(err: unknown): string | null {
+  return typeof err === "object" && err !== null && "code" in err ? String((err as { code: unknown }).code) : null;
+}
+
 export function friendlyFirebaseError(err: unknown, fallback: string): string {
-  const code = typeof err === "object" && err !== null && "code" in err ? String((err as { code: unknown }).code) : null;
+  const code = getFirebaseErrorCode(err);
   if (code && KNOWN_MESSAGES[code]) return KNOWN_MESSAGES[code];
   if (code) return `${fallback} (${code})`;
   return fallback;
