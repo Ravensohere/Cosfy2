@@ -56,7 +56,7 @@ export function InsightsPanel({
       {insights ? (
         <div className="mt-3 pt-3 border-t border-white/10 flex items-start gap-1.5 text-[11px] text-cosfy-lime">
           <TriangleAlert size={13} className="mt-[1px] shrink-0" />
-          <span>Not financial advice — verify before acting on it.</span>
+          <span>Not financial advice, verify before acting on it.</span>
         </div>
       ) : null}
     </div>

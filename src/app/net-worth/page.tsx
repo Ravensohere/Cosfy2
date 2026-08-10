@@ -41,7 +41,7 @@ export default async function NetWorthPage() {
         <p className="text-[12px] text-white/60 font-semibold">Estimated net worth</p>
         <MoneyAmount amount={breakdown.netWorth} size="hero" className="text-white" />
         <p className="text-[11px] text-white/50 mt-1">
-          Estimate from manually entered balances plus what Cosfy tracks — not a live bank feed.
+          Estimate from manually entered balances plus what Cosfy tracks, not a live bank feed.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default async function NetWorthPage() {
         <Row label="Gold holdings" amount={breakdown.goldValue} />
         <Row label="Goal savings" amount={breakdown.goalSavings} />
         {breakdown.totalAssets === 0 ? (
-          <p className="text-[13px] text-cosfy-muted py-2">No assets entered yet — add balances below.</p>
+          <p className="text-[13px] text-cosfy-muted py-2">No assets entered yet, add balances below.</p>
         ) : null}
       </div>
 

@@ -55,7 +55,7 @@ export function VoiceImportTab() {
       <label className="flex flex-col items-center justify-center gap-2 rounded-card border-2 border-dashed border-cosfy-border h-40 cursor-pointer text-cosfy-muted">
         <Mic size={28} />
         <span className="text-[13px] font-semibold text-center px-6">
-          Record or upload a voice note — e.g. &quot;spent 200 on groceries&quot;
+          Record or upload a voice note, e.g. &quot;spent 200 on groceries&quot;
         </span>
         <input
           ref={inputRef}

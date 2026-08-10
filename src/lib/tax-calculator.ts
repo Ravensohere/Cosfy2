@@ -2,7 +2,7 @@ export type TaxRegime = "new" | "old";
 
 type Slab = { upto: number; rate: number };
 
-// FY 2025-26 (AY 2026-27) slabs. Estimate only — ignores HRA/other exemptions, consult a CA.
+// FY 2025-26 (AY 2026-27) slabs. Estimate only, ignores HRA/other exemptions, consult a CA.
 const NEW_REGIME_SLABS: Slab[] = [
   { upto: 400_000, rate: 0 },
   { upto: 800_000, rate: 0.05 },

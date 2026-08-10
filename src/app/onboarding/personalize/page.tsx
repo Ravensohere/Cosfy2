@@ -28,7 +28,7 @@ export default function PersonalizePage() {
   return (
     <div className="min-h-dvh flex flex-col px-6 pt-10 pb-8 md:max-w-md md:mx-auto md:pt-16">
       <h1 className="text-[24px] font-extrabold mb-1 text-cosfy-ink">What should we call you?</h1>
-      <p className="text-[14px] text-cosfy-muted mb-6">You&apos;re signed in — let&apos;s personalise Cosfy a bit.</p>
+      <p className="text-[14px] text-cosfy-muted mb-6">You&apos;re signed in, let&apos;s personalise Cosfy a bit.</p>
 
       <div className="space-y-4 flex-1">
         <div>

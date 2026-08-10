@@ -136,7 +136,7 @@ export function toPromptSummary(ctx: FinancialContext): string {
   }
 
   if (!ctx.hasEnoughData) {
-    lines.push("Note: this user has very little transaction history so far — keep advice general and say so if asked for specifics.");
+    lines.push("Note: this user has very little transaction history so far, keep advice general and say so if asked for specifics.");
   }
 
   return lines.join("\n");

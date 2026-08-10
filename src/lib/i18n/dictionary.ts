@@ -56,7 +56,7 @@ const hi: Record<keyof typeof en, string> = {
 export const translations: Record<Language, Record<keyof typeof en, string>> = { en, hi };
 export type TranslationKey = keyof typeof en;
 
-/** Server-safe translation lookup (no hooks) — use in server components. */
+/** Server-safe translation lookup (no hooks), use in server components. */
 export function translate(language: Language, key: TranslationKey): string {
   return translations[language]?.[key] ?? translations.en[key];
 }

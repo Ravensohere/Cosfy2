@@ -33,7 +33,7 @@ export function TextImportTab() {
       </div>
 
       {text && !parsed ? (
-        <p className="text-[13px] text-cosfy-red">Couldn&apos;t find an amount in that text — try pasting the full SMS.</p>
+        <p className="text-[13px] text-cosfy-red">Couldn&apos;t find an amount in that text, try pasting the full SMS.</p>
       ) : null}
 
       {parsed ? (

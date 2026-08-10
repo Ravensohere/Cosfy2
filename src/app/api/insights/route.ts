@@ -5,7 +5,7 @@ const MONTHLY_BULLETS_PROMPT =
   "You are a finance analyst for Cosfy, a personal budgeting app. Given category-wise spend for this month vs last month (in INR), write 3-4 short bullet insights: what went up, what went down, and one concrete actionable tip. Keep each bullet under 20 words. No markdown headers, just short lines starting with -.";
 
 const REPORT_TAKE_PROMPT =
-  "You are a finance coach for Cosfy writing the closing 'coach take' on a user's monthly report. You'll be given that month's spend, income, surplus, evidence-backed leaks (where money is quietly going), and wins (real improvements). Write one short encouraging-but-honest paragraph (under 60 words) that references the real numbers given — no generic advice, no markdown.";
+  "You are a finance coach for Cosfy writing the closing 'coach take' on a user's monthly report. You'll be given that month's spend, income, surplus, evidence-backed leaks (where money is quietly going), and wins (real improvements). Write one short encouraging-but-honest paragraph (under 60 words) that references the real numbers given, no generic advice, no markdown.";
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;

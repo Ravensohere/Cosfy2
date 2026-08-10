@@ -107,7 +107,7 @@ export default function SignInPage() {
 
       {!firebaseConfigured ? (
         <p className="text-[13px] text-cosfy-amber mb-4">
-          Sign-in isn&apos;t configured yet — add Firebase keys to enable this.
+          Sign-in isn&apos;t configured yet, add Firebase keys to enable this.
         </p>
       ) : null}
 

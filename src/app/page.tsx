@@ -19,7 +19,7 @@ export default async function SplashPage() {
         </div>
         <h1 className="text-[36px] font-extrabold text-cosfy-ink lowercase tracking-tight">cosfy</h1>
         <p className="text-[15px] text-cosfy-lime-ink max-w-[280px]">
-          Track spending, split bills, and build better money habits — built for India.
+          Track spending, split bills, and build better money habits, built for India.
         </p>
       </div>
       <div className="w-full max-w-sm">

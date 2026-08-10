@@ -18,19 +18,19 @@ export function computeHealthScore(ctx: FinancialContext): HealthScoreResult {
     return { score: 0, dimensions: [], insufficientData: true };
   }
 
-  // 1. Monthly surplus / savings rate — reward a healthy positive surplus, penalize deficits.
+  // 1. Monthly surplus / savings rate, reward a healthy positive surplus, penalize deficits.
   const surplus = ctx.averageMonthlySurplus ?? 0;
   const surplusScore = clampScore(50 + (surplus / Math.max(ctx.spentThisMonth, 1)) * 100);
 
-  // 2. Debt burden — liabilities as a share of assets; lower is better.
+  // 2. Debt burden, liabilities as a share of assets; lower is better.
   const debtRatio = ctx.netWorth.totalLiabilities / Math.max(ctx.netWorth.totalAssets, 1);
   const debtScore = clampScore(100 - debtRatio * 100);
 
-  // 3. Emergency fund — bank balance vs. ~3 months of current spend.
+  // 3. Emergency fund, bank balance vs. ~3 months of current spend.
   const emergencyTarget = Math.max(ctx.spentThisMonth * 3, 1);
   const emergencyScore = clampScore((ctx.netWorth.bankBalance / emergencyTarget) * 100);
 
-  // 4. Budget discipline — share of active budgets kept under their alert threshold.
+  // 4. Budget discipline, share of active budgets kept under their alert threshold.
   const budgetScore =
     ctx.budgets.length > 0
       ? clampScore(
@@ -40,7 +40,7 @@ export function computeHealthScore(ctx: FinancialContext): HealthScoreResult {
         )
       : 50;
 
-  // 5. Goal progress — average completion across active goals.
+  // 5. Goal progress, average completion across active goals.
   const goalScore =
     ctx.goals.length > 0
       ? clampScore(
@@ -49,7 +49,7 @@ export function computeHealthScore(ctx: FinancialContext): HealthScoreResult {
         )
       : 50;
 
-  // 6. Insurance / protection — coarse check for any policy on file.
+  // 6. Insurance / protection, coarse check for any policy on file.
   const insuranceScore = ctx.insurancePolicies.length > 0 ? 100 : 20;
 
   const dimensions: HealthDimension[] = [

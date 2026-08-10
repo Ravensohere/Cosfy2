@@ -74,7 +74,7 @@ export default async function InsightsPage() {
 
       {donutSegments.length > 0 ? (
         <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 mb-4">
-          <h2 className="text-[13px] font-bold text-cosfy-ink mb-3">Spending by category — this month</h2>
+          <h2 className="text-[13px] font-bold text-cosfy-ink mb-3">Spending by category, this month</h2>
           <DonutChart segments={donutSegments} />
         </div>
       ) : null}
@@ -88,7 +88,7 @@ export default async function InsightsPage() {
 
       <div className="space-y-3 mb-6">
         {categories.length === 0 ? (
-          <p className="text-[13px] text-cosfy-muted">Not enough data yet — add a few expenses first.</p>
+          <p className="text-[13px] text-cosfy-muted">Not enough data yet, add a few expenses first.</p>
         ) : (
           categories.map((category) => {
             const current = thisMonth[category] ?? 0;

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   try {
     const transcript = await transcribeAudio(apiKey, file);
     if (!transcript.trim()) {
-      return NextResponse.json({ error: "Couldn't hear anything — try again." }, { status: 422 });
+      return NextResponse.json({ error: "Couldn't hear anything, try again." }, { status: 422 });
     }
     return NextResponse.json({ transcript });
   } catch (err) {

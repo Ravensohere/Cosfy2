@@ -23,7 +23,7 @@ export function CreateGoalForm({ avgMonthlySurplus }: { avgMonthlySurplus: numbe
       return "Add income and more spending data for a more accurate feasibility check.";
     }
     if (avgMonthlySurplus <= 0) {
-      return "Your recent spending has outpaced income — add more data or adjust the target.";
+      return "Your recent spending has outpaced income, add more data or adjust the target.";
     }
     const months = Math.ceil(numericAmount / avgMonthlySurplus);
     return `At your average monthly surplus, this could take about ${months} month${months === 1 ? "" : "s"}.`;

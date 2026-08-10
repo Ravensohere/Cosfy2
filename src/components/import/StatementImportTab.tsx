@@ -105,7 +105,7 @@ export function StatementImportTab() {
         <div className="space-y-3">
           {format === "pdf" ? (
             <p className="text-[12px] text-cosfy-amber">
-              PDF parsing is best-effort — double check amounts before importing.
+              PDF parsing is best-effort, double check amounts before importing.
             </p>
           ) : null}
           <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border max-h-[360px] overflow-y-auto">

@@ -33,7 +33,7 @@ export default async function SubscriptionsPage() {
         <EmptyState
           icon={Repeat}
           title="No subscriptions tracked yet"
-          description="Add recurring payments to see renewal reminders — or wait for Cosfy to spot them in your transactions."
+          description="Add recurring payments to see renewal reminders, or wait for Cosfy to spot them in your transactions."
           action={<AddSubscriptionButton variant="primary" />}
         />
       ) : (

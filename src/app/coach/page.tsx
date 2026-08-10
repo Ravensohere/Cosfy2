@@ -45,7 +45,7 @@ export default async function CoachPage() {
         <ChevronRight size={16} className="text-cosfy-muted shrink-0" />
       </Link>
       <ChatWindow
-        greeting="I can look at your real transactions, budgets, goals, and cards to answer questions about your money. Not a licensed advisor — treat this as information, not instructions."
+        greeting="I can look at your real transactions, budgets, goals, and cards to answer questions about your money. I'm not a licensed advisor, so treat this as information, not instructions."
         suggestedQuestions={SUGGESTED_QUESTIONS}
         allowVoice
       />

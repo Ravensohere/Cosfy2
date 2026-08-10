@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "cosfy",
-  description: "Track spending, split bills, and build better money habits — built for India.",
+  description: "Track spending, split bills, and build better money habits, built for India.",
 };
 
 export const viewport: Viewport = {

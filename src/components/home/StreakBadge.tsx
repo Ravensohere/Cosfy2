@@ -3,9 +3,9 @@ import { Flame } from "lucide-react";
 export function StreakBadge({ noSpendStreak, loggingStreak }: { noSpendStreak: number; loggingStreak: number }) {
   const message =
     noSpendStreak >= 2
-      ? `${noSpendStreak}-day no-spend streak — keep it going`
+      ? `${noSpendStreak}-day no-spend streak, keep it going`
       : loggingStreak >= 3
-      ? `${loggingStreak}-day logging streak — you're on top of it`
+      ? `${loggingStreak}-day logging streak, you're on top of it`
       : null;
 
   if (!message) return null;

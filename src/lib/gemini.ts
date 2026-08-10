@@ -23,6 +23,15 @@ function extractText(data: {
   return data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
 }
 
+function sanitizeAIText(text: string): string {
+  return text
+    .replace(/\s*[—–]\s*/g, ", ")
+    .replace(/,\s*,/g, ",")
+    .replace(/,\s*([.!?])/g, "$1")
+    .replace(/ {2,}/g, " ")
+    .trim();
+}
+
 export async function callGemini({
   apiKey,
   systemPrompt,
@@ -43,7 +52,9 @@ export async function callGemini({
     generationConfig: { temperature: 0.4, maxOutputTokens: 600 },
   });
 
-  return extractText(data) || "Sorry, I couldn't generate a reply.";
+  const text = extractText(data);
+  if (!text) return "Sorry, I couldn't generate a reply.";
+  return sanitizeAIText(text);
 }
 
 export async function callGeminiJSON({
@@ -109,7 +120,7 @@ async function friendlyGeminiError(res: Response): Promise<string> {
     return "Gemini API key is missing permission for this model. Check it at aistudio.google.com/apikey.";
   }
   if (res.status === 429) {
-    return "Gemini is rate-limiting requests right now — wait a moment and try again.";
+    return "Gemini is rate-limiting requests right now, wait a moment and try again.";
   }
 
   return `Gemini request failed: ${(message ?? raw).slice(0, 200)}`;

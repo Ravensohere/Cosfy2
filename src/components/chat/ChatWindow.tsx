@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, TriangleAlert, Mic } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { FormattedAIText } from "@/components/ui/FormattedAIText";
+import { CosfyMascot } from "@/components/ui/CosfyMascot";
 import { cn } from "@/lib/cn";
 
 type Message = {
@@ -14,7 +15,7 @@ type Message = {
 };
 
 export function ChatWindow({
-  greeting = "Ask me about budgeting, saving, or finance news. I'm a helper, not a financial advisor — double check anything important.",
+  greeting = "Hey, I'm here for whatever's on your mind about money. Budgeting, saving, that weird SMS, the latest finance news, ask away. I'm not a licensed advisor, so double check anything big before you act on it.",
   suggestedQuestions,
   allowVoice = false,
 }: {
@@ -164,7 +165,8 @@ export function ChatWindow({
 function ChatBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
   return (
-    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}>
+      {!isUser ? <CosfyMascot mood="happy" size={28} /> : null}
       <div
         className={cn(
           "max-w-[85%] rounded-card px-4 py-3 text-[14px] leading-relaxed",
@@ -177,8 +179,8 @@ function ChatBubble({ message }: { message: Message }) {
             <TriangleAlert size={13} className="mt-[1px] shrink-0" />
             <span>
               {message.usedLiveData
-                ? "Based on recent headlines — not financial advice. Verify before acting on it."
-                : "Not financial advice — verify before acting on it."}
+                ? "Based on recent headlines, not financial advice. Verify before acting on it."
+                : "Not financial advice, so verify before acting on it."}
             </span>
           </div>
         ) : null}

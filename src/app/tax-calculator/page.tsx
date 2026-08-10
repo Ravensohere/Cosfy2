@@ -52,7 +52,7 @@ export default function TaxCalculatorPage() {
 
         {regime === "old" ? (
           <div>
-            <FieldLabel>80C deductions (PF, ELSS, insurance — max ₹1.5L)</FieldLabel>
+            <FieldLabel>80C deductions (PF, ELSS, insurance, max ₹1.5L)</FieldLabel>
             <Input
               type="number"
               inputMode="numeric"
@@ -87,7 +87,7 @@ export default function TaxCalculatorPage() {
             <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4">
               <p className="text-[13px] font-semibold text-cosfy-lime-ink">
                 {betterRegime === regime
-                  ? `${regime === "new" ? "New" : "Old"} regime looks better for you here — saves ${new Intl.NumberFormat("en-IN").format(Math.abs(result.totalTax - otherRegimeResult.totalTax))} vs the other regime.`
+                  ? `${regime === "new" ? "New" : "Old"} regime looks better for you here, saves ${new Intl.NumberFormat("en-IN").format(Math.abs(result.totalTax - otherRegimeResult.totalTax))} vs the other regime.`
                   : `Switching to the ${betterRegime === "new" ? "new" : "old"} regime could save you ${new Intl.NumberFormat("en-IN").format(Math.abs(result.totalTax - otherRegimeResult.totalTax))}.`}
               </p>
             </div>
@@ -98,7 +98,7 @@ export default function TaxCalculatorPage() {
           <TriangleAlert size={14} className="mt-[1px] shrink-0" />
           <p>
             Estimate based on FY2025-26 slabs. Doesn&apos;t account for HRA, other exemptions, or surcharge on high
-            incomes. Not tax advice — check with a CA before filing.
+            incomes. Not tax advice, check with a CA before filing.
           </p>
         </div>
       </div>

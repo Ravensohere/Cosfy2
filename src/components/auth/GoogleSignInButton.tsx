@@ -8,10 +8,10 @@ import { friendlyFirebaseError, getFirebaseErrorCode } from "@/lib/firebase-erro
 import { completeFirebaseSignIn } from "@/lib/complete-firebase-signin";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 
-// Popup avoids the cross-site storage read-back that signInWithRedirect needs —
+// Popup avoids the cross-site storage read-back that signInWithRedirect needs,
 // browsers that partition third-party storage (modern Chrome included) can silently
 // fail to complete a redirect round-trip. Only fall back to redirect when the popup
-// itself couldn't open/run (blocked, or the environment doesn't support it at all) —
+// itself couldn't open/run (blocked, or the environment doesn't support it at all),
 // getRedirectResult() on the sign-in page picks up that fallback's result on return.
 const REDIRECT_FALLBACK_CODES = new Set([
   "auth/popup-blocked",
@@ -47,7 +47,7 @@ export function GoogleSignInButton() {
       if (code && REDIRECT_FALLBACK_CODES.has(code)) {
         try {
           await signInWithRedirect(auth, new GoogleAuthProvider());
-          return; // navigating away — sign-in page's getRedirectResult() takes it from here
+          return; // navigating away, sign-in page's getRedirectResult() takes it from here
         } catch (redirectErr) {
           setError(friendlyFirebaseError(redirectErr, "Google sign-in was cancelled or failed."));
         }

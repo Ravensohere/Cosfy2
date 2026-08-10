@@ -27,7 +27,7 @@ export function SettleList({ groupId, groupName, debts }: { groupId: string; gro
   function message(d: Debt) {
     const base =
       tone === "Friendly"
-        ? `Hey ${d.fromName} — ${formatINR(d.amount)} is pending for ${groupName}. Settle whenever works.`
+        ? `Hey ${d.fromName}, ${formatINR(d.amount)} is pending for ${groupName}. Settle whenever works.`
         : `${d.fromName}, please settle ${formatINR(d.amount)} for ${groupName}.`;
     return base + inviteLine();
   }

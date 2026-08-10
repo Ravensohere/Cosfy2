@@ -29,7 +29,7 @@ export default function OnboardingGoalPage() {
     <div className="min-h-dvh flex flex-col px-6 pt-10 pb-8 md:max-w-md md:mx-auto md:pt-16">
       <ProgressDots step={1} total={3} />
       <h1 className="text-[24px] font-extrabold mt-6 mb-1 text-cosfy-ink">What brings you here?</h1>
-      <p className="text-[14px] text-cosfy-muted mb-6">Pick as many as apply — we&apos;ll tailor Cosfy around them.</p>
+      <p className="text-[14px] text-cosfy-muted mb-6">Pick as many as apply, we&apos;ll tailor Cosfy around them.</p>
       <div className="flex flex-col gap-3 flex-1">
         {ONBOARDING_GOALS.map((g) => (
           <button

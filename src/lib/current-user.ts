@@ -8,7 +8,7 @@ export const getCurrentUser = cache(async () => {
   const uid = cookieStore.get(COOKIE_NAME)?.value;
 
   if (!uid) {
-    throw new Error("Missing guest session cookie — middleware should have set it.");
+    throw new Error("Missing guest session cookie, middleware should have set it.");
   }
 
   const user = await db.user.upsert({

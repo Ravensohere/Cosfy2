@@ -175,7 +175,7 @@ export async function removeGroupMember(groupId: string, memberId: string) {
   if (Math.abs(balance) > 0.01) {
     return {
       ok: false as const,
-      error: `Settle up before removing — ${member.name} has a balance of ${formatINR(Math.abs(balance))}`,
+      error: `Settle up before removing ${member.name}, they have a balance of ${formatINR(Math.abs(balance))}`,
     };
   }
 

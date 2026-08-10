@@ -68,7 +68,7 @@ export function ParticipantsForm({ groups }: { groups: Group[] }) {
           className="w-full text-left rounded-card bg-cosfy-card border border-cosfy-border p-4"
         >
           <p className="font-bold text-[15px] text-cosfy-ink">One-time split</p>
-          <p className="text-[13px] text-cosfy-muted mt-0.5">Just for this bill — add names manually</p>
+          <p className="text-[13px] text-cosfy-muted mt-0.5">Just for this bill, add names manually</p>
         </button>
       </div>
     );

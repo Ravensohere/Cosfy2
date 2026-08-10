@@ -13,7 +13,7 @@ function renderInline(text: string, keyPrefix: string) {
   );
 }
 
-/** Renders the narrow markdown subset our AI prompts actually produce: "- " bullets and **bold** spans. No parser/dependency — plain text falls through untouched. */
+/** Renders the narrow markdown subset our AI prompts actually produce: "- " bullets and **bold** spans. No parser/dependency, plain text falls through untouched. */
 export function FormattedAIText({ text, className }: { text: string; className?: string }) {
   const lines = text.split("\n");
   const blocks: { type: "bullets" | "text"; lines: string[] }[] = [];
