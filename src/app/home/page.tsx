@@ -6,6 +6,7 @@ import { HeroCard } from "@/components/ui/HeroCard";
 import { StatCard } from "@/components/ui/StatCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { CosfyMascot, type MascotMood } from "@/components/ui/CosfyMascot";
 import { TransactionRow } from "@/components/finance/TransactionRow";
 import { QuickActionLink } from "@/components/home/QuickActionButton";
 import { fetchFinanceHeadlines } from "@/lib/news-feed";
@@ -74,26 +75,30 @@ export default async function HomePage({
   const surplus = income - spent;
 
   const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(monthStart);
+  const mascotMood: MascotMood = monthTransactions.length === 0 ? "neutral" : surplus >= 0 ? "happy" : "concerned";
   const lang: Language = SUPPORTED_LANGUAGES.includes(user.language as Language) ? (user.language as Language) : "en";
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
 
   return (
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          {user.preferredName ? (
-            <>
-              <p className="text-[13px] text-cosfy-muted">{t("home.welcomeBack")}</p>
-              <p className="text-[18px] font-extrabold text-cosfy-ink">
-                {t("home.greetingNamed").replace("{name}", user.preferredName)}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-[13px] text-cosfy-muted">{t("home.greeting")}</p>
-              <p className="text-[18px] font-extrabold text-cosfy-ink">{t("home.welcome")}</p>
-            </>
-          )}
+        <div className="flex items-center gap-3">
+          <CosfyMascot mood={mascotMood} size={44} />
+          <div>
+            {user.preferredName ? (
+              <>
+                <p className="text-[13px] text-cosfy-muted">{t("home.welcomeBack")}</p>
+                <p className="text-[18px] font-extrabold text-cosfy-ink">
+                  {t("home.greetingNamed").replace("{name}", user.preferredName)}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[13px] text-cosfy-muted">{t("home.greeting")}</p>
+                <p className="text-[18px] font-extrabold text-cosfy-ink">{t("home.welcome")}</p>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -129,9 +134,10 @@ export default async function HomePage({
         <StatCard label={t("home.surplus")} amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mt-6 max-w-[220px] mx-auto">
+      <div className="grid grid-cols-3 gap-2 mt-6 max-w-[280px] mx-auto">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
+        <QuickActionLink href="/coach" icon="Sparkles" label="Coach" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">

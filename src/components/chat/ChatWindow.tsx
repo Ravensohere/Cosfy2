@@ -13,13 +13,14 @@ type Message = {
   sources?: { title: string; url: string }[];
 };
 
-export function ChatWindow() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Ask me about budgeting, saving, or finance news. I'm a helper, not a financial advisor — double check anything important.",
-    },
-  ]);
+export function ChatWindow({
+  greeting = "Ask me about budgeting, saving, or finance news. I'm a helper, not a financial advisor — double check anything important.",
+  suggestedQuestions,
+}: {
+  greeting?: string;
+  suggestedQuestions?: string[];
+}) {
+  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: greeting }]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -28,8 +29,8 @@ export function ChatWindow() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function handleSend() {
-    const text = input.trim();
+  async function handleSend(overrideText?: string) {
+    const text = (overrideText ?? input).trim();
     if (!text || isSending) return;
 
     const nextMessages: Message[] = [...messages, { role: "user", content: text }];
@@ -70,6 +71,21 @@ export function ChatWindow() {
         {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} /> : null}
         <div ref={bottomRef} />
       </div>
+      {suggestedQuestions && messages.length === 1 ? (
+        <div className="flex flex-wrap gap-2 pb-3">
+          {suggestedQuestions.map((q) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => handleSend(q)}
+              disabled={isSending}
+              className="text-[12px] font-semibold px-3 py-2 rounded-full bg-cosfy-card border border-cosfy-border text-cosfy-ink disabled:opacity-40"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="flex gap-2 pt-2 border-t border-cosfy-border">
         <Input
           value={input}
@@ -82,7 +98,7 @@ export function ChatWindow() {
         />
         <button
           type="button"
-          onClick={handleSend}
+          onClick={() => handleSend()}
           disabled={isSending || !input.trim()}
           aria-label="Send"
           className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-lime text-cosfy-lime-ink flex items-center justify-center disabled:opacity-40"

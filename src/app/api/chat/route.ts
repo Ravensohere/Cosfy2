@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { fetchFinanceNews, wantsLiveNews } from "@/lib/finance-news";
 import { callGemini } from "@/lib/gemini";
 import { getCurrentUser } from "@/lib/current-user";
-import { db } from "@/lib/db";
-import { formatINR } from "@/lib/format";
+import { buildFinancialContext, toPromptSummary } from "@/lib/financial-context";
 
 const SYSTEM_PROMPT = `You are Cosfy's finance assistant, built into a personal budgeting app for India.
 Answer questions about budgeting, saving, spending habits, credit, taxes, and general market/finance concepts in short, plain language.
@@ -27,16 +26,11 @@ export async function POST(req: Request) {
   let systemPrompt = SYSTEM_PROMPT;
 
   const user = await getCurrentUser();
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-  const monthTransactions = await db.transaction.findMany({
-    where: { userId: user.id, amount: { lt: 0 }, date: { gte: monthStart } },
-    select: { amount: true },
-  });
-  const spentThisMonth = monthTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  const context = await buildFinancialContext(user.id);
 
   systemPrompt += `\n\nAbout the person you're talking to: ${
     user.preferredName ? `they go by ${user.preferredName}.` : "no name on file, don't guess one."
-  } They've spent ${formatINR(spentThisMonth)} so far this month. Use this only when it's actually relevant to their question — don't force it into every answer.`;
+  }\n\nTheir financial picture:\n${toPromptSummary(context)}\n\nUse this only when it's actually relevant to their question — don't force it into every answer.`;
 
   if (wantsLiveNews(lastUserMessage)) {
     const headlines = await fetchFinanceNews(lastUserMessage);

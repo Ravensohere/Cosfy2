@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { MessageCircle, CheckCircle2 } from "lucide-react";
+import { MessageCircle, CheckCircle2, Scale } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { IconTile } from "@/components/ui/IconTile";
 import { PillChip } from "@/components/ui/PillChip";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
@@ -60,10 +61,13 @@ export function SettleList({ groupId, groupName, debts }: { groupId: string; gro
       <div className="space-y-3">
         {remaining.map((d) => (
           <div key={`${d.fromMemberId}-${d.toMemberId}`} className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-            <p className="text-[14px] text-cosfy-ink mb-3">
-              <span className="font-semibold">{d.fromName}</span> owes <span className="font-semibold">{d.toName}</span>{" "}
-              <MoneyAmount amount={d.amount} size="sm" />
-            </p>
+            <div className="flex items-center gap-3 mb-3">
+              <IconTile icon={Scale} tone="dark" size={44} />
+              <p className="flex-1 min-w-0 text-[14px] text-cosfy-ink">
+                <span className="font-semibold">{d.fromName}</span> owes <span className="font-semibold">{d.toName}</span>{" "}
+                <MoneyAmount amount={d.amount} size="sm" />
+              </p>
+            </div>
             <div className="flex gap-2">
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(message(d))}`}

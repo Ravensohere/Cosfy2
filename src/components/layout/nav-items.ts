@@ -7,7 +7,7 @@ export const CORE_NAV_PREFIXES = [
   "/goals",
   "/groups",
   "/profile",
-  "/chat",
+  "/coach",
   "/tax-calculator",
   "/sms-import",
   "/import",

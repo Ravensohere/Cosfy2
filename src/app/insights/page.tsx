@@ -1,7 +1,10 @@
+import Link from "next/link";
+import { HeartPulse, FileText, ChevronRight } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { DonutChart } from "@/components/ui/DonutChart";
 import { TrendBarChart } from "@/components/ui/TrendBarChart";
+import { IconTile } from "@/components/ui/IconTile";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
@@ -49,8 +52,26 @@ export default async function InsightsPage() {
     return { label: monthDate.toLocaleDateString("en-IN", { month: "short" }), value: total };
   });
 
+  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
   return (
     <PageContainer title="AI insights" backHref="/home">
+      <div className="space-y-2.5 mb-4">
+        <Link href="/health-score" className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
+          <IconTile icon={HeartPulse} tone="dark" size={40} />
+          <span className="flex-1 text-[13px] font-semibold text-cosfy-ink">Financial health score</span>
+          <ChevronRight size={18} className="text-cosfy-muted" />
+        </Link>
+        <Link
+          href={`/reports/${currentYearMonth}`}
+          className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5"
+        >
+          <IconTile icon={FileText} tone="dark" size={40} />
+          <span className="flex-1 text-[13px] font-semibold text-cosfy-ink">This month&apos;s report</span>
+          <ChevronRight size={18} className="text-cosfy-muted" />
+        </Link>
+      </div>
+
       {donutSegments.length > 0 ? (
         <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 mb-4">
           <h2 className="text-[13px] font-bold text-cosfy-ink mb-3">Spending by category — this month</h2>

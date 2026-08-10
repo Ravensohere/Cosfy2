@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, User } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { HeroCard } from "@/components/ui/HeroCard";
+import { IconTile } from "@/components/ui/IconTile";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
@@ -40,8 +41,9 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
 
       <div className="space-y-2 mb-5">
         {expense.splits.map((s) => (
-          <div key={s.id} className="flex items-center justify-between rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
-            <span className="font-semibold text-[14px] text-cosfy-ink">{s.member.name}</span>
+          <div key={s.id} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
+            <IconTile icon={User} tone="soft" size={40} />
+            <span className="flex-1 min-w-0 font-semibold text-[14px] text-cosfy-ink truncate">{s.member.name}</span>
             <MoneyAmount amount={s.shareAmount} size="md" />
           </div>
         ))}

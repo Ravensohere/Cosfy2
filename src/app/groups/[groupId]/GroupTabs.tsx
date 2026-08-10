@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Receipt, Scale, History } from "lucide-react";
+import { IconTile } from "@/components/ui/IconTile";
+import { Receipt, Scale, History, CheckCircle2 } from "lucide-react";
 import { PillChip } from "@/components/ui/PillChip";
 import { formatDate } from "@/lib/format";
 
@@ -40,11 +41,12 @@ export function GroupTabs({
         (expenses.length === 0 ? (
           <EmptyState icon={Receipt} title="No expenses yet" description="Add the first shared expense." />
         ) : (
-          <div className="divide-y divide-cosfy-border">
+          <div className="space-y-3">
             {expenses.map((e) => (
-              <div key={e.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold text-[14px] text-cosfy-ink">{e.description}</p>
+              <div key={e.id} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
+                <IconTile icon={Receipt} tone="dark" size={44} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[14px] text-cosfy-ink truncate">{e.description}</p>
                   <p className="text-[12px] text-cosfy-muted">
                     Paid by {e.paidByName} · {formatDate(e.date)}
                   </p>
@@ -59,10 +61,11 @@ export function GroupTabs({
         (debts.length === 0 ? (
           <EmptyState icon={Scale} title="All settled up" description="No one owes anything in this group." />
         ) : (
-          <div className="divide-y divide-cosfy-border">
+          <div className="space-y-3">
             {debts.map((d, i) => (
-              <div key={i} className="flex items-center justify-between py-3">
-                <p className="text-[14px] text-cosfy-ink">
+              <div key={i} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
+                <IconTile icon={Scale} tone={d.involvesYou ? "dark" : "soft"} size={44} />
+                <p className="flex-1 min-w-0 text-[14px] text-cosfy-ink">
                   <span className="font-semibold">{d.fromName}</span> owes{" "}
                   <span className="font-semibold">{d.toName}</span>
                 </p>
@@ -76,10 +79,11 @@ export function GroupTabs({
         (settlements.length === 0 ? (
           <EmptyState icon={History} title="No settlements yet" description="Recorded settlements will show here." />
         ) : (
-          <div className="divide-y divide-cosfy-border">
+          <div className="space-y-3">
             {settlements.map((s, i) => (
-              <div key={i} className="flex items-center justify-between py-3">
-                <div>
+              <div key={i} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
+                <IconTile icon={CheckCircle2} tone="soft" size={44} />
+                <div className="flex-1 min-w-0">
                   <p className="text-[14px] text-cosfy-ink">
                     <span className="font-semibold">{s.fromName}</span> paid{" "}
                     <span className="font-semibold">{s.toName}</span>
