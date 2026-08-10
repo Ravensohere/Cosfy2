@@ -25,7 +25,7 @@ export async function savePersonalization(input: PersonalizationInput) {
     data: { preferredName: parsed.data.preferredName, age: parsed.data.age ?? null },
   });
 
-  redirect("/home");
+  redirect("/coach");
 }
 
 export async function updatePersonalization(input: PersonalizationInput) {

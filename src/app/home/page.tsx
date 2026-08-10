@@ -134,10 +134,11 @@ export default async function HomePage({
         <StatCard label={t("home.surplus")} amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mt-6 max-w-[280px] mx-auto">
+      <div className="grid grid-cols-4 gap-2 mt-6 max-w-[320px] mx-auto">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
         <QuickActionLink href="/coach" icon="Sparkles" label="Coach" />
+        <QuickActionLink href="/learn" icon="GraduationCap" label="Learn" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">

@@ -9,6 +9,7 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { formatINR } from "@/lib/format";
+import { inviteLine } from "@/lib/invite-link";
 import { CopyButton } from "./CopyButton";
 
 export default async function SplitResultPage({ params }: { params: Promise<{ groupExpenseId: string }> }) {
@@ -22,12 +23,13 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
 
   if (!expense) notFound();
 
-  const summaryText = [
-    `${expense.description} — ${formatINR(expense.totalAmount)}`,
-    `Paid by ${expense.paidByMember.name}`,
-    ...expense.splits.map((s) => `${s.member.name}: ${formatINR(s.shareAmount)}`),
-    `Sent via Cosfy`,
-  ].join("\n");
+  const summaryText =
+    [
+      `${expense.description} — ${formatINR(expense.totalAmount)}`,
+      `Paid by ${expense.paidByMember.name}`,
+      ...expense.splits.map((s) => `${s.member.name}: ${formatINR(s.shareAmount)}`),
+      `Sent via Cosfy`,
+    ].join("\n") + inviteLine();
 
   return (
     <PageContainer title="Split complete" backHref={`/groups/${expense.groupId}`}>

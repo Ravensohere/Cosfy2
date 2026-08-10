@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Cosfy",
     short_name: "Cosfy",
     description: "Track spending, split bills, and build better money habits — built for India.",
-    start_url: "/home",
+    start_url: "/coach",
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",

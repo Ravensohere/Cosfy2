@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, TriangleAlert } from "lucide-react";
+import { Send, TriangleAlert, Mic } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { FormattedAIText } from "@/components/ui/FormattedAIText";
 import { cn } from "@/lib/cn";
@@ -16,14 +16,40 @@ type Message = {
 export function ChatWindow({
   greeting = "Ask me about budgeting, saving, or finance news. I'm a helper, not a financial advisor — double check anything important.",
   suggestedQuestions,
+  allowVoice = false,
 }: {
   greeting?: string;
   suggestedQuestions?: string[];
+  allowVoice?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: greeting }]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const voiceInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleVoiceFile(file: File) {
+    setVoiceError(null);
+    setIsTranscribing(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/import/voice-chat", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) {
+        setVoiceError(data.error ?? "Couldn't transcribe that.");
+        return;
+      }
+      setInput(data.transcript);
+    } catch {
+      setVoiceError("Couldn't reach the server.");
+    } finally {
+      setIsTranscribing(false);
+      if (voiceInputRef.current) voiceInputRef.current.value = "";
+    }
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,6 +112,7 @@ export function ChatWindow({
           ))}
         </div>
       ) : null}
+      {voiceError ? <p className="text-[11px] text-cosfy-red pb-1.5">{voiceError}</p> : null}
       <div className="flex gap-2 pt-2 border-t border-cosfy-border">
         <Input
           value={input}
@@ -93,9 +120,33 @@ export function ChatWindow({
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSend();
           }}
-          placeholder="e.g. How much should I save monthly?"
-          disabled={isSending}
+          placeholder={isTranscribing ? "Listening…" : "e.g. How much should I save monthly?"}
+          disabled={isSending || isTranscribing}
         />
+        {allowVoice ? (
+          <>
+            <input
+              ref={voiceInputRef}
+              type="file"
+              accept="audio/*"
+              capture="user"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleVoiceFile(file);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => voiceInputRef.current?.click()}
+              disabled={isSending || isTranscribing}
+              aria-label="Record voice message"
+              className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-card-soft text-cosfy-ink-soft flex items-center justify-center disabled:opacity-40"
+            >
+              <Mic size={18} strokeWidth={2.5} />
+            </button>
+          </>
+        ) : null}
         <button
           type="button"
           onClick={() => handleSend()}

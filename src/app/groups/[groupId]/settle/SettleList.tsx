@@ -9,6 +9,7 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { recordSettlement } from "@/lib/actions/groups";
 import { formatINR } from "@/lib/format";
+import { inviteLine } from "@/lib/invite-link";
 
 type Debt = { fromMemberId: string; fromName: string; toMemberId: string; toName: string; amount: number };
 
@@ -24,9 +25,11 @@ export function SettleList({ groupId, groupName, debts }: { groupId: string; gro
   }
 
   function message(d: Debt) {
-    return tone === "Friendly"
-      ? `Hey ${d.fromName} — ${formatINR(d.amount)} is pending for ${groupName}. Settle whenever works.`
-      : `${d.fromName}, please settle ${formatINR(d.amount)} for ${groupName}.`;
+    const base =
+      tone === "Friendly"
+        ? `Hey ${d.fromName} — ${formatINR(d.amount)} is pending for ${groupName}. Settle whenever works.`
+        : `${d.fromName}, please settle ${formatINR(d.amount)} for ${groupName}.`;
+    return base + inviteLine();
   }
 
   function handleRecordSettled(d: Debt) {

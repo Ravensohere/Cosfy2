@@ -32,6 +32,10 @@ export async function POST(req: Request) {
     user.preferredName ? `they go by ${user.preferredName}.` : "no name on file, don't guess one."
   }\n\nTheir financial picture:\n${toPromptSummary(context)}\n\nUse this only when it's actually relevant to their question — don't force it into every answer.`;
 
+  if (user.language === "hi") {
+    systemPrompt += `\n\nReply in conversational Hindi (Devanagari script), the way a fluent Hindi speaker actually talks about money — not a stiff word-for-word translation. Keep numbers and ₹ amounts as digits.`;
+  }
+
   if (wantsLiveNews(lastUserMessage)) {
     const headlines = await fetchFinanceNews(lastUserMessage);
     if (headlines.length > 0) {

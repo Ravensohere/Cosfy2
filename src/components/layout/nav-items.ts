@@ -20,6 +20,7 @@ export const CORE_NAV_PREFIXES = [
   "/gold",
   "/net-worth",
   "/calendar",
+  "/learn",
 ];
 
 export const LEFT_NAV_ITEMS = [
