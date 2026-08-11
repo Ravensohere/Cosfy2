@@ -43,6 +43,10 @@ export default function AssignItemsPage() {
 
   const allAssigned = items.every((item) => (assignments[item.id] ?? []).length > 0);
 
+  function splitEverythingEqually() {
+    for (const item of items) assignAllToItem(item.id);
+  }
+
   function handleConfirm() {
     setError(null);
     if (!allAssigned) {
@@ -64,10 +68,20 @@ export default function AssignItemsPage() {
   return (
     <PageContainer title="Who had what?" backHref="/scan/participants">
       <div className="space-y-4">
-        {items.map((item) => (
+        <button
+          type="button"
+          onClick={splitEverythingEqually}
+          className="w-full text-center rounded-card bg-cosfy-card-soft border border-cosfy-border py-2.5 text-[13px] font-semibold text-cosfy-lime-deep"
+        >
+          Split everything equally instead
+        </button>
+
+        {items.map((item, index) => (
           <div key={item.id} className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold text-[14px] text-cosfy-ink">{item.name}</p>
+              <p className="font-semibold text-[14px] text-cosfy-ink">
+                <span className="text-cosfy-muted font-medium">{index + 1}.</span> {item.name}
+              </p>
               <MoneyAmount amount={item.quantity * item.price} size="sm" />
             </div>
             <div className="flex flex-wrap gap-2">

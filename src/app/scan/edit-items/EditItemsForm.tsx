@@ -110,9 +110,17 @@ export function EditItemsForm({
 
       <div>
         <FieldLabel>Items</FieldLabel>
+        <div className="flex items-center gap-2 px-0.5 mb-1">
+          <span className="w-6 text-[10px] font-semibold text-cosfy-muted text-center">#</span>
+          <span className="flex-1 text-[10px] font-semibold text-cosfy-muted">ITEM</span>
+          <span className="w-16 text-[10px] font-semibold text-cosfy-muted text-center">QTY</span>
+          <span className="w-24 text-[10px] font-semibold text-cosfy-muted text-center">PRICE</span>
+          <span className="w-8" />
+        </div>
         <div className="space-y-2">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <div key={item.id} className="flex items-center gap-2">
+              <span className="w-6 text-[13px] font-semibold text-cosfy-muted text-center shrink-0">{index + 1}</span>
               <Input
                 placeholder="Item name"
                 className="flex-1"
