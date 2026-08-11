@@ -132,6 +132,17 @@ export async function confirmBillSplit(input: z.infer<typeof confirmSplitSchema>
         payerMemberId = wizardIdToMemberId.get("you")!;
       }
 
+      const itemsBreakdown = {
+        items: items.map((i) => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+        assignments: Object.fromEntries(
+          Object.entries(assignments).map(([itemId, wizardIds]) => [
+            itemId,
+            wizardIds.map((wid) => wizardIdToMemberId.get(wid)).filter((mid): mid is string => Boolean(mid)),
+          ])
+        ),
+        taxAndCharges,
+      };
+
       const expense = await tx.groupExpense.create({
         data: {
           groupId: resolvedGroupId!,
@@ -139,6 +150,7 @@ export async function confirmBillSplit(input: z.infer<typeof confirmSplitSchema>
           totalAmount: total,
           paidByMemberId: payerMemberId,
           splitType: "ByItem",
+          itemsBreakdown,
           splits: {
             create: participants
               .map((p) => ({ memberId: wizardIdToMemberId.get(p.id)!, shareAmount: finalShare[p.id] ?? 0 }))

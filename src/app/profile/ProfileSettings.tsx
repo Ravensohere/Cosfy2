@@ -8,6 +8,7 @@ import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { RoundUpSettingsCard } from "@/components/profile/RoundUpSettingsCard";
 import { AppLockSettingsCard } from "@/components/profile/AppLockSettingsCard";
 import { GmailImportCard } from "@/components/profile/GmailImportCard";
+import { PrivacySecurityCard } from "@/components/profile/PrivacySecurityCard";
 import { LanguageSettingsCard } from "@/components/profile/LanguageSettingsCard";
 import { PersonalizationSettingsCard } from "@/components/profile/PersonalizationSettingsCard";
 import { updateNotificationsPref, deleteAccount } from "@/lib/actions/profile";
@@ -51,6 +52,8 @@ export function ProfileSettings({
   return (
     <div className="space-y-3">
       <PersonalizationSettingsCard preferredName={preferredName} age={age} />
+
+      <PrivacySecurityCard />
 
       <div className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4">
         <IconTile icon={Bell} tone="lime" size={44} />

@@ -185,6 +185,10 @@ export default function SignInPage() {
           </button>
         </div>
       )}
+
+      <p className="text-center text-[11px] text-cosfy-muted mt-6">
+        Your data is encrypted in transit, sensitive credentials are encrypted at rest, and it&apos;s never sold or shared with third parties.
+      </p>
     </div>
   );
 }

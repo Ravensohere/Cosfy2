@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HeartPulse, FileText, ChevronRight } from "lucide-react";
+import { HeartPulse, FileText, PieChart, ChevronRight } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { DonutChart } from "@/components/ui/DonutChart";
@@ -68,6 +68,11 @@ export default async function InsightsPage() {
         >
           <IconTile icon={FileText} tone="dark" size={40} />
           <span className="flex-1 text-[13px] font-semibold text-cosfy-ink">This month&apos;s report</span>
+          <ChevronRight size={18} className="text-cosfy-muted" />
+        </Link>
+        <Link href="/summary" className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
+          <IconTile icon={PieChart} tone="dark" size={40} />
+          <span className="flex-1 text-[13px] font-semibold text-cosfy-ink">Full summary, any time period</span>
           <ChevronRight size={18} className="text-cosfy-muted" />
         </Link>
       </div>

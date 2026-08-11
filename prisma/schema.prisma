@@ -227,6 +227,7 @@ model GroupExpense {
   paidByMemberId String
   paidByMember   GroupMember @relation("PaidBy", fields: [paidByMemberId], references: [id], onDelete: Cascade)
   splitType      String      @default("Equal")
+  itemsBreakdown Json?
   createdAt      DateTime    @default(now())
 
   splits ExpenseSplit[]

@@ -8,8 +8,10 @@ import { IconTile } from "@/components/ui/IconTile";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
+import { PersonSplitCard } from "@/components/finance/PersonSplitCard";
 import { formatINR } from "@/lib/format";
 import { inviteLine } from "@/lib/invite-link";
+import { parseItemsBreakdown, computePersonItems } from "@/lib/split-breakdown";
 import { CopyButton } from "./CopyButton";
 
 export default async function SplitResultPage({ params }: { params: Promise<{ groupExpenseId: string }> }) {
@@ -22,6 +24,9 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
   });
 
   if (!expense) notFound();
+
+  const breakdown = parseItemsBreakdown(expense.itemsBreakdown);
+  const memberNamesById = Object.fromEntries(expense.splits.map((s) => [s.member.id, s.member.name]));
 
   const summaryText =
     [
@@ -41,14 +46,33 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
         </p>
       </HeroCard>
 
-      <div className="space-y-2 mb-5">
-        {expense.splits.map((s) => (
-          <div key={s.id} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
-            <IconTile icon={User} tone="soft" size={40} />
-            <span className="flex-1 min-w-0 font-semibold text-[14px] text-cosfy-ink truncate">{s.member.name}</span>
-            <MoneyAmount amount={s.shareAmount} size="md" />
-          </div>
-        ))}
+      <div className="space-y-3 mb-5">
+        {expense.splits.map((s) => {
+          if (!breakdown) {
+            return (
+              <div key={s.id} className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
+                <IconTile icon={User} tone="soft" size={40} />
+                <span className="flex-1 min-w-0 font-semibold text-[14px] text-cosfy-ink truncate">{s.member.name}</span>
+                <MoneyAmount amount={s.shareAmount} size="md" />
+              </div>
+            );
+          }
+
+          const items = computePersonItems(breakdown, s.member.id, memberNamesById);
+          const itemsSum = items.reduce((sum, i) => sum + i.amount, 0);
+          const taxShare = s.shareAmount - itemsSum;
+
+          return (
+            <PersonSplitCard
+              key={s.id}
+              merchant={expense.description}
+              personName={s.member.name}
+              items={items}
+              taxShare={taxShare}
+              total={s.shareAmount}
+            />
+          );
+        })}
       </div>
 
       <div className="flex gap-2 mb-4">
