@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { useTour } from "@/components/tour/TourProvider";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
@@ -9,11 +9,15 @@ import { ProgressDots } from "@/components/onboarding/ProgressDots";
 type Rect = { top: number; left: number; width: number; height: number };
 
 const PAD = 6;
+const SAFE_MARGIN = 16;
+const GAP = 14;
 
 export function TourSpotlight() {
   const { active, stepIndex, steps, next, prev, skip, skipMissing } = useTour();
   const step = steps[stepIndex];
   const [rect, setRect] = useState<Rect | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [cardHeight, setCardHeight] = useState(200);
 
   useEffect(() => {
     if (!active || !step) {
@@ -47,6 +51,10 @@ export function TourSpotlight() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, stepIndex]);
 
+  useLayoutEffect(() => {
+    if (cardRef.current) setCardHeight(cardRef.current.offsetHeight);
+  });
+
   if (!active || !step || !rect) return null;
 
   const radius = step.radius ?? 20;
@@ -56,8 +64,20 @@ export function TourSpotlight() {
   const spotlightHeight = rect.height + PAD * 2;
 
   const viewportH = typeof window !== "undefined" ? window.innerHeight : 800;
-  const spaceBelow = viewportH - (spotlightTop + spotlightHeight);
-  const placeBelow = spaceBelow > 200 || spotlightTop < 200;
+
+  const belowTop = spotlightTop + spotlightHeight + GAP;
+  const aboveTop = spotlightTop - GAP - cardHeight;
+  const maxTop = viewportH - SAFE_MARGIN - cardHeight;
+
+  let cardTop: number;
+  if (belowTop <= maxTop) {
+    cardTop = belowTop;
+  } else if (aboveTop >= SAFE_MARGIN) {
+    cardTop = aboveTop;
+  } else {
+    cardTop = belowTop;
+  }
+  cardTop = Math.min(Math.max(cardTop, SAFE_MARGIN), Math.max(SAFE_MARGIN, maxTop));
 
   return (
     <div className="fixed inset-0 z-[200]">
@@ -75,9 +95,12 @@ export function TourSpotlight() {
 
       <div
         className="fixed left-4 right-4 z-[201] transition-all duration-300 ease-out"
-        style={placeBelow ? { top: spotlightTop + spotlightHeight + 14 } : { bottom: viewportH - spotlightTop + 14 }}
+        style={{ top: cardTop }}
       >
-        <div className="max-w-sm mx-auto rounded-card bg-cosfy-card border border-cosfy-border shadow-soft p-4">
+        <div
+          ref={cardRef}
+          className="max-w-sm mx-auto max-h-[70vh] overflow-y-auto rounded-card bg-cosfy-card border border-cosfy-border shadow-soft p-4"
+        >
           <div className="flex items-start justify-between gap-3 mb-2">
             <ProgressDots step={stepIndex + 1} total={steps.length} />
             <button
