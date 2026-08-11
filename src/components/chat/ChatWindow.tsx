@@ -16,11 +16,9 @@ type Message = {
 
 export function ChatWindow({
   greeting = "Hey, I'm here for whatever's on your mind about money. Budgeting, saving, that weird SMS, the latest finance news, ask away. I'm not a licensed advisor, so double check anything big before you act on it.",
-  suggestedQuestions,
   allowVoice = false,
 }: {
   greeting?: string;
-  suggestedQuestions?: string[];
   allowVoice?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: greeting }]);
@@ -98,21 +96,6 @@ export function ChatWindow({
         {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} showAvatar={false} /> : null}
         <div ref={bottomRef} />
       </div>
-      {suggestedQuestions && messages.length === 1 ? (
-        <div className="flex flex-wrap gap-2 pb-3">
-          {suggestedQuestions.map((q) => (
-            <button
-              key={q}
-              type="button"
-              onClick={() => handleSend(q)}
-              disabled={isSending}
-              className="text-[12px] font-semibold px-3 py-2 rounded-full bg-cosfy-card border border-cosfy-border text-cosfy-ink disabled:opacity-40"
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-      ) : null}
       {voiceError ? <p className="text-[11px] text-cosfy-red pb-1.5">{voiceError}</p> : null}
       <div className="flex gap-2 pt-2 border-t border-cosfy-border">
         <Input

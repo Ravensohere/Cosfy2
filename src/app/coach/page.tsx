@@ -7,12 +7,6 @@ import { getCurrentUser } from "@/lib/current-user";
 import { buildFinancialContext } from "@/lib/financial-context";
 import { pickContextualLesson } from "@/lib/lessons";
 
-const SUGGESTED_QUESTIONS = [
-  "Where's my money actually going?",
-  "Am I on track with my goals?",
-  "Can I afford to splurge a little?",
-];
-
 export default async function CoachPage() {
   const user = await getCurrentUser();
   if (!user.onboardingCompleted) {
@@ -46,7 +40,6 @@ export default async function CoachPage() {
       </Link>
       <ChatWindow
         greeting="I can look at your real transactions, budgets, goals, and cards to answer questions about your money. I'm not a licensed advisor, so treat this as information, not instructions."
-        suggestedQuestions={SUGGESTED_QUESTIONS}
         allowVoice
       />
     </div>
