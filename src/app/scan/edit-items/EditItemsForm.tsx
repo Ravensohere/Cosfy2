@@ -7,6 +7,7 @@ import { Input, FieldLabel } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { BillPhotoScan } from "@/components/scan/BillPhotoScan";
 import { useBillWizard, type BillItem } from "@/lib/bill-wizard-store";
 import { saveBillAsPersonalExpense } from "@/lib/actions/bills";
 
@@ -49,6 +50,14 @@ export function EditItemsForm({
     setItems((prev) => (prev.length > 1 ? prev.filter((i) => i.id !== id) : prev));
   }
 
+  function handleScanned(bill: { merchant: string; date: string | null; items: BillItem[]; taxAndCharges: number }) {
+    setError(null);
+    if (bill.merchant) setMerchant(bill.merchant);
+    if (bill.date) setDate(bill.date);
+    setItems(bill.items);
+    setTaxAndCharges(String(bill.taxAndCharges));
+  }
+
   function validate() {
     if (!merchant.trim()) return "Add a merchant name";
     if (items.some((i) => !i.name.trim())) return "Every item needs a name";
@@ -88,6 +97,8 @@ export function EditItemsForm({
 
   return (
     <div className="space-y-5">
+      <BillPhotoScan onScanned={handleScanned} />
+
       <div>
         <FieldLabel>Merchant</FieldLabel>
         <Input placeholder="e.g. Beach Shack" value={merchant} onChange={(e) => setMerchant(e.target.value)} />
