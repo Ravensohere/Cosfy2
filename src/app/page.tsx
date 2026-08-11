@@ -7,7 +7,7 @@ export default async function SplashPage() {
   const user = await getCurrentUser();
 
   if (user.onboardingCompleted) {
-    redirect("/coach");
+    redirect("/home");
   }
 
   return (

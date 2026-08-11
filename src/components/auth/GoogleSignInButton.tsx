@@ -40,7 +40,7 @@ export function GoogleSignInButton() {
         setError(outcome.error);
         return;
       }
-      router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/coach");
+      router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/home");
       router.refresh();
     } catch (err) {
       const code = getFirebaseErrorCode(err);

@@ -41,7 +41,7 @@ export default function SignInPage() {
           setError(outcome.error);
           return;
         }
-        router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/coach");
+        router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/home");
         router.refresh();
       })
       .catch((err) => setError(friendlyFirebaseError(err, "Google sign-in failed.")))
@@ -71,7 +71,7 @@ export default function SignInPage() {
         setError(outcome.error);
         return;
       }
-      router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/coach");
+      router.push(outcome.needsPersonalization ? "/onboarding/personalize" : "/home");
       router.refresh();
     } catch (err) {
       setError(friendlyFirebaseError(err, mode === "signin" ? "Wrong email or password." : "Couldn't create that account."));

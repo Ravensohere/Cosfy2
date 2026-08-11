@@ -21,6 +21,7 @@ export function FloatingChatButton() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ask Cosfy"
+        data-tour="floating-ai"
         className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-cosfy-ink text-cosfy-lime flex items-center justify-center shadow-soft active:opacity-80"
       >
         <Sparkles size={24} strokeWidth={2} />

@@ -81,7 +81,7 @@ export default async function HomePage({
 
   return (
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6" data-tour="home-greeting">
         <div className="flex items-center gap-3">
           <CosfyMascot mood={mascotMood} size={44} />
           <div>
@@ -102,7 +102,7 @@ export default async function HomePage({
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-3 mb-2">
+      <div className="flex items-center justify-center gap-3 mb-2" data-tour="home-month-picker">
         <Link
           href={`/home?m=${monthParam(prevMonth)}`}
           aria-label="Previous month"
@@ -124,17 +124,19 @@ export default async function HomePage({
         )}
       </div>
 
-      <HeroCard>
-        <p className="text-[13px] text-white/70 mb-1">{t("home.spending")}</p>
-        <MoneyAmount amount={spent} size="hero" className="text-white" />
-      </HeroCard>
+      <div data-tour="home-hero-spending">
+        <HeroCard>
+          <p className="text-[13px] text-white/70 mb-1">{t("home.spending")}</p>
+          <MoneyAmount amount={spent} size="hero" className="text-white" />
+        </HeroCard>
+      </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-4">
+      <div className="grid grid-cols-2 gap-3 mt-4" data-tour="home-stats">
         <StatCard label={t("home.income")} amount={income} />
         <StatCard label={t("home.surplus")} amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mt-6 max-w-[220px] mx-auto">
+      <div className="grid grid-cols-2 gap-2 mt-6 max-w-[220px] mx-auto" data-tour="home-quick-actions">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
       </div>
@@ -147,15 +149,15 @@ export default async function HomePage({
         </p>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6" data-tour="home-streak">
         <StreakBadge noSpendStreak={noSpendStreak} loggingStreak={loggingStreak} />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6" data-tour="home-net-worth">
         <NetWorthWidget netWorth={netWorth.netWorth} />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6" data-tour="home-recent-activity">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-[15px] font-extrabold text-cosfy-ink">{t("home.recentActivity")}</h2>
           {recentTransactions.length > 0 && (
@@ -183,7 +185,7 @@ export default async function HomePage({
       </div>
 
       {headlines.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-6" data-tour="home-news">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-[15px] font-extrabold text-cosfy-ink">{t("home.financeNews")}</h2>
             <Link href="/news" className="text-[12px] font-semibold text-cosfy-lime-deep">

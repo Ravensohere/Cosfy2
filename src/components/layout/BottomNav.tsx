@@ -32,6 +32,7 @@ export function BottomNav() {
           type="button"
           aria-label="Add expense"
           onClick={openQuickAdd}
+          data-tour="nav-add"
           className="flex items-center justify-center w-16 h-16 rounded-full bg-cosfy-lime text-cosfy-lime-ink -mt-6 shadow-soft shrink-0"
         >
           <Plus size={30} strokeWidth={2.5} />
@@ -63,7 +64,12 @@ function NavLink({
   active: boolean;
 }) {
   return (
-    <Link href={href} aria-label={label} className="flex-1 flex flex-col items-center justify-center gap-0.5">
+    <Link
+      href={href}
+      aria-label={label}
+      data-tour={`nav-${href.slice(1)}`}
+      className="flex-1 flex flex-col items-center justify-center gap-0.5"
+    >
       <Icon size={24} strokeWidth={active ? 2.5 : 2} className={active ? "text-cosfy-lime-deep" : "text-cosfy-muted"} />
       <span className={cn("text-[9px] font-semibold", active ? "text-cosfy-lime-deep" : "text-cosfy-muted")}>
         {label}

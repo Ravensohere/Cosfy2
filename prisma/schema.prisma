@@ -13,6 +13,7 @@ model User {
   onboardingGoals      String[] @default([])
   lifeStage            String?
   onboardingCompleted  Boolean  @default(false)
+  tourCompleted        Boolean  @default(false)
   notificationsEnabled Boolean  @default(true)
   openaiApiKey         String?
   firebaseUid          String?  @unique
@@ -22,7 +23,7 @@ model User {
   authProvider         String?
   createdAt            DateTime @default(now())
 
-  // net worth — manual inputs (no live account-aggregation integration)
+  // net worth: manual inputs (no live account-aggregation integration)
   bankBalance      Float?
   otherInvestments Float?
   epfBalance       Float?
