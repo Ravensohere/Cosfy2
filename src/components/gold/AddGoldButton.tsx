@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createGoldHolding } from "@/lib/actions/gold";
 import { GOLD_TYPES } from "@/lib/constants";
@@ -93,7 +94,7 @@ export function AddGoldButton({ variant = "icon" }: { variant?: "icon" | "primar
             </div>
             <div>
               <FieldLabel>Purchase date</FieldLabel>
-              <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+              <DatePickerField value={purchaseDate} onChange={setPurchaseDate} />
             </div>
           </div>
           <div>

@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { GOAL_TYPES } from "@/lib/constants";
 import { createGoal } from "@/lib/actions/goals";
@@ -83,7 +84,7 @@ export function CreateGoalForm({ avgMonthlySurplus }: { avgMonthlySurplus: numbe
 
       <div>
         <FieldLabel>Target date (optional)</FieldLabel>
-        <Input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
+        <DatePickerField value={targetDate} onChange={setTargetDate} />
       </div>
 
       {feasibility && (

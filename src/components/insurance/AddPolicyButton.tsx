@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createInsurancePolicy } from "@/lib/actions/insurance";
 import { INSURANCE_TYPES, INSURANCE_FREQUENCIES } from "@/lib/constants";
@@ -118,7 +119,7 @@ export function AddPolicyButton({ variant = "icon" }: { variant?: "icon" | "prim
             </div>
             <div>
               <FieldLabel>Next renewal date</FieldLabel>
-              <Input type="date" value={nextRenewalDate} onChange={(e) => setNextRenewalDate(e.target.value)} />
+              <DatePickerField value={nextRenewalDate} onChange={setNextRenewalDate} />
             </div>
           </div>
           {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}

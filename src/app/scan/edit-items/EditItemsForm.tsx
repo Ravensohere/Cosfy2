@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Plus } from "lucide-react";
 import { Input, FieldLabel } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
@@ -105,7 +106,7 @@ export function EditItemsForm({
       </div>
       <div>
         <FieldLabel>Bill date</FieldLabel>
-        <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <DatePickerField value={date} onChange={setDate} />
       </div>
 
       <div>

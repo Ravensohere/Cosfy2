@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PillChip } from "@/components/ui/PillChip";
-import { Input, FieldLabel } from "@/components/ui/Input";
+import { FieldLabel } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { RANGE_PRESETS, type RangePreset } from "@/lib/summary-range";
 
@@ -53,11 +54,11 @@ export function RangePicker({
         <div className="flex items-end gap-2 mt-3">
           <div className="flex-1">
             <FieldLabel>From</FieldLabel>
-            <Input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+            <DatePickerField value={start} onChange={setStart} maxDate={end || undefined} />
           </div>
           <div className="flex-1">
             <FieldLabel>To</FieldLabel>
-            <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
+            <DatePickerField value={end} onChange={setEnd} minDate={start || undefined} />
           </div>
           <PrimaryButton className="h-[52px] px-4 text-[13px]" disabled={!start || !end} onClick={applyCustom}>
             Go

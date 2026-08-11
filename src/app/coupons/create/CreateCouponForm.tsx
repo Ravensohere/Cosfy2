@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Input, FieldLabel, Textarea } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { CouponPhotoScan } from "@/components/coupons/CouponPhotoScan";
 import { createCoupon } from "@/lib/actions/coupons";
@@ -64,7 +65,7 @@ export function CreateCouponForm() {
       </div>
       <div>
         <FieldLabel>Expires on (optional)</FieldLabel>
-        <Input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+        <DatePickerField value={expiresAt} onChange={setExpiresAt} placeholder="No expiry" />
       </div>
 
       {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}

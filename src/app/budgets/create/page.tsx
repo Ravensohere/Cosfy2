@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { BUDGET_TYPES, CATEGORIES, BUDGET_PRESETS, type CategoryValue } from "@/lib/constants";
@@ -130,11 +131,11 @@ export default function CreateBudgetPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <FieldLabel>Starts</FieldLabel>
-                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                <DatePickerField value={startDate} onChange={setStartDate} />
               </div>
               <div>
                 <FieldLabel>Ends</FieldLabel>
-                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                <DatePickerField value={endDate} onChange={setEndDate} minDate={startDate || undefined} />
               </div>
             </div>
           ) : null}

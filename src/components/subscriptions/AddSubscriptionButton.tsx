@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createSubscription } from "@/lib/actions/subscriptions";
 import { SUBSCRIPTION_CYCLES } from "@/lib/constants";
@@ -95,7 +96,7 @@ export function AddSubscriptionButton({ variant = "icon" }: { variant?: "icon" |
           </div>
           <div>
             <FieldLabel>Next renewal date</FieldLabel>
-            <Input type="date" value={nextRenewalDate} onChange={(e) => setNextRenewalDate(e.target.value)} />
+            <DatePickerField value={nextRenewalDate} onChange={setNextRenewalDate} />
           </div>
           {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
           <PrimaryButton fullWidth type="button" disabled={isPending || !name.trim()} onClick={handleSubmit}>
