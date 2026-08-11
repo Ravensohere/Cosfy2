@@ -6,8 +6,20 @@ import { IconTile } from "@/components/ui/IconTile";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ProfileSettings } from "./ProfileSettings";
 
-export default async function ProfilePage() {
+const GMAIL_STATUS_MESSAGES: Record<string, { text: string; tone: "success" | "error" }> = {
+  connected: { text: "Gmail connected. Tap \"Sync now\" below to pull in transactions.", tone: "success" },
+  error: { text: "Couldn't connect Gmail. Try again.", tone: "error" },
+  "not-configured": { text: "Gmail import isn't set up on the server yet.", tone: "error" },
+};
+
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ gmail?: string }>;
+}) {
   const user = await getCurrentUser();
+  const { gmail } = await searchParams;
+  const gmailStatus = gmail ? GMAIL_STATUS_MESSAGES[gmail] : undefined;
 
   const [billsScanned, groupsCount, goals] = await Promise.all([
     db.groupExpense.count({ where: { splitType: "ByItem", group: { userId: user.id } } }),
@@ -19,6 +31,17 @@ export default async function ProfilePage() {
 
   return (
     <PageContainer title="Profile">
+      {gmailStatus ? (
+        <p
+          className={`text-[13px] font-semibold rounded-card p-3 mb-4 ${
+            gmailStatus.tone === "success"
+              ? "bg-cosfy-lime-pale text-cosfy-lime-ink border border-cosfy-lime-soft"
+              : "bg-cosfy-red-soft text-cosfy-red border border-cosfy-red/20"
+          }`}
+        >
+          {gmailStatus.text}
+        </p>
+      ) : null}
       <div className="rounded-[22px] bg-cosfy-dark-card text-white p-5 mb-4 flex items-center gap-4" data-tour="profile-header">
         <IconTile icon={User} tone="lime" size={56} />
         <div className="flex-1 min-w-0">
@@ -51,6 +74,8 @@ export default async function ProfilePage() {
         appLockEnabled={user.appLockEnabled}
         preferredName={user.preferredName}
         age={user.age}
+        gmailConnected={user.gmailConnected}
+        gmailEmail={user.gmailEmail}
       />
     </PageContainer>
   );

@@ -44,6 +44,12 @@ model User {
   preferredName String?
   age           Int?
 
+  // Gmail auto-import
+  gmailConnected       Boolean   @default(false)
+  gmailEmail           String?
+  gmailRefreshTokenEnc String?
+  gmailLastSyncAt      DateTime?
+
   transactions      Transaction[]
   groups            Group[]
   budgets           Budget[]
@@ -53,6 +59,17 @@ model User {
   insurancePolicies InsurancePolicy[]
   subscriptions     Subscription[]
   goldHoldings      GoldHolding[]
+  gmailImports      GmailImportRecord[]
+}
+
+model GmailImportRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  messageId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, messageId])
 }
 
 model CreditCard {

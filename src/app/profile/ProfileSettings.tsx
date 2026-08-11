@@ -7,6 +7,7 @@ import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { RoundUpSettingsCard } from "@/components/profile/RoundUpSettingsCard";
 import { AppLockSettingsCard } from "@/components/profile/AppLockSettingsCard";
+import { GmailImportCard } from "@/components/profile/GmailImportCard";
 import { LanguageSettingsCard } from "@/components/profile/LanguageSettingsCard";
 import { PersonalizationSettingsCard } from "@/components/profile/PersonalizationSettingsCard";
 import { updateNotificationsPref, deleteAccount } from "@/lib/actions/profile";
@@ -20,6 +21,8 @@ export function ProfileSettings({
   appLockEnabled,
   preferredName,
   age,
+  gmailConnected,
+  gmailEmail,
 }: {
   notificationsEnabled: boolean;
   roundUpEnabled: boolean;
@@ -29,6 +32,8 @@ export function ProfileSettings({
   appLockEnabled: boolean;
   preferredName: string | null;
   age: number | null;
+  gmailConnected: boolean;
+  gmailEmail: string | null;
 }) {
   const [notifications, setNotifications] = useState(notificationsEnabled);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -64,6 +69,8 @@ export function ProfileSettings({
       />
 
       <AppLockSettingsCard appLockEnabled={appLockEnabled} />
+
+      <GmailImportCard gmailConnected={gmailConnected} gmailEmail={gmailEmail} />
 
       <LanguageSettingsCard />
 
