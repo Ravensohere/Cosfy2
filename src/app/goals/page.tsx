@@ -12,6 +12,7 @@ import {
   Coins,
   TrendingUp,
   CalendarDays,
+  Tag,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -104,6 +105,7 @@ export default async function GoalsPage() {
           <ToolLink href="/loans" icon={Landmark} label="Loans & EMIs" />
           <ToolLink href="/insurance" icon={ShieldCheck} label="Insurance" />
           <ToolLink href="/subscriptions" icon={Repeat} label="Subscriptions" />
+          <ToolLink href="/coupons" icon={Tag} label="Coupons" />
           <ToolLink href="/gold" icon={Coins} label="Gold" />
           <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
           <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />

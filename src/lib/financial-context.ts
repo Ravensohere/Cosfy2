@@ -16,6 +16,7 @@ export type FinancialContext = {
   creditCards: { name: string; due: number; urgency: string; daysUntilDue: number }[];
   subscriptions: { name: string; amount: number; cycle: string }[];
   insurancePolicies: { policyName: string; type: string; premiumAmount: number }[];
+  coupons: { title: string; merchant: string | null; code: string | null; expiresAt: Date | null }[];
   hasEnoughData: boolean;
 };
 
@@ -24,7 +25,7 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const [expenseTx, netWorth, averageMonthlySurplus, budgetRows, goalRows, creditCards, subscriptions, insurancePolicies, txCount] =
+  const [expenseTx, netWorth, averageMonthlySurplus, budgetRows, goalRows, creditCards, subscriptions, insurancePolicies, coupons, txCount] =
     await Promise.all([
       db.transaction.findMany({ where: { userId, amount: { lt: 0 }, date: { gte: lastMonthStart } } }),
       getNetWorthBreakdown(userId),
@@ -34,6 +35,7 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
       db.creditCard.findMany({ where: { userId } }),
       db.subscription.findMany({ where: { userId, isActive: true } }),
       db.insurancePolicy.findMany({ where: { userId } }),
+      db.coupon.findMany({ where: { userId, isRedeemed: false, OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] } }),
       db.transaction.count({ where: { userId } }),
     ]);
 
@@ -90,6 +92,7 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
     creditCards: creditCardStatus,
     subscriptions: subscriptions.map((s) => ({ name: s.name, amount: s.amount, cycle: s.cycle })),
     insurancePolicies: insurancePolicies.map((p) => ({ policyName: p.policyName, type: p.type, premiumAmount: p.premiumAmount })),
+    coupons: coupons.map((c) => ({ title: c.title, merchant: c.merchant, code: c.code, expiresAt: c.expiresAt })),
     hasEnoughData: txCount >= 5,
   };
 }
@@ -133,6 +136,21 @@ export function toPromptSummary(ctx: FinancialContext): string {
 
   if (ctx.subscriptions.length > 0) {
     lines.push(`Active subscriptions: ${ctx.subscriptions.map((s) => `${s.name} ${formatINR(s.amount)}/${s.cycle}`).join(", ")}.`);
+  }
+
+  if (ctx.coupons.length > 0) {
+    const couponList = ctx.coupons
+      .map((c) => {
+        const parts = [c.title];
+        if (c.merchant) parts.push(`at ${c.merchant}`);
+        if (c.code) parts.push(`code ${c.code}`);
+        if (c.expiresAt) parts.push(`expires ${c.expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`);
+        return parts.join(", ");
+      })
+      .join("; ");
+    lines.push(
+      `Saved coupons they haven't used yet: ${couponList}. If they mention wanting to buy something or from a store that matches one of these, remind them of it and the code. Don't mention coupons otherwise.`
+    );
   }
 
   if (!ctx.hasEnoughData) {

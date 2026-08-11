@@ -35,8 +35,8 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "home-quick-actions",
     path: "/home",
-    title: "Split bills and groups",
-    body: "Scan a bill to split it with friends, or manage shared expense groups here.",
+    title: "Split bills, groups, and coupons",
+    body: "Scan a bill to split it with friends, manage shared expense groups, or save coupons before you forget to use them.",
   },
   {
     id: "home-streak",

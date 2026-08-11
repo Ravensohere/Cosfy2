@@ -21,6 +21,7 @@ export const CORE_NAV_PREFIXES = [
   "/net-worth",
   "/calendar",
   "/learn",
+  "/coupons",
 ];
 
 export const LEFT_NAV_ITEMS = [

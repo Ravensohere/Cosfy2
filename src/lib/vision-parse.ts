@@ -73,3 +73,40 @@ export async function extractBillFromImage(apiKey: string, dataUrl: string): Pro
     return empty;
   }
 }
+
+export type VisionCoupon = {
+  title: string;
+  merchant: string;
+  code: string;
+  description: string;
+  expiresAt: string | null;
+};
+
+const COUPON_PROMPT =
+  'Extract the offer from this coupon, promo code, or discount voucher photo/screenshot. Respond with strict JSON only: ' +
+  '{"title": string, "merchant": string, "code": string, "description": string, "expiresAt": string | null}. ' +
+  '"title" is a short summary like "20% off first order" or "Free delivery". "merchant" is the brand or store name, empty string if unclear. ' +
+  '"code" is the promo/coupon code to enter at checkout, empty string if none (auto-applied offers have no code). ' +
+  '"description" is any terms shown (min order value, category, etc.), empty string if none. "expiresAt" is YYYY-MM-DD if a valid-until date is visible, else null.';
+
+export async function extractCouponFromImage(apiKey: string, dataUrl: string): Promise<VisionCoupon> {
+  const empty: VisionCoupon = { title: "", merchant: "", code: "", description: "", expiresAt: null };
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) return empty;
+  const [, mimeType, base64Data] = match;
+
+  const content = await callGeminiJSON({ apiKey, prompt: COUPON_PROMPT, mimeType, base64Data });
+
+  try {
+    const parsed = JSON.parse(content);
+    return {
+      title: typeof parsed.title === "string" ? parsed.title : "",
+      merchant: typeof parsed.merchant === "string" ? parsed.merchant : "",
+      code: typeof parsed.code === "string" ? parsed.code : "",
+      description: typeof parsed.description === "string" ? parsed.description : "",
+      expiresAt: typeof parsed.expiresAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.expiresAt) ? parsed.expiresAt : null,
+    };
+  } catch {
+    return empty;
+  }
+}

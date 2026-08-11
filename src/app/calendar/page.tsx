@@ -1,18 +1,25 @@
-import { CalendarDays, CreditCard, Landmark, ShieldCheck, Repeat, Target } from "lucide-react";
+import { CalendarDays, CreditCard, Landmark, ShieldCheck, Repeat, Target, Tag } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
-import { nextDueDate, daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { nextDueDate, daysUntil, dueUrgency, type DueUrgency } from "@/lib/credit-card-status";
 
 type CalendarEntry = {
   label: string;
   date: Date;
-  amount: number;
+  amount?: number;
   icon: typeof CreditCard;
   href: string;
 };
+
+function urgencyFor(days: number, amount: number | undefined): DueUrgency {
+  if (amount !== undefined) return dueUrgency(days, amount);
+  if (days < 0) return "overdue";
+  if (days <= 5) return "soon";
+  return "upcoming";
+}
 
 const URGENCY_STYLES = {
   overdue: "text-cosfy-red",
@@ -23,12 +30,13 @@ const URGENCY_STYLES = {
 
 export default async function CalendarPage() {
   const user = await getCurrentUser();
-  const [creditCards, loans, policies, subscriptions, goals] = await Promise.all([
+  const [creditCards, loans, policies, subscriptions, goals, coupons] = await Promise.all([
     db.creditCard.findMany({ where: { userId: user.id } }),
     db.loan.findMany({ where: { userId: user.id } }),
     db.insurancePolicy.findMany({ where: { userId: user.id } }),
     db.subscription.findMany({ where: { userId: user.id, isActive: true } }),
     db.goal.findMany({ where: { userId: user.id, targetDate: { not: null } } }),
+    db.coupon.findMany({ where: { userId: user.id, isRedeemed: false, expiresAt: { not: null } } }),
   ]);
 
   const entries: CalendarEntry[] = [
@@ -39,6 +47,7 @@ export default async function CalendarPage() {
     ...policies.map((p) => ({ label: `${p.policyName} renewal`, date: p.nextRenewalDate, amount: p.premiumAmount, icon: ShieldCheck, href: "/insurance" })),
     ...subscriptions.map((s) => ({ label: `${s.name} renewal`, date: s.nextRenewalDate, amount: s.amount, icon: Repeat, href: "/subscriptions" })),
     ...goals.map((g) => ({ label: `${g.name} target date`, date: g.targetDate as Date, amount: g.targetAmount, icon: Target, href: `/goals/${g.id}` })),
+    ...coupons.map((c) => ({ label: `${c.title} expires`, date: c.expiresAt as Date, icon: Tag, href: "/coupons" })),
   ];
 
   const sixtyDaysOut = new Date();
@@ -62,7 +71,7 @@ export default async function CalendarPage() {
         <EmptyState
           icon={CalendarDays}
           title="Nothing due in the next 60 days"
-          description="Credit card bills, EMIs, insurance renewals, subscriptions, and goal target dates will show up here."
+          description="Credit card bills, EMIs, insurance renewals, subscriptions, coupon expiries, and goal target dates will show up here."
         />
       ) : (
         <div className="space-y-6">
@@ -72,7 +81,7 @@ export default async function CalendarPage() {
               <div className="space-y-2.5">
                 {monthEntries.map((entry, i) => {
                   const days = daysUntil(entry.date);
-                  const urgency = dueUrgency(days, entry.amount);
+                  const urgency = urgencyFor(days, entry.amount);
                   const Icon = entry.icon;
                   return (
                     <a
@@ -88,7 +97,7 @@ export default async function CalendarPage() {
                           {days === 0 ? "Today" : days > 0 ? `In ${days}d` : `${Math.abs(days)}d ago`}
                         </p>
                       </div>
-                      <MoneyAmount amount={entry.amount} size="sm" />
+                      {entry.amount !== undefined ? <MoneyAmount amount={entry.amount} size="sm" /> : null}
                     </a>
                   );
                 })}

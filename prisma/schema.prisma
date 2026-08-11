@@ -60,6 +60,22 @@ model User {
   subscriptions     Subscription[]
   goldHoldings      GoldHolding[]
   gmailImports      GmailImportRecord[]
+  coupons           Coupon[]
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  merchant    String?
+  code        String?
+  description String?
+  expiresAt   DateTime?
+  isRedeemed  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, expiresAt])
 }
 
 model GmailImportRecord {
