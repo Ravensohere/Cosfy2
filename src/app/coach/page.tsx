@@ -26,7 +26,7 @@ export default async function CoachPage() {
       <div className="flex items-center gap-3 mb-4" data-tour="coach-chat">
         <CosfyMascot mood={mood} size={44} />
         <div>
-          <p className="text-[13px] text-cosfy-muted">Cosfy Coach</p>
+          <p className="text-[13px] text-cosfy-muted">Kosh, your Cosfy coach</p>
           <p className="text-[18px] font-extrabold text-cosfy-ink">Hey{name}, ask me anything</p>
         </div>
       </div>

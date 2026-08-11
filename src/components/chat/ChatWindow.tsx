@@ -15,7 +15,7 @@ type Message = {
 };
 
 export function ChatWindow({
-  greeting = "Hey, I'm here for whatever's on your mind about money. Budgeting, saving, that weird SMS, the latest finance news, ask away. I'm not a licensed advisor, so double check anything big before you act on it.",
+  greeting = "Hey, I'm Kosh. Whatever's on your mind about money, budgeting, saving, that weird SMS, the latest finance news, ask away. I'm not a licensed advisor, so double check anything big before you act on it.",
   allowVoice = false,
 }: {
   greeting?: string;
@@ -93,7 +93,7 @@ export function ChatWindow({
         {messages.map((m, i) => (
           <ChatBubble key={i} message={m} showAvatar={i === 0} />
         ))}
-        {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} showAvatar={false} /> : null}
+        {isSending ? <ThinkingBubble /> : null}
         <div ref={bottomRef} />
       </div>
       {voiceError ? <p className="text-[11px] text-cosfy-red pb-1.5">{voiceError}</p> : null}
@@ -145,6 +145,19 @@ export function ChatWindow({
   );
 }
 
+function ThinkingBubble() {
+  return (
+    <div className="flex items-end gap-2 justify-start">
+      <CosfyMascot mood="thinking" size={28} interactive={false} />
+      <div className="rounded-card px-4 py-3 bg-cosfy-card border border-cosfy-border flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-cosfy-muted animate-bounce [animation-delay:-0.3s]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-cosfy-muted animate-bounce [animation-delay:-0.15s]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-cosfy-muted animate-bounce" />
+      </div>
+    </div>
+  );
+}
+
 function ChatBubble({ message, showAvatar }: { message: Message; showAvatar: boolean }) {
   const isUser = message.role === "user";
   return (
@@ -157,7 +170,7 @@ function ChatBubble({ message, showAvatar }: { message: Message; showAvatar: boo
         )}
       >
         {isUser ? <p className="whitespace-pre-wrap">{message.content}</p> : <FormattedAIText text={message.content} />}
-        {!isUser && message.content !== "Thinking…" ? (
+        {!isUser ? (
           <div className="mt-2 pt-2 border-t border-cosfy-border flex items-start gap-1.5 text-[11px] text-cosfy-amber">
             <TriangleAlert size={13} className="mt-[1px] shrink-0" />
             <span>

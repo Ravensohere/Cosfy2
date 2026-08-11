@@ -30,8 +30,8 @@ export function FloatingChatButton() {
         <div className="flex flex-col gap-3">
           <MenuOption
             href="/coach"
-            title="AI Coach"
-            description="Chat about your spending, budgets, and goals"
+            title="Kosh"
+            description="Your AI money coach, chat about spending, budgets, and goals"
             onClick={() => setOpen(false)}
           >
             <CosfyMascot mood="happy" size={48} />

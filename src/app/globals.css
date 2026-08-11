@@ -118,9 +118,38 @@ body {
   50% { transform: translateY(-2px) rotate(-1.5deg); }
 }
 
+@keyframes cosfy-mascot-bob-happy {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  35% { transform: translateY(-4px) rotate(3deg) scale(1.03); }
+  65% { transform: translateY(-1px) rotate(-2deg) scale(1.01); }
+}
+
+@keyframes cosfy-mascot-bob-concerned {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(1px) rotate(-1deg); }
+}
+
+@keyframes cosfy-mascot-bob-thinking {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-1px) rotate(2deg); }
+}
+
 @keyframes cosfy-mascot-blink {
   0%, 90%, 100% { transform: scaleY(1); }
   93%, 96% { transform: scaleY(0.1); }
+}
+
+@keyframes cosfy-mascot-eye-shift {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1.2px); }
+  75% { transform: translateX(1.2px); }
+}
+
+@keyframes cosfy-mascot-tap {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.88, 1.12); }
+  60% { transform: scale(1.08, 0.94); }
+  100% { transform: scale(1); }
 }
 
 .cosfy-mascot-bob {
@@ -129,15 +158,50 @@ body {
   animation: cosfy-mascot-bob 3.6s ease-in-out infinite;
 }
 
+.cosfy-mascot-bob-happy {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-bob-happy 1.8s ease-in-out infinite;
+}
+
+.cosfy-mascot-bob-concerned {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-bob-concerned 4.5s ease-in-out infinite;
+}
+
+.cosfy-mascot-bob-thinking {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-bob-thinking 1.1s ease-in-out infinite;
+}
+
 .cosfy-mascot-eye {
   transform-box: fill-box;
   transform-origin: center;
   animation: cosfy-mascot-blink 4.8s ease-in-out infinite;
 }
 
+.cosfy-mascot-eye-thinking {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-eye-shift 1.6s ease-in-out infinite;
+}
+
+.cosfy-mascot-tap {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-tap 0.4s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cosfy-mascot-bob,
-  .cosfy-mascot-eye {
+  .cosfy-mascot-bob-happy,
+  .cosfy-mascot-bob-concerned,
+  .cosfy-mascot-bob-thinking,
+  .cosfy-mascot-eye,
+  .cosfy-mascot-eye-thinking,
+  .cosfy-mascot-tap {
     animation: none;
   }
 }

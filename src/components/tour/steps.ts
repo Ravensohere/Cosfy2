@@ -10,8 +10,8 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "home-greeting",
     path: "/home",
-    title: "Meet your mascot",
-    body: "This little guy changes mood with your finances, happy when you're saving, concerned when you're overspending.",
+    title: "Meet Kosh",
+    body: "Kosh changes mood with your finances, happy when you're saving, concerned when you're overspending. Give Kosh a tap.",
   },
   {
     id: "home-month-picker",
@@ -100,15 +100,15 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "floating-ai",
     path: "/home",
-    title: "Ask Cosfy anything",
-    body: "Tap here anytime for your AI Coach or a quick lesson from Money School.",
+    title: "Ask Kosh anything",
+    body: "Tap here anytime to chat with Kosh, your AI money coach, or grab a quick lesson from Money School.",
     radius: 999,
   },
   {
     id: "coach-chat",
     path: "/coach",
-    title: "Your AI coach",
-    body: "Ask anything about your spending, budgets, or goals. Cosfy answers using your real numbers, not generic advice.",
+    title: "This is Kosh",
+    body: "Ask anything about your spending, budgets, or goals. Kosh answers using your real numbers, not generic advice.",
   },
   {
     id: "learn-featured",
