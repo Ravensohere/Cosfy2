@@ -27,6 +27,7 @@ export default async function LearnPage({
     <PageContainer title="Money School" backHref="/coach">
       <Link
         href={`/learn/${featured.id}`}
+        data-tour="learn-featured"
         className="block rounded-card bg-cosfy-dark-card text-cosfy-dark-card-text p-5 mb-5"
       >
         <p className="text-[12px] text-white/60 mb-1">Picked for you</p>

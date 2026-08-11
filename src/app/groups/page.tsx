@@ -50,7 +50,7 @@ export default async function GroupsPage({
     <PageContainer
       title="Groups"
       action={
-        <PrimaryButton href="/groups/create" className="h-9 px-4 text-[12px]">
+        <PrimaryButton href="/groups/create" data-tour="groups-new" className="h-9 px-4 text-[12px]">
           <Plus size={16} /> New
         </PrimaryButton>
       }

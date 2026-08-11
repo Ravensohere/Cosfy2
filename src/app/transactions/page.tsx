@@ -33,7 +33,7 @@ export default async function TransactionsPage({
   return (
     <PageContainer title="Transactions" backHref="/home">
       {months.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-4" data-tour="transactions-filter">
           <MonthWindowPicker value={selectedMonth} basePath="/transactions" allowedMonths={months} allowAll />
         </div>
       )}

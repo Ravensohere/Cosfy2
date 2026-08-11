@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   href?: string;
   fullWidth?: boolean;
+  "data-tour"?: string;
 };
 
 const base =
@@ -14,7 +15,7 @@ export function PrimaryButton({ href, fullWidth, className, ...props }: Props) {
   const classes = cn(base, fullWidth && "w-full", className);
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} data-tour={props["data-tour"]}>
         {props.children}
       </Link>
     );

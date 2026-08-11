@@ -23,7 +23,7 @@ export default async function CoachPage() {
 
   return (
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto h-dvh flex flex-col">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4" data-tour="coach-chat">
         <CosfyMascot mood={mood} size={44} />
         <div>
           <p className="text-[13px] text-cosfy-muted">Cosfy Coach</p>

@@ -52,7 +52,7 @@ export default async function GoalsPage() {
     <PageContainer
       title="Goals"
       action={
-        <PrimaryButton href="/goals/create" className="h-9 px-4 text-[12px]">
+        <PrimaryButton href="/goals/create" data-tour="goals-new" className="h-9 px-4 text-[12px]">
           <Plus size={16} /> New
         </PrimaryButton>
       }
@@ -96,7 +96,7 @@ export default async function GoalsPage() {
         </div>
       ) : null}
 
-      <div className="mt-6">
+      <div className="mt-6" data-tour="goals-tools">
         <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
         <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
           <ToolLink href="/net-worth" icon={TrendingUp} label="Net worth" />

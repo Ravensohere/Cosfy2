@@ -27,9 +27,9 @@
   --cosfy-blue-soft: #E4EBF3;
   --cosfy-violet: #5E5790;
 
-  /* chart categorical palette — validated via dataviz skill's validate_palette.js
+  /* chart categorical palette, validated via dataviz skill's validate_palette.js
      against surface #FFFFFF: chroma/lightness/CVD/normal-vision checks all pass.
-     Fixed order — assign in sequence, never cycle or reorder per-chart. */
+     Fixed order, assign in sequence, never cycle or reorder per-chart. */
   --chart-1: #2a78d6;
   --chart-2: #eb6834;
   --chart-3: #1baf7a;
@@ -111,4 +111,33 @@ body {
 @keyframes cosfy-page-in {
   0% { opacity: 0; transform: translateY(10px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cosfy-mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-1.5deg); }
+}
+
+@keyframes cosfy-mascot-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  93%, 96% { transform: scaleY(0.1); }
+}
+
+.cosfy-mascot-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-bob 3.6s ease-in-out infinite;
+}
+
+.cosfy-mascot-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosfy-mascot-blink 4.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cosfy-mascot-bob,
+  .cosfy-mascot-eye {
+    animation: none;
+  }
 }

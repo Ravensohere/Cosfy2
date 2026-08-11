@@ -50,7 +50,7 @@ export default async function BudgetsPage() {
     <PageContainer
       title="Budgets"
       action={
-        <PrimaryButton href="/budgets/create" className="h-9 px-4 text-[12px]">
+        <PrimaryButton href="/budgets/create" data-tour="budgets-new" className="h-9 px-4 text-[12px]">
           <Plus size={16} /> New
         </PrimaryButton>
       }

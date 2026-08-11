@@ -56,7 +56,7 @@ export default async function InsightsPage() {
 
   return (
     <PageContainer title="AI insights" backHref="/home">
-      <div className="space-y-2.5 mb-4">
+      <div className="space-y-2.5 mb-4" data-tour="insights-links">
         <Link href="/health-score" className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3.5">
           <IconTile icon={HeartPulse} tone="dark" size={40} />
           <span className="flex-1 text-[13px] font-semibold text-cosfy-ink">Financial health score</span>

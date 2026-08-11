@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { useTour } from "@/components/tour/TourProvider";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
@@ -11,10 +12,14 @@ type Rect = { top: number; left: number; width: number; height: number };
 const PAD = 6;
 const SAFE_MARGIN = 16;
 const GAP = 14;
+const MAX_POLL_ATTEMPTS = 10;
+const POLL_INTERVAL_MS = 150;
 
 export function TourSpotlight() {
   const { active, stepIndex, steps, next, prev, skip, skipMissing } = useTour();
   const step = steps[stepIndex];
+  const pathname = usePathname();
+  const router = useRouter();
   const [rect, setRect] = useState<Rect | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [cardHeight, setCardHeight] = useState(200);
@@ -25,31 +30,60 @@ export function TourSpotlight() {
       return;
     }
 
-    const el = document.querySelector<HTMLElement>(`[data-tour="${step.id}"]`);
-    if (!el || (el.offsetWidth === 0 && el.offsetHeight === 0)) {
-      skipMissing();
+    if (step.path && pathname !== step.path) {
+      setRect(null);
+      router.push(step.path);
       return;
     }
 
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
+    let settleTimer: ReturnType<typeof setTimeout> | undefined;
+    let removeListeners: (() => void) | undefined;
+    let attempts = 0;
 
-    function measure() {
-      if (!el) return;
+    function measure(el: HTMLElement) {
       const r = el.getBoundingClientRect();
       setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
     }
 
-    measure();
-    const settleTimer = setTimeout(measure, 350);
-    window.addEventListener("scroll", measure, true);
-    window.addEventListener("resize", measure);
+    function poll() {
+      if (cancelled) return;
+      const el = document.querySelector<HTMLElement>(`[data-tour="${step.id}"]`);
+      const found = el && (el.offsetWidth > 0 || el.offsetHeight > 0);
+
+      if (found && el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        const update = () => measure(el);
+        update();
+        settleTimer = setTimeout(update, 350);
+        window.addEventListener("scroll", update, true);
+        window.addEventListener("resize", update);
+        removeListeners = () => {
+          window.removeEventListener("scroll", update, true);
+          window.removeEventListener("resize", update);
+        };
+        return;
+      }
+
+      attempts += 1;
+      if (attempts >= MAX_POLL_ATTEMPTS) {
+        skipMissing();
+        return;
+      }
+      pollTimer = setTimeout(poll, POLL_INTERVAL_MS);
+    }
+
+    poll();
+
     return () => {
-      clearTimeout(settleTimer);
-      window.removeEventListener("scroll", measure, true);
-      window.removeEventListener("resize", measure);
+      cancelled = true;
+      if (pollTimer) clearTimeout(pollTimer);
+      if (settleTimer) clearTimeout(settleTimer);
+      removeListeners?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, stepIndex]);
+  }, [active, stepIndex, pathname]);
 
   useLayoutEffect(() => {
     if (cardRef.current) setCardHeight(cardRef.current.offsetHeight);

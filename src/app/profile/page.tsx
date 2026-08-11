@@ -19,7 +19,7 @@ export default async function ProfilePage() {
 
   return (
     <PageContainer title="Profile">
-      <div className="rounded-[22px] bg-cosfy-dark-card text-white p-5 mb-4 flex items-center gap-4">
+      <div className="rounded-[22px] bg-cosfy-dark-card text-white p-5 mb-4 flex items-center gap-4" data-tour="profile-header">
         <IconTile icon={User} tone="lime" size={56} />
         <div className="flex-1 min-w-0">
           <p className="font-extrabold text-[17px] truncate">
