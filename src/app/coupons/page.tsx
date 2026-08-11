@@ -30,11 +30,12 @@ export default async function CouponsPage() {
           action={<PrimaryButton href="/coupons/create">Add coupon</PrimaryButton>}
         />
       ) : (
-        <div className="space-y-3">
-          {coupons.map((c) => (
+        <div className="grid grid-cols-2 gap-3">
+          {coupons.map((c, index) => (
             <CouponCard
               key={c.id}
               id={c.id}
+              index={index}
               title={c.title}
               merchant={c.merchant}
               code={c.code}

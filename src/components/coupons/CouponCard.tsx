@@ -1,23 +1,17 @@
 "use client";
 
 import { useTransition } from "react";
-import { Trash2, Tag } from "lucide-react";
-import { IconTile } from "@/components/ui/IconTile";
-import { ShareCouponButton } from "@/components/coupons/ShareCouponButton";
+import { Share2, Check, Trash2, RotateCcw } from "lucide-react";
 import { toggleCouponRedeemed, deleteCoupon } from "@/lib/actions/coupons";
 import { couponUrgency } from "@/lib/coupon-status";
+import { inviteLine } from "@/lib/invite-link";
 import { cn } from "@/lib/cn";
 
-const URGENCY_STYLES: Record<string, string> = {
-  expired: "text-cosfy-red",
-  soon: "text-cosfy-amber",
-  upcoming: "text-cosfy-muted",
-  redeemed: "text-cosfy-muted",
-  none: "text-cosfy-muted",
-};
+const BAND_COLORS = ["#33588A", "#5E5790", "#3C7A3E", "#A66A1B"];
 
 export function CouponCard({
   id,
+  index,
   title,
   merchant,
   code,
@@ -26,6 +20,7 @@ export function CouponCard({
   isRedeemed,
 }: {
   id: string;
+  index: number;
   title: string;
   merchant: string | null;
   code: string | null;
@@ -35,55 +30,77 @@ export function CouponCard({
 }) {
   const [isPending, startTransition] = useTransition();
   const urgency = couponUrgency(expiresAt, isRedeemed);
+  const band = BAND_COLORS[index % BAND_COLORS.length];
 
-  const expiryLabel = isRedeemed
-    ? "Used"
+  const badge = isRedeemed
+    ? { text: "Used", className: "bg-white/90 text-cosfy-muted" }
     : urgency === "expired"
-      ? "Expired"
-      : expiresAt
-        ? `Expires ${expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`
-        : "No expiry";
+      ? { text: "Expired", className: "bg-white/90 text-cosfy-red" }
+      : urgency === "soon" && expiresAt
+        ? { text: `${expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`, className: "bg-cosfy-amber text-white" }
+        : null;
+
+  const shareText =
+    [`${title}${merchant ? ` at ${merchant}` : ""}`, code ? `Code: ${code}` : null].filter(Boolean).join("\n") + inviteLine();
 
   return (
-    <div className={cn("rounded-card bg-cosfy-card border border-cosfy-border p-4", isRedeemed && "opacity-60")}>
-      <div className="flex items-start gap-3 mb-3">
-        <IconTile icon={Tag} tone={urgency === "soon" ? "lime" : "soft"} size={40} />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] text-cosfy-ink truncate">{title}</p>
-          <p className="text-[12px] text-cosfy-muted truncate">{merchant || "Any store"}</p>
-        </div>
-        <button
-          type="button"
-          aria-label="Delete coupon"
-          onClick={() => startTransition(() => void deleteCoupon(id))}
-          disabled={isPending}
-          className="text-cosfy-muted p-1"
-        >
-          <Trash2 size={16} />
-        </button>
-      </div>
-
-      {code ? (
-        <p className="font-mono text-[13px] font-bold text-cosfy-lime-ink bg-cosfy-lime-pale border border-cosfy-lime-soft rounded-input px-3 py-1.5 inline-block mb-2">
-          {code}
+    <div className={cn("rounded-card border border-cosfy-border overflow-hidden bg-cosfy-card", isRedeemed && "opacity-55")}>
+      <div className="relative p-3 pb-4" style={{ backgroundColor: band }}>
+        {badge ? (
+          <span className={cn("absolute top-2 right-2 rounded-full px-2 py-0.5 text-[9px] font-bold", badge.className)}>
+            {badge.text}
+          </span>
+        ) : null}
+        <p className="text-[10px] font-semibold text-white/70 uppercase tracking-wide truncate pr-10">
+          {merchant || "Any store"}
         </p>
-      ) : null}
-
-      {description ? <p className="text-[12px] text-cosfy-muted mb-2">{description}</p> : null}
-
-      <p className={cn("text-[11px] font-semibold mb-3", URGENCY_STYLES[urgency])}>{expiryLabel}</p>
-
-      <div className="flex items-center gap-2">
-        <ShareCouponButton title={title} merchant={merchant} code={code} expiresAt={expiresAt} />
+        <p className="text-[14px] font-extrabold text-white leading-snug line-clamp-2 mt-0.5 pr-2">{title}</p>
       </div>
-      <button
-        type="button"
-        onClick={() => startTransition(() => void toggleCouponRedeemed(id, !isRedeemed))}
-        disabled={isPending}
-        className="text-[12px] font-semibold text-cosfy-lime-deep mt-2"
-      >
-        {isRedeemed ? "Mark as active" : "Mark as used"}
-      </button>
+
+      <div className="relative flex items-center px-3">
+        <span className="w-3 h-3 rounded-full bg-cosfy-bg border border-cosfy-border -ml-3" />
+        <span className="flex-1 border-t-2 border-dashed border-cosfy-border" />
+        <span className="w-3 h-3 rounded-full bg-cosfy-bg border border-cosfy-border -mr-3" />
+      </div>
+
+      <div className="p-3">
+        {code ? (
+          <p className="font-mono text-[12px] font-bold text-cosfy-ink truncate">{code}</p>
+        ) : (
+          <p className="text-[12px] text-cosfy-muted">Auto-applied</p>
+        )}
+        {description ? <p className="text-[11px] text-cosfy-muted mt-1 line-clamp-2">{description}</p> : null}
+
+        <div className="flex items-center gap-1 mt-2.5 -ml-1.5">
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Share coupon"
+            className="p-1.5 text-cosfy-ink-soft"
+          >
+            <Share2 size={15} />
+          </a>
+          <button
+            type="button"
+            aria-label={isRedeemed ? "Mark as active" : "Mark as used"}
+            onClick={() => startTransition(() => void toggleCouponRedeemed(id, !isRedeemed))}
+            disabled={isPending}
+            className="p-1.5 text-cosfy-ink-soft"
+          >
+            {isRedeemed ? <RotateCcw size={15} /> : <Check size={15} />}
+          </button>
+          <button
+            type="button"
+            aria-label="Delete coupon"
+            onClick={() => startTransition(() => void deleteCoupon(id))}
+            disabled={isPending}
+            className="p-1.5 text-cosfy-muted ml-auto"
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
