@@ -93,9 +93,9 @@ export function ChatWindow({
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 overflow-y-auto space-y-3 pb-4">
         {messages.map((m, i) => (
-          <ChatBubble key={i} message={m} />
+          <ChatBubble key={i} message={m} showAvatar={i === 0} />
         ))}
-        {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} /> : null}
+        {isSending ? <ChatBubble message={{ role: "assistant", content: "Thinking…" }} showAvatar={false} /> : null}
         <div ref={bottomRef} />
       </div>
       {suggestedQuestions && messages.length === 1 ? (
@@ -162,11 +162,11 @@ export function ChatWindow({
   );
 }
 
-function ChatBubble({ message }: { message: Message }) {
+function ChatBubble({ message, showAvatar }: { message: Message; showAvatar: boolean }) {
   const isUser = message.role === "user";
   return (
     <div className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}>
-      {!isUser ? <CosfyMascot mood="happy" size={28} /> : null}
+      {!isUser && showAvatar ? <CosfyMascot mood="happy" size={28} /> : null}
       <div
         className={cn(
           "max-w-[85%] rounded-card px-4 py-3 text-[14px] leading-relaxed",

@@ -8,9 +8,9 @@ import { buildFinancialContext } from "@/lib/financial-context";
 import { pickContextualLesson } from "@/lib/lessons";
 
 const SUGGESTED_QUESTIONS = [
-  "Where did my money go this month?",
-  "Can I afford a new phone?",
-  "How do I save ₹10k a month?",
+  "Where's my money actually going?",
+  "Am I on track with my goals?",
+  "Can I afford to splurge a little?",
 ];
 
 export default async function CoachPage() {

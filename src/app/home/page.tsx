@@ -13,6 +13,7 @@ import { fetchFinanceHeadlines } from "@/lib/news-feed";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { NetWorthWidget } from "@/components/home/NetWorthWidget";
 import { StreakBadge } from "@/components/home/StreakBadge";
+import { MonthWindowPicker } from "@/components/ui/MonthWindowPicker";
 import { computeNoSpendStreak, computeLoggingStreak } from "@/lib/streaks";
 import { translate, SUPPORTED_LANGUAGES, type Language } from "@/lib/i18n/dictionary";
 import Link from "next/link";
@@ -74,7 +75,6 @@ export default async function HomePage({
   const spent = monthTransactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const surplus = income - spent;
 
-  const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(monthStart);
   const mascotMood: MascotMood = monthTransactions.length === 0 ? "neutral" : surplus >= 0 ? "happy" : "concerned";
   const lang: Language = SUPPORTED_LANGUAGES.includes(user.language as Language) ? (user.language as Language) : "en";
   const t = (key: Parameters<typeof translate>[1]) => translate(lang, key);
@@ -110,7 +110,7 @@ export default async function HomePage({
         >
           <ChevronLeft size={16} />
         </Link>
-        <span className="text-[12px] font-semibold text-cosfy-muted min-w-[9ch] text-center">{monthLabel}</span>
+        <MonthWindowPicker value={monthParam(monthStart)} basePath="/home" />
         {isCurrentMonth ? (
           <span className="w-7 h-7" />
         ) : (
@@ -134,11 +134,9 @@ export default async function HomePage({
         <StatCard label={t("home.surplus")} amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-4 gap-2 mt-6 max-w-[320px] mx-auto">
+      <div className="grid grid-cols-2 gap-2 mt-6 max-w-[220px] mx-auto">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
-        <QuickActionLink href="/coach" icon="Sparkles" label="Coach" />
-        <QuickActionLink href="/learn" icon="GraduationCap" label="Learn" />
       </div>
 
       <div className="rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft p-4 mt-6">

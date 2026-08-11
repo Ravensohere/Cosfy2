@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
-import { MonthFilter } from "@/components/finance/MonthFilter";
+import { MonthWindowPicker } from "@/components/ui/MonthWindowPicker";
 
 export default async function TransactionsPage({
   searchParams,
@@ -32,7 +32,11 @@ export default async function TransactionsPage({
 
   return (
     <PageContainer title="Transactions" backHref="/home">
-      {months.length > 0 && <MonthFilter months={months} selected={selectedMonth} />}
+      {months.length > 0 && (
+        <div className="mb-4">
+          <MonthWindowPicker value={selectedMonth} basePath="/transactions" allowedMonths={months} allowAll />
+        </div>
+      )}
       {transactions.length === 0 ? (
         <EmptyState
           icon={Receipt}
