@@ -20,5 +20,5 @@ export async function completeOnboarding(notificationsEnabled: boolean) {
     where: { id: user.id },
     data: { onboardingCompleted: true, notificationsEnabled },
   });
-  redirect("/home");
+  redirect("/onboarding/personalize");
 }
