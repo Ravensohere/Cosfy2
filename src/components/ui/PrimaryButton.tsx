@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes } from "react";
-import { cn } from "@/lib/cn";
+import { buttonClasses } from "@/components/ui/buttonClasses";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   href?: string;
@@ -8,11 +8,8 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   "data-tour"?: string;
 };
 
-const base =
-  "inline-flex items-center justify-center gap-2 rounded-button bg-cosfy-lime text-cosfy-lime-ink font-bold text-[14px] h-[54px] px-6 transition-opacity active:opacity-80 disabled:opacity-40 disabled:pointer-events-none";
-
 export function PrimaryButton({ href, fullWidth, className, ...props }: Props) {
-  const classes = cn(base, fullWidth && "w-full", className);
+  const classes = buttonClasses("bg-cosfy-lime text-cosfy-lime-ink", fullWidth, className);
   if (href) {
     return (
       <Link href={href} className={classes} data-tour={props["data-tour"]}>

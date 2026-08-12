@@ -57,6 +57,7 @@ model User {
   creditCards       CreditCard[]
   loans             Loan[]
   insurancePolicies InsurancePolicy[]
+  insuranceDocuments InsuranceDocument[]
   subscriptions     Subscription[]
   goldHoldings      GoldHolding[]
   gmailImports      GmailImportRecord[]
@@ -134,6 +135,25 @@ model InsurancePolicy {
   frequency       String
   nextRenewalDate DateTime
   createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+model InsuranceDocument {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  fileName      String
+  type          String
+  subType       String?
+  provider      String?
+  policyName    String?
+  sumInsured    Float?
+  premiumAmount Float?
+  frequency     String?
+  rawText       String
+  summary       Json
+  createdAt     DateTime @default(now())
 
   @@index([userId])
 }

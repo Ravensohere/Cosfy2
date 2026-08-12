@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { cn } from "@/lib/cn";
+import { formatDate, formatMonthYear } from "@/lib/format";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -20,7 +21,7 @@ function parseYMD(s: string | undefined): Date | null {
 function formatDisplay(s: string) {
   const d = parseYMD(s);
   if (!d) return "";
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  return formatDate(d);
 }
 
 export function DatePickerField({
@@ -108,7 +109,7 @@ export function DatePickerField({
             <ChevronLeft size={16} />
           </button>
           <span className="text-[15px] font-extrabold text-cosfy-ink">
-            {viewDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+            {formatMonthYear(viewDate)}
           </span>
           <button
             type="button"

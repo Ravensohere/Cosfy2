@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, TriangleAlert, Mic } from "lucide-react";
+import { Send, TriangleAlert, Mic, Paperclip } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { FormattedAIText } from "@/components/ui/FormattedAIText";
 import { CosfyMascot } from "@/components/ui/CosfyMascot";
@@ -17,17 +17,22 @@ type Message = {
 export function ChatWindow({
   greeting = "Hey, I'm Kosh. Whatever's on your mind about money, budgeting, saving, that weird SMS, the latest finance news, ask away. I'm not a licensed advisor, so double check anything big before you act on it.",
   allowVoice = false,
+  allowFile = false,
 }: {
   greeting?: string;
   allowVoice?: boolean;
+  allowFile?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: greeting }]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const voiceInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleVoiceFile(file: File) {
     setVoiceError(null);
@@ -47,6 +52,29 @@ export function ChatWindow({
     } finally {
       setIsTranscribing(false);
       if (voiceInputRef.current) voiceInputRef.current.value = "";
+    }
+  }
+
+  async function handleDocFile(file: File) {
+    setFileError(null);
+    setMessages((prev) => [...prev, { role: "user", content: `📄 Uploaded ${file.name}` }]);
+    setIsUploadingDoc(true);
+
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/import/insurance-doc", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) {
+        setFileError(data.error ?? "Couldn't read that document.");
+        return;
+      }
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    } catch {
+      setFileError("Couldn't reach the server. Try again.");
+    } finally {
+      setIsUploadingDoc(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
@@ -93,10 +121,11 @@ export function ChatWindow({
         {messages.map((m, i) => (
           <ChatBubble key={i} message={m} showAvatar={i === 0} />
         ))}
-        {isSending ? <ThinkingBubble /> : null}
+        {isSending || isUploadingDoc ? <ThinkingBubble /> : null}
         <div ref={bottomRef} />
       </div>
       {voiceError ? <p className="text-[11px] text-cosfy-red pb-1.5">{voiceError}</p> : null}
+      {fileError ? <p className="text-[11px] text-cosfy-red pb-1.5">{fileError}</p> : null}
       <div className="flex gap-2 pt-2 border-t border-cosfy-border">
         <Input
           value={input}
@@ -104,9 +133,32 @@ export function ChatWindow({
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSend();
           }}
-          placeholder={isTranscribing ? "Listening…" : "e.g. How much should I save monthly?"}
-          disabled={isSending || isTranscribing}
+          placeholder={isTranscribing ? "Listening…" : isUploadingDoc ? "Reading document…" : "e.g. How much should I save monthly?"}
+          disabled={isSending || isTranscribing || isUploadingDoc}
         />
+        {allowFile ? (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf,image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleDocFile(file);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isSending || isTranscribing || isUploadingDoc}
+              aria-label="Upload insurance document"
+              className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-card-soft text-cosfy-ink-soft flex items-center justify-center disabled:opacity-40"
+            >
+              <Paperclip size={18} strokeWidth={2.5} />
+            </button>
+          </>
+        ) : null}
         {allowVoice ? (
           <>
             <input
@@ -123,7 +175,7 @@ export function ChatWindow({
             <button
               type="button"
               onClick={() => voiceInputRef.current?.click()}
-              disabled={isSending || isTranscribing}
+              disabled={isSending || isTranscribing || isUploadingDoc}
               aria-label="Record voice message"
               className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-card-soft text-cosfy-ink-soft flex items-center justify-center disabled:opacity-40"
             >
@@ -134,7 +186,7 @@ export function ChatWindow({
         <button
           type="button"
           onClick={() => handleSend()}
-          disabled={isSending || !input.trim()}
+          disabled={isSending || isUploadingDoc || !input.trim()}
           aria-label="Send"
           className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-lime text-cosfy-lime-ink flex items-center justify-center disabled:opacity-40"
         >

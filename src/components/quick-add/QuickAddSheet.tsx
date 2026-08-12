@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Pencil } from "lucide-react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
+import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
 import { Input } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
@@ -43,7 +43,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
 
   function handleClose() {
     onClose();
-    setTimeout(reset, 300);
+    setTimeout(reset, BOTTOM_SHEET_TRANSITION_MS);
   }
 
   function selectType(next: EntryType) {

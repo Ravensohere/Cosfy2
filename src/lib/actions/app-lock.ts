@@ -25,6 +25,16 @@ function verifyPin(pin: string, stored: string): boolean {
   return timingSafeEqual(candidate, expected);
 }
 
+async function setUnlockCookie() {
+  const cookieStore = await cookies();
+  cookieStore.set(UNLOCK_COOKIE_NAME, "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
+}
+
 export async function setAppLockPin(pin: string) {
   const parsed = pinSchema.safeParse(pin);
   if (!parsed.success) {
@@ -37,8 +47,7 @@ export async function setAppLockPin(pin: string) {
     data: { appLockEnabled: true, appLockPinHash: hashPin(pin) },
   });
 
-  const cookieStore = await cookies();
-  cookieStore.set(UNLOCK_COOKIE_NAME, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+  await setUnlockCookie();
 
   revalidatePath("/profile");
   return { ok: true as const };
@@ -57,8 +66,7 @@ export async function unlockApp(pin: string) {
     return { ok: false as const, error: "Incorrect PIN" };
   }
 
-  const cookieStore = await cookies();
-  cookieStore.set(UNLOCK_COOKIE_NAME, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+  await setUnlockCookie();
 
   return { ok: true as const };
 }

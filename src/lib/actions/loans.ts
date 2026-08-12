@@ -42,13 +42,6 @@ export async function recordEmiPayment(id: string) {
   return { ok: true as const };
 }
 
-export async function updateOutstandingPrincipal(id: string, outstandingPrincipal: number) {
-  const user = await getCurrentUser();
-  await db.loan.updateMany({ where: { id, userId: user.id }, data: { outstandingPrincipal: Math.max(0, outstandingPrincipal) } });
-  revalidatePath("/loans");
-  return { ok: true as const };
-}
-
 export async function deleteLoan(id: string) {
   const user = await getCurrentUser();
   await db.loan.deleteMany({ where: { id, userId: user.id } });

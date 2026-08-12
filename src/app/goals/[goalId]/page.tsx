@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { DonutProgress } from "@/components/ui/DonutProgress";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
-import { formatINR } from "@/lib/format";
+import { formatINR, formatDate } from "@/lib/format";
 import { AddContributionForm } from "./AddContributionForm";
 
 export default async function GoalDetailPage({ params }: { params: Promise<{ goalId: string }> }) {
@@ -83,9 +83,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
             {goal.contributions.map((c) => (
               <div key={c.id} className="flex items-center justify-between py-2.5">
                 <p className="text-[13px] text-cosfy-muted">
-                  {new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(
-                    c.createdAt
-                  )}
+                  {formatDate(c.createdAt)}
                 </p>
                 <MoneyAmount amount={c.amount} size="sm" />
               </div>

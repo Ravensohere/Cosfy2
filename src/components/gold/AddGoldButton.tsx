@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
-import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
+import { Input, FieldLabel } from "@/components/ui/Input";
+import { SelectField } from "@/components/ui/SelectField";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createGoldHolding } from "@/lib/actions/gold";
@@ -30,7 +31,7 @@ export function AddGoldButton({ variant = "icon" }: { variant?: "icon" | "primar
 
   function handleClose() {
     setOpen(false);
-    setTimeout(reset, 300);
+    setTimeout(reset, BOTTOM_SHEET_TRANSITION_MS);
   }
 
   function handleSubmit() {
@@ -74,13 +75,12 @@ export function AddGoldButton({ variant = "icon" }: { variant?: "icon" | "primar
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel>Type</FieldLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value as (typeof GOLD_TYPES)[number])}>
-                {GOLD_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </Select>
+              <SelectField
+                value={type}
+                onChange={(v) => setType(v as (typeof GOLD_TYPES)[number])}
+                options={[...GOLD_TYPES]}
+                title="Select type"
+              />
             </div>
             <div>
               <FieldLabel>Grams</FieldLabel>

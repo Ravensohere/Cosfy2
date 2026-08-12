@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Image as ImageIcon, MessageCircle } from "lucide-react";
 import { inviteLine } from "@/lib/invite-link";
+import { useImageShare } from "@/lib/useImageShare";
 
 export function SummaryShareCard({
   rangeLabel,
@@ -14,42 +14,13 @@ export function SummaryShareCard({
   shareText: string;
   children: ReactNode;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
+  const { cardRef, isCapturing, shareError, handleShareImage } = useImageShare({
+    backgroundColor: "#F6F3EC",
+    fileName: "cosfy-summary.png",
+    shareTitle: `Cosfy summary, ${rangeLabel}`,
+  });
 
   const fullShareText = shareText + inviteLine();
-
-  async function handleShareImage() {
-    if (!cardRef.current) return;
-    setShareError(null);
-    setIsCapturing(true);
-    try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(cardRef.current, { backgroundColor: "#F6F3EC", scale: 2 });
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-      if (!blob) throw new Error("Couldn't render image");
-
-      const file = new File([blob], `cosfy-summary.png`, { type: "image/png" });
-      const nav = navigator as Navigator & { canShare?: (data: { files: File[] }) => boolean };
-
-      if (nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: `Cosfy summary, ${rangeLabel}` });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "cosfy-summary.png";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-      setShareError("Couldn't share the image. Try text instead.");
-    } finally {
-      setIsCapturing(false);
-    }
-  }
 
   return (
     <div>

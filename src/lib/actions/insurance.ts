@@ -55,3 +55,10 @@ export async function deleteInsurancePolicy(id: string) {
   revalidatePath("/insurance");
   return { ok: true as const };
 }
+
+export async function deleteInsuranceDocument(id: string) {
+  const user = await getCurrentUser();
+  await db.insuranceDocument.deleteMany({ where: { id, userId: user.id } });
+  revalidatePath("/insurance");
+  return { ok: true as const };
+}

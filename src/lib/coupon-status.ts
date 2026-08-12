@@ -10,5 +10,3 @@ export function couponUrgency(expiresAt: Date | null, isRedeemed: boolean): Coup
   if (days <= 5) return "soon";
   return "upcoming";
 }
-
-export { daysUntil };

@@ -6,6 +6,7 @@ import { toggleCouponRedeemed, deleteCoupon } from "@/lib/actions/coupons";
 import { couponUrgency } from "@/lib/coupon-status";
 import { inviteLine } from "@/lib/invite-link";
 import { cn } from "@/lib/cn";
+import { formatShortDate } from "@/lib/format";
 
 const BAND_COLORS = ["#33588A", "#5E5790", "#3C7A3E", "#A66A1B"];
 
@@ -37,7 +38,7 @@ export function CouponCard({
     : urgency === "expired"
       ? { text: "Expired", className: "bg-white/90 text-cosfy-red" }
       : urgency === "soon" && expiresAt
-        ? { text: `${expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`, className: "bg-cosfy-amber text-white" }
+        ? { text: formatShortDate(expiresAt), className: "bg-cosfy-amber text-white" }
         : null;
 
   const shareText =

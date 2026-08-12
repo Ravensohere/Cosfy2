@@ -8,7 +8,8 @@ import { IconTile } from "@/components/ui/IconTile";
 import { ReportCoachTake } from "@/components/reports/ReportCoachTake";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
-import { formatINR } from "@/lib/format";
+import { formatINR, formatMonthYear } from "@/lib/format";
+import { computeIncomeAndSpent } from "@/lib/transaction-totals";
 
 const SMALL_SPEND_THRESHOLD = 200;
 const SMALL_SPEND_MIN_COUNT = 5;
@@ -35,9 +36,7 @@ export default async function MonthlyReportPage({ params }: { params: Promise<{ 
     }),
   ]);
 
-  const income = transactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-  const spent = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const surplus = income - spent;
+  const { income, spent, surplus } = computeIncomeAndSpent(transactions);
 
   const categoryThisMonth: Record<string, number> = {};
   const categoryPrevMonth: Record<string, number> = {};
@@ -88,7 +87,7 @@ export default async function MonthlyReportPage({ params }: { params: Promise<{ 
     ...goalContributions.map((c) => `Added ${formatINR(c.amount)} to ${c.goal.name}`),
   ];
 
-  const monthLabel = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(monthStart);
+  const monthLabel = formatMonthYear(monthStart);
 
   return (
     <PageContainer title={monthLabel} backHref="/insights">

@@ -74,10 +74,3 @@ export async function createTransactionsBulk(rows: z.infer<typeof bulkRowSchema>
   revalidateMoneyScreens();
   return { ok: true as const, count: parsedRows.length };
 }
-
-export async function deleteTransaction(id: string) {
-  const user = await getCurrentUser();
-  await db.transaction.deleteMany({ where: { id, userId: user.id } });
-  revalidateMoneyScreens();
-  return { ok: true as const };
-}

@@ -3,19 +3,11 @@
 import { useTransition } from "react";
 import type { InsurancePolicy } from "@prisma/client";
 import { ShieldCheck, Trash2 } from "lucide-react";
-import { IconTile } from "@/components/ui/IconTile";
-import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { RenewalRowHeader } from "@/components/ui/RenewalRowHeader";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
-import { cn } from "@/lib/cn";
 import { daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { formatShortDate } from "@/lib/format";
 import { markPolicyRenewed, deleteInsurancePolicy } from "@/lib/actions/insurance";
-
-const URGENCY_STYLES = {
-  overdue: "text-cosfy-red",
-  soon: "text-cosfy-amber",
-  upcoming: "text-cosfy-muted",
-  paid: "text-cosfy-green",
-};
 
 const URGENCY_LABEL = {
   overdue: (days: number) => `Renewal overdue by ${Math.abs(days)}d`,
@@ -53,20 +45,14 @@ function PolicyRow({ policy }: { policy: InsurancePolicy }) {
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      <div className="flex items-center gap-3">
-        <IconTile icon={ShieldCheck} tone="dark" size={44} />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] text-cosfy-ink truncate">
-            {policy.policyName}
-            <span className="text-cosfy-muted font-normal"> · {policy.type}</span>
-          </p>
-          <p className={cn("text-[12px] font-semibold", URGENCY_STYLES[urgency])}>
-            {URGENCY_LABEL[urgency](days)} ·{" "}
-            {policy.nextRenewalDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-          </p>
-        </div>
-        <MoneyAmount amount={policy.premiumAmount} size="md" />
-      </div>
+      <RenewalRowHeader
+        icon={ShieldCheck}
+        title={policy.policyName}
+        subtitle={<span className="text-cosfy-muted font-normal"> · {policy.type}</span>}
+        statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(policy.nextRenewalDate)}`}
+        urgency={urgency}
+        amount={policy.premiumAmount}
+      />
       <div className="flex gap-2 mt-3">
         <SecondaryButton className="flex-1 h-9 text-[12px]" onClick={renew} disabled={isPending}>
           Mark renewed

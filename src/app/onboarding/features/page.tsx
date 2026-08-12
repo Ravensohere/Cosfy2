@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Receipt, Target, Tag, ChevronLeft } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -48,9 +49,13 @@ const CARDS: Card[] = [
   },
 ];
 
+const SWIPE_THRESHOLD = 48;
+
 export default function OnboardingFeaturesPage() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState<"forward" | "back">("forward");
+  const dragStartX = useRef<number | null>(null);
   const card = CARDS[index];
   const isLast = index === CARDS.length - 1;
 
@@ -59,11 +64,33 @@ export default function OnboardingFeaturesPage() {
       router.push("/onboarding/goal");
       return;
     }
+    setDirection("forward");
     setIndex((i) => i + 1);
   }
 
   function back() {
+    setDirection("back");
     setIndex((i) => Math.max(0, i - 1));
+  }
+
+  function goTo(step: number) {
+    setDirection(step - 1 > index ? "forward" : "back");
+    setIndex(step - 1);
+  }
+
+  function handlePointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    dragStartX.current = e.clientX;
+  }
+
+  function handlePointerUp(e: ReactPointerEvent<HTMLDivElement>) {
+    if (dragStartX.current === null) return;
+    const delta = e.clientX - dragStartX.current;
+    dragStartX.current = null;
+    if (delta <= -SWIPE_THRESHOLD) {
+      next();
+    } else if (delta >= SWIPE_THRESHOLD && index > 0) {
+      back();
+    }
   }
 
   return (
@@ -91,8 +118,14 @@ export default function OnboardingFeaturesPage() {
       </div>
 
       <div
-        className="flex-1 rounded-[28px] flex flex-col items-center justify-center text-center px-6 py-10 mb-6"
-        style={{ backgroundColor: card.band }}
+        key={index}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className="flex-1 rounded-[28px] flex flex-col items-center justify-center text-center px-6 py-10 mb-6 touch-pan-y select-none cursor-grab active:cursor-grabbing"
+        style={{
+          backgroundColor: card.band,
+          animation: `${direction === "forward" ? "cosfy-card-in-forward" : "cosfy-card-in-back"} 0.28s ease-out`,
+        }}
       >
         {card.icon === "mascot" ? (
           <CosfyMascot mood="happy" size={88} interactive={false} />
@@ -104,7 +137,7 @@ export default function OnboardingFeaturesPage() {
       </div>
 
       <div className="flex justify-center mb-5">
-        <ProgressDots step={index + 1} total={CARDS.length} />
+        <ProgressDots step={index + 1} total={CARDS.length} onStepClick={goTo} />
       </div>
 
       <DarkButton fullWidth onClick={next}>

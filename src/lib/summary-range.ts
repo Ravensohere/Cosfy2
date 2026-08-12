@@ -1,3 +1,5 @@
+import { formatShortDate, formatDate, formatMonthYear } from "@/lib/format";
+
 export type RangePreset = "this-month" | "last-3-months" | "this-year" | "all-time" | "custom";
 
 export const RANGE_PRESETS: { value: RangePreset; label: string }[] = [
@@ -18,7 +20,7 @@ export function resolveRange(
   if (preset === "this-month") {
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    return { start, end, label: new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(start) };
+    return { start, end, label: formatMonthYear(start) };
   }
 
   if (preset === "last-3-months") {
@@ -40,8 +42,8 @@ export function resolveRange(
   const start = customStart ? new Date(`${customStart}T00:00:00`) : new Date(now.getFullYear(), now.getMonth(), 1);
   const endDay = customEnd ? new Date(`${customEnd}T00:00:00`) : now;
   const end = new Date(endDay.getTime() + 24 * 60 * 60 * 1000);
-  const startLabel = start.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-  const endLabel = new Date(end.getTime() - 1).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  const startLabel = formatShortDate(start);
+  const endLabel = formatDate(new Date(end.getTime() - 1));
   return { start, end, label: `${startLabel} to ${endLabel}` };
 }
 

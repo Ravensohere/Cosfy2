@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { Image as ImageIcon, MessageCircle } from "lucide-react";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { formatINR } from "@/lib/format";
 import { inviteLine } from "@/lib/invite-link";
+import { useImageShare } from "@/lib/useImageShare";
 import type { ItemsBreakdown } from "@/lib/split-breakdown";
 
 export function FullSplitShareCard({
@@ -22,9 +22,11 @@ export function FullSplitShareCard({
   memberNamesById: Record<string, string>;
   people: { name: string; amount: number }[];
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [shareError, setShareError] = useState<string | null>(null);
+  const { cardRef, isCapturing, shareError, handleShareImage } = useImageShare({
+    backgroundColor: "#FFFFFF",
+    fileName: "cosfy-split.png",
+    shareTitle: `${merchant} split`,
+  });
 
   const shareText =
     [
@@ -44,37 +46,6 @@ export function FullSplitShareCard({
       "Who owes what:",
       ...people.map((p) => `${p.name}: ${formatINR(p.amount)}`),
     ].join("\n") + inviteLine();
-
-  async function handleShareImage() {
-    if (!cardRef.current) return;
-    setShareError(null);
-    setIsCapturing(true);
-    try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(cardRef.current, { backgroundColor: "#FFFFFF", scale: 2 });
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-      if (!blob) throw new Error("Couldn't render image");
-
-      const file = new File([blob], "cosfy-split.png", { type: "image/png" });
-      const nav = navigator as Navigator & { canShare?: (data: { files: File[] }) => boolean };
-
-      if (nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: `${merchant} split` });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "cosfy-split.png";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return;
-      setShareError("Couldn't share the image. Try text instead.");
-    } finally {
-      setIsCapturing(false);
-    }
-  }
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border overflow-hidden mb-5">

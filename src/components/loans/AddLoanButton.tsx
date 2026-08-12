@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
+import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel } from "@/components/ui/Input";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createLoan } from "@/lib/actions/loans";
@@ -34,7 +34,7 @@ export function AddLoanButton({ variant = "icon" }: { variant?: "icon" | "primar
 
   function handleClose() {
     setOpen(false);
-    setTimeout(reset, 300);
+    setTimeout(reset, BOTTOM_SHEET_TRANSITION_MS);
   }
 
   function handleSubmit() {

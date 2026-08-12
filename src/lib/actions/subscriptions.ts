@@ -48,13 +48,6 @@ export async function markSubscriptionRenewed(id: string) {
   return { ok: true as const };
 }
 
-export async function toggleSubscriptionActive(id: string, isActive: boolean) {
-  const user = await getCurrentUser();
-  await db.subscription.updateMany({ where: { id, userId: user.id }, data: { isActive } });
-  revalidatePath("/subscriptions");
-  return { ok: true as const };
-}
-
 export async function deleteSubscription(id: string) {
   const user = await getCurrentUser();
   await db.subscription.deleteMany({ where: { id, userId: user.id } });

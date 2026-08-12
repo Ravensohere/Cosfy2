@@ -55,6 +55,46 @@ const confirmSplitSchema = z.object({
   assignments: z.record(z.string(), z.array(z.string())),
 });
 
+/**
+ * Splits item costs across participants (proportional to what each person ordered),
+ * then folds tax/charges in proportionally to each person's raw item share. The last
+ * participant absorbs any rounding remainder so shares always sum exactly to `total`.
+ */
+function computeShares(
+  items: z.infer<typeof billItemSchema>[],
+  taxAndCharges: number,
+  participantIds: string[],
+  assignments: Record<string, string[]>
+): { total: number; shares: Record<string, number> } {
+  const subtotal = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+  const total = subtotal + taxAndCharges;
+
+  const rawShare: Record<string, number> = Object.fromEntries(participantIds.map((id) => [id, 0]));
+  for (const item of items) {
+    const assignees = assignments[item.id];
+    const itemTotal = item.quantity * item.price;
+    const per = itemTotal / assignees.length;
+    for (const pid of assignees) {
+      rawShare[pid] = (rawShare[pid] ?? 0) + per;
+    }
+  }
+
+  const taxRatio = subtotal > 0 ? taxAndCharges / subtotal : 0;
+  const shares: Record<string, number> = {};
+  let allocated = 0;
+  participantIds.forEach((pid, idx) => {
+    if (idx === participantIds.length - 1) {
+      shares[pid] = Math.round((total - allocated) * 100) / 100;
+    } else {
+      const share = Math.round((rawShare[pid] + rawShare[pid] * taxRatio) * 100) / 100;
+      shares[pid] = share;
+      allocated += share;
+    }
+  });
+
+  return { total, shares };
+}
+
 export async function confirmBillSplit(input: z.infer<typeof confirmSplitSchema>) {
   const parsed = confirmSplitSchema.safeParse(input);
   if (!parsed.success) {
@@ -70,32 +110,12 @@ export async function confirmBillSplit(input: z.infer<typeof confirmSplitSchema>
     }
   }
 
-  const subtotal = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-  const total = subtotal + taxAndCharges;
-
-  const rawShare: Record<string, number> = Object.fromEntries(participants.map((p) => [p.id, 0]));
-  for (const item of items) {
-    const assignees = assignments[item.id];
-    const itemTotal = item.quantity * item.price;
-    const per = itemTotal / assignees.length;
-    for (const pid of assignees) {
-      rawShare[pid] = (rawShare[pid] ?? 0) + per;
-    }
-  }
-
-  const taxRatio = subtotal > 0 ? taxAndCharges / subtotal : 0;
-  const finalShare: Record<string, number> = {};
-  let allocated = 0;
-  const orderedIds = participants.map((p) => p.id);
-  orderedIds.forEach((pid, idx) => {
-    if (idx === orderedIds.length - 1) {
-      finalShare[pid] = Math.round((total - allocated) * 100) / 100;
-    } else {
-      const share = Math.round((rawShare[pid] + rawShare[pid] * taxRatio) * 100) / 100;
-      finalShare[pid] = share;
-      allocated += share;
-    }
-  });
+  const { total, shares: finalShare } = computeShares(
+    items,
+    taxAndCharges,
+    participants.map((p) => p.id),
+    assignments
+  );
 
   try {
     const result = await db.$transaction(async (tx) => {

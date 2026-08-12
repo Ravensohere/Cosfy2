@@ -1,8 +1,22 @@
 import { db } from "@/lib/db";
-import { formatINR } from "@/lib/format";
+import { formatINR, formatShortDate } from "@/lib/format";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { getAverageMonthlySurplus } from "@/lib/actions/goals";
 import { nextDueDate, daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import type { InsuranceDocSummary } from "@/lib/insurance-doc-parse";
+
+function coerceDocSummary(json: unknown): InsuranceDocSummary {
+  const s = typeof json === "object" && json !== null ? (json as Record<string, unknown>) : {};
+  return {
+    roomRentLimit: typeof s.roomRentLimit === "string" ? s.roomRentLimit : null,
+    coPayPercent: typeof s.coPayPercent === "number" ? s.coPayPercent : null,
+    subLimits: Array.isArray(s.subLimits) ? s.subLimits.filter((x): x is string => typeof x === "string") : [],
+    waitingPeriodMonths: typeof s.waitingPeriodMonths === "number" ? s.waitingPeriodMonths : null,
+    keyExclusions: Array.isArray(s.keyExclusions) ? s.keyExclusions.filter((x): x is string => typeof x === "string") : [],
+    proportionateDeductionApplies: Boolean(s.proportionateDeductionApplies),
+    note: typeof s.note === "string" ? s.note : "",
+  };
+}
 
 export type FinancialContext = {
   spentThisMonth: number;
@@ -16,6 +30,22 @@ export type FinancialContext = {
   creditCards: { name: string; due: number; urgency: string; daysUntilDue: number }[];
   subscriptions: { name: string; amount: number; cycle: string }[];
   insurancePolicies: { policyName: string; type: string; premiumAmount: number }[];
+  insuranceDocuments: {
+    type: string;
+    subType: string | null;
+    provider: string | null;
+    policyName: string | null;
+    sumInsured: number | null;
+    summary: {
+      roomRentLimit: string | null;
+      coPayPercent: number | null;
+      subLimits: string[];
+      waitingPeriodMonths: number | null;
+      keyExclusions: string[];
+      proportionateDeductionApplies: boolean;
+      note: string;
+    };
+  }[];
   coupons: { title: string; merchant: string | null; code: string | null; expiresAt: Date | null }[];
   hasEnoughData: boolean;
 };
@@ -25,7 +55,7 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const [expenseTx, netWorth, averageMonthlySurplus, budgetRows, goalRows, creditCards, subscriptions, insurancePolicies, coupons, txCount] =
+  const [expenseTx, netWorth, averageMonthlySurplus, budgetRows, goalRows, creditCards, subscriptions, insurancePolicies, insuranceDocuments, coupons, txCount] =
     await Promise.all([
       db.transaction.findMany({ where: { userId, amount: { lt: 0 }, date: { gte: lastMonthStart } } }),
       getNetWorthBreakdown(userId),
@@ -35,6 +65,7 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
       db.creditCard.findMany({ where: { userId } }),
       db.subscription.findMany({ where: { userId, isActive: true } }),
       db.insurancePolicy.findMany({ where: { userId } }),
+      db.insuranceDocument.findMany({ where: { userId } }),
       db.coupon.findMany({ where: { userId, isRedeemed: false, OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] } }),
       db.transaction.count({ where: { userId } }),
     ]);
@@ -92,6 +123,14 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
     creditCards: creditCardStatus,
     subscriptions: subscriptions.map((s) => ({ name: s.name, amount: s.amount, cycle: s.cycle })),
     insurancePolicies: insurancePolicies.map((p) => ({ policyName: p.policyName, type: p.type, premiumAmount: p.premiumAmount })),
+    insuranceDocuments: insuranceDocuments.map((d) => ({
+      type: d.type,
+      subType: d.subType,
+      provider: d.provider,
+      policyName: d.policyName,
+      sumInsured: d.sumInsured,
+      summary: coerceDocSummary(d.summary),
+    })),
     coupons: coupons.map((c) => ({ title: c.title, merchant: c.merchant, code: c.code, expiresAt: c.expiresAt })),
     hasEnoughData: txCount >= 5,
   };
@@ -144,12 +183,31 @@ export function toPromptSummary(ctx: FinancialContext): string {
         const parts = [c.title];
         if (c.merchant) parts.push(`at ${c.merchant}`);
         if (c.code) parts.push(`code ${c.code}`);
-        if (c.expiresAt) parts.push(`expires ${c.expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`);
+        if (c.expiresAt) parts.push(`expires ${formatShortDate(c.expiresAt)}`);
         return parts.join(", ");
       })
       .join("; ");
     lines.push(
       `Saved coupons they haven't used yet: ${couponList}. If they mention wanting to buy something or from a store that matches one of these, remind them of it and the code. Don't mention coupons otherwise.`
+    );
+  }
+
+  if (ctx.insuranceDocuments.length > 0) {
+    const docLines = ctx.insuranceDocuments.map((d) => {
+      const parts = [`${d.subType ?? d.type}${d.provider ? ` (${d.provider})` : ""}`];
+      if (d.policyName) parts.push(d.policyName);
+      if (d.sumInsured) parts.push(`sum insured ${formatINR(d.sumInsured)}`);
+      if (d.summary.roomRentLimit) parts.push(`room rent limit: ${d.summary.roomRentLimit}`);
+      if (d.summary.coPayPercent) parts.push(`co-pay ${d.summary.coPayPercent}%`);
+      if (d.summary.subLimits.length > 0) parts.push(`sub-limits: ${d.summary.subLimits.join("; ")}`);
+      if (d.summary.waitingPeriodMonths) parts.push(`waiting period ${d.summary.waitingPeriodMonths}mo`);
+      if (d.summary.keyExclusions.length > 0) parts.push(`exclusions: ${d.summary.keyExclusions.join("; ")}`);
+      if (d.summary.proportionateDeductionApplies) parts.push("proportionate deduction clause applies");
+      if (d.summary.note) parts.push(d.summary.note);
+      return parts.join(", ");
+    });
+    lines.push(
+      `Uploaded insurance documents (use these exact terms to answer coverage questions, don't guess beyond them):\n- ${docLines.join("\n- ")}`
     );
   }
 

@@ -3,6 +3,10 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+// Must match the `duration-300` Tailwind classes below — callers use this to
+// delay resetting form state until the close transition finishes.
+export const BOTTOM_SHEET_TRANSITION_MS = 300;
+
 export function BottomSheet({
   open,
   onClose,

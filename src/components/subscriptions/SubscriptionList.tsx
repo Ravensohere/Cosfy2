@@ -3,19 +3,11 @@
 import { useTransition } from "react";
 import type { Subscription } from "@prisma/client";
 import { Repeat, Trash2 } from "lucide-react";
-import { IconTile } from "@/components/ui/IconTile";
-import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { RenewalRowHeader } from "@/components/ui/RenewalRowHeader";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
-import { cn } from "@/lib/cn";
 import { daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { formatShortDate } from "@/lib/format";
 import { markSubscriptionRenewed, deleteSubscription } from "@/lib/actions/subscriptions";
-
-const URGENCY_STYLES = {
-  overdue: "text-cosfy-red",
-  soon: "text-cosfy-amber",
-  upcoming: "text-cosfy-muted",
-  paid: "text-cosfy-green",
-};
 
 const URGENCY_LABEL = {
   overdue: (days: number) => `Overdue by ${Math.abs(days)}d`,
@@ -53,20 +45,14 @@ function SubscriptionRow({ subscription }: { subscription: Subscription }) {
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      <div className="flex items-center gap-3">
-        <IconTile icon={Repeat} tone="dark" size={44} />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] text-cosfy-ink truncate">
-            {subscription.name}
-            <span className="text-cosfy-muted font-normal"> · {subscription.cycle}</span>
-          </p>
-          <p className={cn("text-[12px] font-semibold", URGENCY_STYLES[urgency])}>
-            {URGENCY_LABEL[urgency](days)} ·{" "}
-            {subscription.nextRenewalDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-          </p>
-        </div>
-        <MoneyAmount amount={subscription.amount} size="md" />
-      </div>
+      <RenewalRowHeader
+        icon={Repeat}
+        title={subscription.name}
+        subtitle={<span className="text-cosfy-muted font-normal"> · {subscription.cycle}</span>}
+        statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(subscription.nextRenewalDate)}`}
+        urgency={urgency}
+        amount={subscription.amount}
+      />
       <div className="flex gap-2 mt-3">
         <SecondaryButton className="flex-1 h-9 text-[12px]" onClick={renew} disabled={isPending}>
           Mark renewed

@@ -10,6 +10,7 @@ import { SummaryShareCard } from "@/components/summary/SummaryShareCard";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { formatINR } from "@/lib/format";
+import { computeIncomeAndSpent } from "@/lib/transaction-totals";
 import { assignChartColors } from "@/lib/chart-colors";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { resolveRange, monthBuckets, type RangePreset } from "@/lib/summary-range";
@@ -33,9 +34,7 @@ export default async function SummaryPage({
     getNetWorthBreakdown(user.id),
   ]);
 
-  const income = transactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-  const spent = transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const surplus = income - spent;
+  const { income, spent, surplus } = computeIncomeAndSpent(transactions);
   const savingsRate = income > 0 ? Math.round((surplus / income) * 100) : 0;
 
   const categoryTotals: Record<string, number> = {};

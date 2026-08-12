@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Sparkles, TriangleAlert } from "lucide-react";
 import { FormattedAIText } from "@/components/ui/FormattedAIText";
+import { useAIInsight } from "@/lib/useAIInsight";
 
 export function InsightsPanel({
   thisMonth,
@@ -11,36 +11,11 @@ export function InsightsPanel({
   thisMonth: Record<string, number>;
   lastMonth: Record<string, number>;
 }) {
-  const [insights, setInsights] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/insights", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ thisMonth, lastMonth }),
-    })
-      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
-        if (cancelled) return;
-        if (!ok) {
-          setError(data.error ?? "Couldn't load insights.");
-          return;
-        }
-        setInsights(data.insights);
-      })
-      .catch(() => {
-        if (!cancelled) setError("Couldn't reach the server.");
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [thisMonth, lastMonth]);
+  const {
+    text: insights,
+    error,
+    isLoading,
+  } = useAIInsight({ thisMonth, lastMonth }, [thisMonth, lastMonth], "Couldn't load insights.");
 
   return (
     <div className="rounded-card bg-cosfy-dark-card text-white p-5">

@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
-import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
+import { Input, FieldLabel } from "@/components/ui/Input";
+import { SelectField } from "@/components/ui/SelectField";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createSubscription } from "@/lib/actions/subscriptions";
@@ -34,7 +35,7 @@ export function AddSubscriptionButton({ variant = "icon" }: { variant?: "icon" |
 
   function handleClose() {
     setOpen(false);
-    setTimeout(reset, 300);
+    setTimeout(reset, BOTTOM_SHEET_TRANSITION_MS);
   }
 
   function handleSubmit() {
@@ -85,13 +86,12 @@ export function AddSubscriptionButton({ variant = "icon" }: { variant?: "icon" |
             </div>
             <div>
               <FieldLabel>Cycle</FieldLabel>
-              <Select value={cycle} onChange={(e) => setCycle(e.target.value as (typeof SUBSCRIPTION_CYCLES)[number])}>
-                {SUBSCRIPTION_CYCLES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
+              <SelectField
+                value={cycle}
+                onChange={(v) => setCycle(v as (typeof SUBSCRIPTION_CYCLES)[number])}
+                options={[...SUBSCRIPTION_CYCLES]}
+                title="Select cycle"
+              />
             </div>
           </div>
           <div>

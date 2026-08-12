@@ -6,6 +6,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { PillChip } from "@/components/ui/PillChip";
 import { cn } from "@/lib/cn";
+import { formatMonthYear } from "@/lib/format";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -20,7 +21,7 @@ function parseYM(ym: string) {
 
 function formatLabel(ym: string) {
   const { year, monthIndex } = parseYM(ym);
-  return new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(new Date(year, monthIndex, 1));
+  return formatMonthYear(new Date(year, monthIndex, 1));
 }
 
 export function MonthWindowPicker({

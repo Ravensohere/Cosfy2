@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PillChip } from "@/components/ui/PillChip";
-import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { Input, FieldLabel } from "@/components/ui/Input";
+import { SelectField } from "@/components/ui/SelectField";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
@@ -83,13 +84,12 @@ export default function CreateBudgetPage() {
         {type === "Category" && (
           <div>
             <FieldLabel>Category</FieldLabel>
-            <Select value={category} onChange={(e) => setCategory(e.target.value as CategoryValue)}>
-              {CATEGORIES.filter((c) => c !== "Income").map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
+            <SelectField
+              value={category}
+              onChange={(v) => setCategory(v as CategoryValue)}
+              options={CATEGORIES.filter((c) => c !== "Income")}
+              title="Select category"
+            />
           </div>
         )}
 

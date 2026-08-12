@@ -15,3 +15,13 @@ export function formatDate(date: Date): string {
     year: "numeric",
   }).format(date);
 }
+
+/** "12 Aug" — no year, used for near-term due/renewal dates throughout the app. */
+export function formatShortDate(date: Date): string {
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
+/** "August 2026" — used by month pickers and period labels. */
+export function formatMonthYear(date: Date): string {
+  return new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(date);
+}

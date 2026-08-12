@@ -9,6 +9,7 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { BudgetCard } from "@/components/finance/BudgetCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PastBudgetsToggle } from "@/components/finance/PastBudgetsToggle";
+import { formatShortDate, formatDate } from "@/lib/format";
 
 export default async function BudgetsPage() {
   const user = await getCurrentUser();
@@ -85,7 +86,7 @@ export default async function BudgetsPage() {
               limit={b.amount}
               dateRangeLabel={
                 b.startDate && b.endDate
-                  ? `${b.startDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} – ${b.endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`
+                  ? `${formatShortDate(b.startDate)} – ${formatShortDate(b.endDate)}`
                   : undefined
               }
             />
@@ -102,7 +103,7 @@ export default async function BudgetsPage() {
               amount: b.amount,
               dateRangeLabel:
                 b.startDate && b.endDate
-                  ? `${b.startDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} – ${b.endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`
+                  ? `${formatShortDate(b.startDate)} – ${formatDate(b.endDate)}`
                   : "",
             }))}
           />

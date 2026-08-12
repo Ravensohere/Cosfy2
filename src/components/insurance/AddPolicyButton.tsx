@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
-import { Input, FieldLabel, Select } from "@/components/ui/Input";
+import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
+import { Input, FieldLabel } from "@/components/ui/Input";
+import { SelectField } from "@/components/ui/SelectField";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createInsurancePolicy } from "@/lib/actions/insurance";
@@ -38,7 +39,7 @@ export function AddPolicyButton({ variant = "icon" }: { variant?: "icon" | "prim
 
   function handleClose() {
     setOpen(false);
-    setTimeout(reset, 300);
+    setTimeout(reset, BOTTOM_SHEET_TRANSITION_MS);
   }
 
   function handleSubmit() {
@@ -82,26 +83,21 @@ export function AddPolicyButton({ variant = "icon" }: { variant?: "icon" | "prim
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel>Type</FieldLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value as (typeof INSURANCE_TYPES)[number])}>
-                {INSURANCE_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </Select>
+              <SelectField
+                value={type}
+                onChange={(v) => setType(v as (typeof INSURANCE_TYPES)[number])}
+                options={[...INSURANCE_TYPES]}
+                title="Select type"
+              />
             </div>
             <div>
               <FieldLabel>Frequency</FieldLabel>
-              <Select
+              <SelectField
                 value={frequency}
-                onChange={(e) => setFrequency(e.target.value as (typeof INSURANCE_FREQUENCIES)[number])}
-              >
-                {INSURANCE_FREQUENCIES.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </Select>
+                onChange={(v) => setFrequency(v as (typeof INSURANCE_FREQUENCIES)[number])}
+                options={[...INSURANCE_FREQUENCIES]}
+                title="Select frequency"
+              />
             </div>
           </div>
           <div>

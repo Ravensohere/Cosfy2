@@ -5,7 +5,7 @@ import { PiggyBank } from "lucide-react";
 import { IconTile } from "@/components/ui/IconTile";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { PillChip } from "@/components/ui/PillChip";
-import { Select } from "@/components/ui/Input";
+import { SelectField } from "@/components/ui/SelectField";
 import { updateRoundUpSettings } from "@/lib/actions/round-up";
 
 const INCREMENTS = [10, 50, 100] as const;
@@ -75,19 +75,15 @@ export function RoundUpSettingsCard({
             ))}
           </div>
           {goals.length > 0 ? (
-            <Select
+            <SelectField
               value={goalId}
-              onChange={(e) => {
-                setGoalId(e.target.value);
-                save({ goalId: e.target.value });
+              onChange={(v) => {
+                setGoalId(v);
+                save({ goalId: v });
               }}
-            >
-              {goals.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </Select>
+              options={goals.map((g) => ({ value: g.id, label: g.name }))}
+              title="Select goal"
+            />
           ) : (
             <p className="text-[12px] text-cosfy-muted">Create a goal first to sweep round-ups into it.</p>
           )}

@@ -3,20 +3,13 @@
 import { useState, useTransition } from "react";
 import type { CreditCard } from "@prisma/client";
 import { CreditCard as CardIcon, Trash2, Gift } from "lucide-react";
-import { IconTile } from "@/components/ui/IconTile";
+import { RenewalRowHeader } from "@/components/ui/RenewalRowHeader";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { Input } from "@/components/ui/Input";
-import { cn } from "@/lib/cn";
 import { nextDueDate, daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { formatShortDate } from "@/lib/format";
 import { updateCreditCardDue, updateCreditCardRewards, deleteCreditCard } from "@/lib/actions/credit-cards";
-
-const URGENCY_STYLES = {
-  overdue: "text-cosfy-red",
-  soon: "text-cosfy-amber",
-  upcoming: "text-cosfy-muted",
-  paid: "text-cosfy-green",
-};
 
 const URGENCY_LABEL = {
   overdue: (days: number) => `Overdue by ${Math.abs(days)}d`,
@@ -65,19 +58,14 @@ function CreditCardRow({ card }: { card: CreditCard }) {
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      <div className="flex items-center gap-3">
-        <IconTile icon={CardIcon} tone="dark" size={44} />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] text-cosfy-ink truncate">
-            {card.name}
-            {card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
-          </p>
-          <p className={cn("text-[12px] font-semibold", URGENCY_STYLES[urgency])}>
-            {URGENCY_LABEL[urgency](days)} · {due.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-          </p>
-        </div>
-        <MoneyAmount amount={card.currentDue} size="md" />
-      </div>
+      <RenewalRowHeader
+        icon={CardIcon}
+        title={card.name}
+        subtitle={card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
+        statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(due)}`}
+        urgency={urgency}
+        amount={card.currentDue}
+      />
 
       {card.rewardPointsBalance || card.cashbackYtd ? (
         <p className="text-[12px] text-cosfy-muted mt-2 flex items-center gap-1">

@@ -3,19 +3,13 @@
 import { useTransition } from "react";
 import type { Loan } from "@prisma/client";
 import { Landmark, Trash2 } from "lucide-react";
-import { IconTile } from "@/components/ui/IconTile";
+import { RenewalRowHeader } from "@/components/ui/RenewalRowHeader";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { cn } from "@/lib/cn";
 import { nextDueDate, daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { formatShortDate } from "@/lib/format";
 import { recordEmiPayment, deleteLoan } from "@/lib/actions/loans";
-
-const URGENCY_STYLES = {
-  overdue: "text-cosfy-red",
-  soon: "text-cosfy-amber",
-  upcoming: "text-cosfy-muted",
-  paid: "text-cosfy-green",
-};
 
 const URGENCY_LABEL = {
   overdue: (days: number) => `Overdue by ${Math.abs(days)}d`,
@@ -54,19 +48,14 @@ function LoanRow({ loan }: { loan: Loan }) {
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      <div className="flex items-center gap-3">
-        <IconTile icon={Landmark} tone="dark" size={44} />
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] text-cosfy-ink truncate">
-            {loan.name}
-            {loan.lender ? <span className="text-cosfy-muted font-normal"> · {loan.lender}</span> : null}
-          </p>
-          <p className={cn("text-[12px] font-semibold", URGENCY_STYLES[urgency])}>
-            {URGENCY_LABEL[urgency](days)} · {due.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-          </p>
-        </div>
-        <MoneyAmount amount={loan.outstandingPrincipal} size="md" />
-      </div>
+      <RenewalRowHeader
+        icon={Landmark}
+        title={loan.name}
+        subtitle={loan.lender ? <span className="text-cosfy-muted font-normal"> · {loan.lender}</span> : null}
+        statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(due)}`}
+        urgency={urgency}
+        amount={loan.outstandingPrincipal}
+      />
       <div className="flex gap-2 mt-3">
         {loan.outstandingPrincipal > 0 ? (
           <SecondaryButton className="flex-1 h-9 text-[12px]" onClick={markEmiPaid} disabled={isPending}>

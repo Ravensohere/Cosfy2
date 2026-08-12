@@ -72,7 +72,26 @@ export async function callGeminiJSON({
 
   const data = await generate(apiKey, {
     contents: [{ role: "user", parts }],
-    generationConfig: { temperature: 0.2, maxOutputTokens: 300, responseMimeType: "application/json" },
+    generationConfig: { temperature: 0.2, maxOutputTokens: 800, responseMimeType: "application/json" },
+  });
+
+  return extractText(data) || "{}";
+}
+
+export async function callGeminiTextJSON({
+  apiKey,
+  prompt,
+  document,
+}: {
+  apiKey: string;
+  prompt: string;
+  document: string;
+}): Promise<string> {
+  const parts: GeminiPart[] = [{ text: `${prompt}\n\n---\n\n${document}` }];
+
+  const data = await generate(apiKey, {
+    contents: [{ role: "user", parts }],
+    generationConfig: { temperature: 0.2, maxOutputTokens: 800, responseMimeType: "application/json" },
   });
 
   return extractText(data) || "{}";

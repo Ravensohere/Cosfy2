@@ -22,3 +22,11 @@ export function dueUrgency(daysLeft: number, amountDue: number): DueUrgency {
   if (daysLeft <= 3) return "soon";
   return "upcoming";
 }
+
+/** Shared text-color mapping for DueUrgency, used by every renewal/due-date list (cards, loans, insurance, subscriptions). */
+export const URGENCY_STYLES: Record<DueUrgency, string> = {
+  overdue: "text-cosfy-red",
+  soon: "text-cosfy-amber",
+  upcoming: "text-cosfy-muted",
+  paid: "text-cosfy-green",
+};

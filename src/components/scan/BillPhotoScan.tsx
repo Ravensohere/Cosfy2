@@ -81,7 +81,7 @@ export function BillPhotoScan({
         />
       </label>
       {preview && !isScanning && !error ? (
-        <p className="text-[11px] text-cosfy-muted mt-1.5">Scanned. Check the items below, fix anything that's off.</p>
+        <p className="text-[11px] text-cosfy-muted mt-1.5">Scanned. Check the items below, fix anything that&apos;s off.</p>
       ) : null}
       {error ? <p className="text-[13px] text-cosfy-red mt-1.5">{error}</p> : null}
     </div>

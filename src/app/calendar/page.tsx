@@ -5,6 +5,7 @@ import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { nextDueDate, daysUntil, dueUrgency, type DueUrgency } from "@/lib/credit-card-status";
+import { formatShortDate, formatMonthYear } from "@/lib/format";
 
 type CalendarEntry = {
   label: string;
@@ -59,7 +60,7 @@ export default async function CalendarPage() {
 
   const grouped = new Map<string, CalendarEntry[]>();
   for (const entry of upcoming) {
-    const key = entry.date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+    const key = formatMonthYear(entry.date);
     const group = grouped.get(key);
     if (group) group.push(entry);
     else grouped.set(key, [entry]);
@@ -93,7 +94,7 @@ export default async function CalendarPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-semibold text-cosfy-ink truncate">{entry.label}</p>
                         <p className={`text-[11px] font-semibold ${URGENCY_STYLES[urgency]}`}>
-                          {entry.date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·{" "}
+                          {formatShortDate(entry.date)} ·{" "}
                           {days === 0 ? "Today" : days > 0 ? `In ${days}d` : `${Math.abs(days)}d ago`}
                         </p>
                       </div>

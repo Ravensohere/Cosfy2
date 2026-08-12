@@ -1,20 +1,21 @@
 import { redirect } from "next/navigation";
-import { Receipt, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { HeroCard } from "@/components/ui/HeroCard";
 import { StatCard } from "@/components/ui/StatCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { CosfyMascot, type MascotMood } from "@/components/ui/CosfyMascot";
-import { TransactionRow } from "@/components/finance/TransactionRow";
 import { QuickActionLink } from "@/components/home/QuickActionButton";
 import { fetchFinanceHeadlines } from "@/lib/news-feed";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { NetWorthWidget } from "@/components/home/NetWorthWidget";
 import { StreakBadge } from "@/components/home/StreakBadge";
+import { RecentActivityList } from "@/components/home/RecentActivityList";
+import { FinanceNewsSection } from "@/components/home/FinanceNewsSection";
 import { MonthWindowPicker } from "@/components/ui/MonthWindowPicker";
 import { computeNoSpendStreak, computeLoggingStreak } from "@/lib/streaks";
+import { computeIncomeAndSpent } from "@/lib/transaction-totals";
 import { translate, SUPPORTED_LANGUAGES, type Language } from "@/lib/i18n/dictionary";
 import Link from "next/link";
 
@@ -71,9 +72,7 @@ export default async function HomePage({
   const noSpendStreak = computeNoSpendStreak(streakTransactions);
   const loggingStreak = computeLoggingStreak(streakTransactions);
 
-  const income = monthTransactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-  const spent = monthTransactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const surplus = income - spent;
+  const { income, spent, surplus } = computeIncomeAndSpent(monthTransactions);
 
   const mascotMood: MascotMood = monthTransactions.length === 0 ? "neutral" : surplus >= 0 ? "happy" : "concerned";
   const lang: Language = SUPPORTED_LANGUAGES.includes(user.language as Language) ? (user.language as Language) : "en";
@@ -159,57 +158,12 @@ export default async function HomePage({
       </div>
 
       <div className="mt-6" data-tour="home-recent-activity">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-[15px] font-extrabold text-cosfy-ink">{t("home.recentActivity")}</h2>
-          {recentTransactions.length > 0 && (
-            <Link href="/transactions" className="text-[12px] font-semibold text-cosfy-lime-deep">
-              {t("home.seeAll")}
-            </Link>
-          )}
-        </div>
-        {recentTransactions.length === 0 ? (
-          <EmptyState icon={Receipt} title={t("home.noExpenses")} description={t("home.tapToAdd")} />
-        ) : (
-          <div className="space-y-2.5">
-            {recentTransactions.map((t) => (
-              <TransactionRow
-                key={t.id}
-                description={t.description}
-                category={t.category}
-                paymentMode={t.paymentMode}
-                amount={t.amount}
-                date={t.date}
-              />
-            ))}
-          </div>
-        )}
+        <RecentActivityList transactions={recentTransactions} t={t} />
       </div>
 
       {headlines.length > 0 && (
         <div className="mt-6" data-tour="home-news">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-[15px] font-extrabold text-cosfy-ink">{t("home.financeNews")}</h2>
-            <Link href="/news" className="text-[12px] font-semibold text-cosfy-lime-deep">
-              {t("home.seeAll")}
-            </Link>
-          </div>
-          <div className="space-y-2.5">
-            {headlines.map((h, i) => (
-              <a
-                key={i}
-                href={h.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start justify-between gap-2 rounded-card bg-cosfy-card border border-cosfy-border p-3.5"
-              >
-                <div>
-                  <p className="text-[13px] font-semibold text-cosfy-ink leading-snug">{h.title}</p>
-                  <p className="text-[11px] text-cosfy-muted mt-1">{h.source}</p>
-                </div>
-                <ExternalLink size={14} className="text-cosfy-muted shrink-0 mt-0.5" />
-              </a>
-            ))}
-          </div>
+          <FinanceNewsSection headlines={headlines} t={t} />
         </div>
       )}
     </div>

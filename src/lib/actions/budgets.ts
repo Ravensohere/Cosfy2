@@ -47,9 +47,3 @@ export async function createBudget(input: CreateBudgetInput) {
   revalidatePath("/budgets");
   redirect("/budgets");
 }
-
-export async function deleteBudget(id: string) {
-  const user = await getCurrentUser();
-  await db.budget.deleteMany({ where: { id, userId: user.id } });
-  revalidatePath("/budgets");
-}
