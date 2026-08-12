@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -32,6 +33,17 @@ function monthParam(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+// Streamed separately so a slow/unreachable RSS feed can't hold up the rest of the page.
+async function FinanceNews({ t }: { t: (key: Parameters<typeof translate>[1]) => string }) {
+  const headlines = await fetchFinanceHeadlines(3);
+  if (headlines.length === 0) return null;
+  return (
+    <div className="mt-6" data-tour="home-news">
+      <FinanceNewsSection headlines={headlines} t={t} />
+    </div>
+  );
+}
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -52,7 +64,7 @@ export default async function HomePage({
   const sixtyDaysAgo = new Date();
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-  const [monthTransactions, recentTransactions, headlines, netWorth, streakTransactions] = await Promise.all([
+  const [monthTransactions, recentTransactions, netWorth, streakTransactions] = await Promise.all([
     db.transaction.findMany({
       where: { userId: user.id, date: { gte: monthStart, lt: monthEnd } },
     }),
@@ -61,7 +73,6 @@ export default async function HomePage({
       orderBy: { date: "desc" },
       take: 5,
     }),
-    fetchFinanceHeadlines(3),
     getNetWorthBreakdown(user.id),
     db.transaction.findMany({
       where: { userId: user.id, date: { gte: sixtyDaysAgo } },
@@ -161,11 +172,9 @@ export default async function HomePage({
         <RecentActivityList transactions={recentTransactions} t={t} />
       </div>
 
-      {headlines.length > 0 && (
-        <div className="mt-6" data-tour="home-news">
-          <FinanceNewsSection headlines={headlines} t={t} />
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <FinanceNews t={t} />
+      </Suspense>
     </div>
   );
 }

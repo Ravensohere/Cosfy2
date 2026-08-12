@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { CosfyMascot } from "@/components/ui/CosfyMascot";
 
 const AUTO_ADVANCE_MS = 5000;
 
 export function WelcomeScreen({ preferredName }: { preferredName: string | null }) {
-  const router = useRouter();
-
   useEffect(() => {
-    const timer = setTimeout(() => router.push("/home"), AUTO_ADVANCE_MS);
+    // Full navigation (not router.push) so the root layout re-fetches the user
+    // fresh — onboardingCompleted/tourCompleted just changed server-side, and a
+    // soft client navigation here can carry a stale value into the tour's
+    // shouldStart check on /home.
+    const timer = setTimeout(() => {
+      window.location.href = "/home";
+    }, AUTO_ADVANCE_MS);
     return () => clearTimeout(timer);
-  }, [router]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-[100] bg-cosfy-lime flex flex-col items-center justify-center gap-4 px-6 text-center">

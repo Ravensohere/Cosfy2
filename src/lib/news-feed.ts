@@ -37,11 +37,14 @@ function parseRSS(xml: string, source: string): NewsFeedItem[] {
   return items;
 }
 
+const FEED_TIMEOUT_MS = 4000;
+
 async function fetchOneFeed(feed: { url: string; source: string }): Promise<NewsFeedItem[]> {
   try {
     const res = await fetch(feed.url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; CosfyNewsBot/1.0)" },
       next: { revalidate: 1200 },
+      signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
     });
     if (!res.ok) return [];
     const xml = await res.text();
