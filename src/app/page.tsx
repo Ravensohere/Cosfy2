@@ -23,7 +23,7 @@ export default async function SplashPage() {
         </p>
       </div>
       <div className="w-full max-w-sm">
-        <DarkButton href="/onboarding/goal" className="w-full">
+        <DarkButton href="/onboarding/features" className="w-full">
           Get started →
         </DarkButton>
       </div>
