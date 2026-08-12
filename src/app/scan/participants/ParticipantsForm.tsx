@@ -14,6 +14,7 @@ type Group = { id: string; name: string; members: { id: string; name: string }[]
 export function ParticipantsForm({ groups }: { groups: Group[] }) {
   const router = useRouter();
   const items = useBillWizard((s) => s.items);
+  const hasHydrated = useBillWizard((s) => s.hasHydrated);
   const setParticipants = useBillWizard((s) => s.setParticipants);
   const setGroupId = useBillWizard((s) => s.setGroupId);
 
@@ -22,8 +23,11 @@ export function ParticipantsForm({ groups }: { groups: Group[] }) {
   const [nameInput, setNameInput] = useState("");
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (items.length === 0) router.replace("/scan/edit-items");
-  }, [items, router]);
+  }, [hasHydrated, items, router]);
+
+  if (!hasHydrated) return null;
 
   function selectGroup(group: Group) {
     setGroupId(group.id);

@@ -11,16 +11,17 @@ import { confirmBillSplit } from "@/lib/actions/bills";
 
 export default function AssignItemsPage() {
   const router = useRouter();
-  const { merchant, items, taxAndCharges, groupId, participants, assignments, toggleAssignment, assignAllToItem, reset } =
+  const { merchant, items, taxAndCharges, groupId, participants, assignments, hasHydrated, toggleAssignment, assignAllToItem, reset } =
     useBillWizard();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (items.length === 0 || participants.length < 2) {
       router.replace("/scan/edit-items");
     }
-  }, [items, participants, router]);
+  }, [hasHydrated, items, participants, router]);
 
   const subtotal = useMemo(() => items.reduce((sum, i) => sum + i.quantity * i.price, 0), [items]);
   const total = subtotal + taxAndCharges;
@@ -64,6 +65,8 @@ export default function AssignItemsPage() {
       router.push(`/scan/split-result/${expenseId}`);
     });
   }
+
+  if (!hasHydrated) return null;
 
   return (
     <PageContainer title="Who had what?" backHref="/scan/participants">
