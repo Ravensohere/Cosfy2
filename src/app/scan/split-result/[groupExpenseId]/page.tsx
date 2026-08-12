@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { MessageCircle, User } from "lucide-react";
+import { User } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -7,12 +7,9 @@ import { HeroCard } from "@/components/ui/HeroCard";
 import { IconTile } from "@/components/ui/IconTile";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { PersonSplitCard } from "@/components/finance/PersonSplitCard";
-import { formatINR } from "@/lib/format";
-import { inviteLine } from "@/lib/invite-link";
+import { FullSplitShareCard } from "@/components/finance/FullSplitShareCard";
 import { parseItemsBreakdown, computePersonItems } from "@/lib/split-breakdown";
-import { CopyButton } from "./CopyButton";
 
 export default async function SplitResultPage({ params }: { params: Promise<{ groupExpenseId: string }> }) {
   const { groupExpenseId } = await params;
@@ -28,14 +25,6 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
   const breakdown = parseItemsBreakdown(expense.itemsBreakdown);
   const memberNamesById = Object.fromEntries(expense.splits.map((s) => [s.member.id, s.member.name]));
 
-  const summaryText =
-    [
-      `${expense.description}: ${formatINR(expense.totalAmount)}`,
-      `Paid by ${expense.paidByMember.name}`,
-      ...expense.splits.map((s) => `${s.member.name}: ${formatINR(s.shareAmount)}`),
-      `Sent via Cosfy`,
-    ].join("\n") + inviteLine();
-
   return (
     <PageContainer title="Split complete" backHref={`/groups/${expense.groupId}`}>
       <HeroCard className="mb-4">
@@ -46,6 +35,16 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
         </p>
       </HeroCard>
 
+      <FullSplitShareCard
+        merchant={expense.description}
+        paidByName={expense.paidByMember.name}
+        total={expense.totalAmount}
+        breakdown={breakdown}
+        memberNamesById={memberNamesById}
+        people={expense.splits.map((s) => ({ name: s.member.name, amount: s.shareAmount }))}
+      />
+
+      <h2 className="text-[13px] font-bold text-cosfy-muted mb-2">Individual shares</h2>
       <div className="space-y-3 mb-5">
         {expense.splits.map((s) => {
           if (!breakdown) {
@@ -73,20 +72,6 @@ export default async function SplitResultPage({ params }: { params: Promise<{ gr
             />
           );
         })}
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        <CopyButton text={summaryText} />
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(summaryText)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1"
-        >
-          <SecondaryButton type="button" fullWidth className="h-11 text-[13px]">
-            <MessageCircle size={16} /> WhatsApp
-          </SecondaryButton>
-        </a>
       </div>
 
       <PrimaryButton fullWidth href={`/groups/${expense.groupId}`}>
