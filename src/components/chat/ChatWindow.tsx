@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, TriangleAlert, Mic, Paperclip } from "lucide-react";
+import { Send, TriangleAlert, Mic, Square, Paperclip } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { FormattedAIText } from "@/components/ui/FormattedAIText";
 import { CosfyMascot } from "@/components/ui/CosfyMascot";
@@ -28,11 +28,58 @@ export function ChatWindow({
   const [isSending, setIsSending] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const voiceInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  async function startRecording() {
+    setVoiceError(null);
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setVoiceError("Voice recording isn't supported on this browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunksRef.current = [];
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : undefined;
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (blob.size === 0) {
+          setVoiceError("Didn't catch that, try again.");
+          return;
+        }
+        const ext = blob.type.includes("ogg") ? "ogg" : "webm";
+        handleVoiceFile(new File([blob], `voice-message.${ext}`, { type: blob.type }));
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      setVoiceError("Microphone access was denied.");
+    }
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
 
   async function handleVoiceFile(file: File) {
     setVoiceError(null);
@@ -51,7 +98,6 @@ export function ChatWindow({
       setVoiceError("Couldn't reach the server.");
     } finally {
       setIsTranscribing(false);
-      if (voiceInputRef.current) voiceInputRef.current.value = "";
     }
   }
 
@@ -133,8 +179,16 @@ export function ChatWindow({
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSend();
           }}
-          placeholder={isTranscribing ? "Listening…" : isUploadingDoc ? "Reading document…" : "e.g. How much should I save monthly?"}
-          disabled={isSending || isTranscribing || isUploadingDoc}
+          placeholder={
+            isRecording
+              ? "Recording…"
+              : isTranscribing
+                ? "Listening…"
+                : isUploadingDoc
+                  ? "Reading document…"
+                  : "e.g. How much should I save monthly?"
+          }
+          disabled={isSending || isTranscribing || isUploadingDoc || isRecording}
         />
         {allowFile ? (
           <>
@@ -160,28 +214,18 @@ export function ChatWindow({
           </>
         ) : null}
         {allowVoice ? (
-          <>
-            <input
-              ref={voiceInputRef}
-              type="file"
-              accept="audio/*"
-              capture="user"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleVoiceFile(file);
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => voiceInputRef.current?.click()}
-              disabled={isSending || isTranscribing || isUploadingDoc}
-              aria-label="Record voice message"
-              className="shrink-0 w-[52px] h-[52px] rounded-input bg-cosfy-card-soft text-cosfy-ink-soft flex items-center justify-center disabled:opacity-40"
-            >
-              <Mic size={18} strokeWidth={2.5} />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={() => (isRecording ? stopRecording() : startRecording())}
+            disabled={isSending || isTranscribing || isUploadingDoc}
+            aria-label={isRecording ? "Stop recording" : "Record voice message"}
+            className={cn(
+              "shrink-0 w-[52px] h-[52px] rounded-input flex items-center justify-center disabled:opacity-40",
+              isRecording ? "bg-cosfy-red text-white animate-pulse" : "bg-cosfy-card-soft text-cosfy-ink-soft"
+            )}
+          >
+            {isRecording ? <Square size={16} strokeWidth={2.5} fill="currentColor" /> : <Mic size={18} strokeWidth={2.5} />}
+          </button>
         ) : null}
         <button
           type="button"
