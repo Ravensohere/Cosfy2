@@ -19,31 +19,31 @@ type Card = {
 const CARDS: Card[] = [
   {
     icon: ShieldCheck,
-    band: "#22221C",
+    band: "linear-gradient(135deg, #16332C 0%, #1F6E52 55%, #34C98F 100%)",
     title: "Your money data, protected",
     body: "Encrypted in transit, sensitive credentials encrypted at rest, and never sold or shared with third parties. Disconnect Gmail import or delete everything from Profile, anytime.",
   },
   {
     icon: Receipt,
-    band: "#33588A",
+    band: "linear-gradient(135deg, #172F52 0%, #2F5FA8 55%, #5AA9FF 100%)",
     title: "Track spending, split bills instantly",
     body: "Log expenses in seconds, scan a bill photo to split it item by item with friends, and settle up with a tap.",
   },
   {
     icon: "mascot",
-    band: "#5E5790",
+    band: "linear-gradient(135deg, #2E2158 0%, #5E4AA0 55%, #9B7FE8 100%)",
     title: "Meet Kosh, your AI money coach",
     body: "Ask anything about your spending, budgets, or goals, Kosh answers using your real numbers. Plus bite-sized lessons from Money School.",
   },
   {
     icon: Target,
-    band: "#3C7A3E",
+    band: "linear-gradient(135deg, #163A1E 0%, #2F7A3E 55%, #5FCB6C 100%)",
     title: "Goals, net worth, and more",
     body: "Set savings goals with automatic round-ups, track net worth, and manage loans, insurance, subscriptions, credit cards, and taxes, all in one place.",
   },
   {
     icon: Tag,
-    band: "#A66A1B",
+    band: "linear-gradient(135deg, #4A2B0F 0%, #A6641B 55%, #F0A93C 100%)",
     title: "Never miss a coupon or a transaction",
     body: "Save coupons by photo and get warned before they expire. Connect Gmail to auto-import transactions, or share a bank SMS straight to Cosfy.",
   },
@@ -123,7 +123,7 @@ export default function OnboardingFeaturesPage() {
         onPointerUp={handlePointerUp}
         className="flex-1 rounded-[28px] flex flex-col items-center justify-center text-center px-6 py-10 mb-6 touch-pan-y select-none cursor-grab active:cursor-grabbing"
         style={{
-          backgroundColor: card.band,
+          backgroundImage: card.band,
           animation: `${direction === "forward" ? "cosfy-card-in-forward" : "cosfy-card-in-back"} 0.28s ease-out`,
         }}
       >
