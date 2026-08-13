@@ -36,6 +36,9 @@ export function AppSplash() {
       >
         cosfy
       </span>
+      <span className="absolute bottom-8 left-0 right-0 text-center text-[12px] font-medium text-cosfy-ink/60 opacity-0 animate-[cosfy-splash-text_0.5s_ease-out_0.5s_forwards]">
+        cosfy by ravenso
+      </span>
     </div>
   );
 }

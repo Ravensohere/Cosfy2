@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Bell, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Bell, Trash2, FileText, ChevronRight } from "lucide-react";
 import { IconTile } from "@/components/ui/IconTile";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
@@ -77,6 +78,18 @@ export function ProfileSettings({
 
       <LanguageSettingsCard />
 
+      <Link
+        href="/legal/terms"
+        className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-4"
+      >
+        <IconTile icon={FileText} tone="soft" size={44} />
+        <div className="flex-1">
+          <p className="font-bold text-[14px] text-cosfy-ink">Terms & permissions</p>
+          <p className="text-[12px] text-cosfy-muted">Terms & Conditions, and what Cosfy accesses</p>
+        </div>
+        <ChevronRight size={18} className="text-cosfy-muted" />
+      </Link>
+
       <div className="rounded-card bg-cosfy-red-soft border border-cosfy-red/20 p-4">
         <div className="flex items-center gap-3 mb-3">
           <IconTile icon={Trash2} tone="soft" size={44} />
@@ -104,6 +117,8 @@ export function ProfileSettings({
           </SecondaryButton>
         )}
       </div>
+
+      <p className="text-center text-[11px] text-cosfy-muted pt-2 pb-1">cosfy by ravenso</p>
     </div>
   );
 }
