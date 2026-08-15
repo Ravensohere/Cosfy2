@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cosfy</string>
+    <string name="title_activity_main">Cosfy</string>
+    <string name="package_name">in.cosfy.app</string>
+    <string name="custom_url_scheme">in.cosfy.app</string>
+</resources>
