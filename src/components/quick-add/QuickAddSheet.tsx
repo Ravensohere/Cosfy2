@@ -95,14 +95,14 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
               </PillChip>
             </>
           ) : null}
-          <button
-            type="button"
+          <PillChip
+            variant="inactive"
+            className="ml-auto"
             aria-label={mode === "manual" ? "Scan a bill or screenshot instead" : "Type manually instead"}
             onClick={() => {
               setError(null);
               setMode((m) => (m === "manual" ? "scan" : "manual"));
             }}
-            className="ml-auto flex items-center gap-1.5 rounded-full border border-cosfy-border px-3 h-8 text-[12px] font-semibold text-cosfy-ink-soft active:opacity-70"
           >
             {mode === "manual" ? (
               <>
@@ -113,7 +113,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
                 <Pencil size={14} /> Type instead
               </>
             )}
-          </button>
+          </PillChip>
         </div>
 
         {mode === "scan" ? (

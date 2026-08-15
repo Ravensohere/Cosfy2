@@ -5,6 +5,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
 import { MonthWindowPicker } from "@/components/ui/MonthWindowPicker";
+import type { CategoryValue, PaymentModeValue } from "@/lib/constants";
 
 export default async function TransactionsPage({
   searchParams,
@@ -48,9 +49,10 @@ export default async function TransactionsPage({
           {transactions.map((t) => (
             <TransactionRow
               key={t.id}
+              id={t.id}
               description={t.description}
-              category={t.category}
-              paymentMode={t.paymentMode}
+              category={t.category as CategoryValue}
+              paymentMode={t.paymentMode as PaymentModeValue}
               amount={t.amount}
               date={t.date}
             />
