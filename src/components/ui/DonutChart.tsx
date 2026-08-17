@@ -33,18 +33,32 @@ export function DonutChart({
 
   const segLens = segments.map((seg) => (total > 0 ? (seg.value / total) * circumference : 0));
   const arcs = segments.map((seg, i) => {
+    const cumulativeFraction = segments.slice(0, i).reduce((sum, s) => sum + (total > 0 ? s.value / total : 0), 0);
     const cumulative = segLens.slice(0, i).reduce((sum, len) => sum + len, 0);
     const drawnLen = Math.max(0, segLens[i] - gapPx);
-    return { ...seg, drawnLen, offset: -cumulative, index: i, pct: total > 0 ? seg.value / total : 0 };
+    const pct = total > 0 ? seg.value / total : 0;
+    const midAngleRad = ((cumulativeFraction + pct / 2) * 360 * Math.PI) / 180;
+    return {
+      ...seg,
+      drawnLen,
+      offset: -cumulative,
+      index: i,
+      pct,
+      labelX: size / 2 + radius * Math.cos(midAngleRad),
+      labelY: size / 2 + radius * Math.sin(midAngleRad),
+    };
   });
 
   if (total <= 0) return null;
+
+  // Slices under this share are too thin for an on-ring label; they still show in the legend below.
+  const MIN_LABEL_PCT = 0.08;
 
   return (
     <div className={cn("flex flex-col items-center gap-4", className)}>
       <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--cosfy-card-soft)" strokeWidth={strokeWidth} />
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#F1EDE2" strokeWidth={strokeWidth} />
           {arcs.map((arc) => (
             <circle
               key={arc.label}
@@ -65,6 +79,22 @@ export function DonutChart({
               onFocus={() => setActiveIndex(arc.index)}
             />
           ))}
+          {arcs
+            .filter((arc) => arc.pct >= MIN_LABEL_PCT)
+            .map((arc) => (
+              <text
+                key={`label-${arc.label}`}
+                x={arc.labelX}
+                y={arc.labelY}
+                transform={`rotate(90 ${arc.labelX} ${arc.labelY})`}
+                textAnchor="middle"
+                dominantBaseline="central"
+                className="pointer-events-none select-none"
+                style={{ fill: "#FFFFFF", fontSize: 11, fontWeight: 800 }}
+              >
+                {Math.round(arc.pct * 100)}%
+              </text>
+            ))}
         </svg>
         <div className="absolute inset-0 flex items-center justify-center px-2">
           {activeIndex !== null ? (

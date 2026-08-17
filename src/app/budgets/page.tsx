@@ -122,15 +122,37 @@ export default async function BudgetsPage({
     group.items.push(t);
   }
 
+  function truncate(text: string, max: number) {
+    return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+  }
+  function tableRow(left: string, right: string, leftWidth: number) {
+    return `${left.padEnd(leftWidth)}${right.padStart(9)}`;
+  }
+
   const shareLines = [
-    `Cosfy expenses, ${filter.label}`,
+    `*Cosfy expenses — ${filter.label}*`,
     "",
-    `Spent: ${formatINR(filteredSpent)}`,
-    ...(comparisonLimit ? [`Budget: ${formatINR(comparisonLimit)}${comparisonIsProrated ? " (prorated)" : ""}`] : []),
-    "",
-    ...donutSegments.map((c) => `${c.label}: ${formatINR(c.value)}`),
-    "",
-    ...filteredTransactions.map((t) => `${formatShortDate(t.date)}  ${t.description}  ${formatINR(Math.abs(t.amount))}`),
+    `Spent: *${formatINR(filteredSpent)}*${comparisonLimit ? `  (of ${formatINR(comparisonLimit)}${comparisonIsProrated ? " prorated" : ""} budget)` : ""}`,
+    ...(donutSegments.length > 0
+      ? [
+          "",
+          "*By category*",
+          "```",
+          ...donutSegments.map((c) => tableRow(truncate(c.label, 12), formatINR(c.value), 13)),
+          "```",
+        ]
+      : []),
+    ...(filteredTransactions.length > 0
+      ? [
+          "",
+          "*Transactions*",
+          "```",
+          ...filteredTransactions.map((t) =>
+            tableRow(`${formatShortDate(t.date)}  ${truncate(t.description, 16)}`, formatINR(Math.abs(t.amount)), 24)
+          ),
+          "```",
+        ]
+      : []),
   ];
 
   return (
