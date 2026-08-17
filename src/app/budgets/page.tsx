@@ -1,4 +1,4 @@
-import { Plus, Wallet } from "lucide-react";
+import { Plus, Wallet, Receipt } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -9,10 +9,41 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { BudgetCard } from "@/components/finance/BudgetCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PastBudgetsToggle } from "@/components/finance/PastBudgetsToggle";
-import { formatShortDate, formatDate } from "@/lib/format";
+import { TransactionRow } from "@/components/finance/TransactionRow";
+import { ExpenseFilterBar } from "@/components/finance/ExpenseFilterBar";
+import { ExpenseShareCard } from "@/components/finance/ExpenseShareCard";
+import { DonutChart } from "@/components/ui/DonutChart";
+import { assignChartColors } from "@/lib/chart-colors";
+import { formatShortDate, formatDate, formatINR } from "@/lib/format";
+import { resolveExpenseFilter, type ExpenseFilterMode } from "@/lib/expense-filter";
+import type { CategoryValue, PaymentModeValue } from "@/lib/constants";
 
-export default async function BudgetsPage() {
+function daysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function dayKey(d: Date) {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function dayHeading(d: Date, now: Date) {
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (dayKey(d) === dayKey(now)) return "Today";
+  if (dayKey(d) === dayKey(yesterday)) return "Yesterday";
+  return formatDate(d);
+}
+
+export default async function BudgetsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string; date?: string; start?: string; end?: string; month?: string; year?: string }>;
+}) {
   const user = await getCurrentUser();
+  const sp = await searchParams;
+  const filter = resolveExpenseFilter(sp.mode as ExpenseFilterMode | undefined, sp);
+  const validModes: ExpenseFilterMode[] = ["day", "range", "month", "year"];
+  const displayMode = validModes.includes(sp.mode as ExpenseFilterMode) ? (sp.mode as ExpenseFilterMode) : filter.mode;
   const allBudgets = await db.budget.findMany({ where: { userId: user.id }, orderBy: { createdAt: "asc" } });
 
   const now = new Date();
@@ -47,12 +78,67 @@ export default async function BudgetsPage() {
   const monthlySpent = monthlyBudget ? await spentFor(monthlyBudget) : 0;
   const otherSpent = await Promise.all(otherBudgets.map((b) => spentFor(b)));
 
+  const filteredTransactions = await db.transaction.findMany({
+    where: { userId: user.id, amount: { lt: 0 }, date: { gte: filter.start, lt: filter.end } },
+    orderBy: { date: "desc" },
+  });
+  const filteredSpent = filteredTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+  const proratedDailyBudget = monthlyBudget
+    ? monthlyBudget.amount / daysInMonth(filter.start.getFullYear(), filter.start.getMonth())
+    : null;
+  const rangeDays = Math.max(1, Math.round((filter.end.getTime() - filter.start.getTime()) / (24 * 60 * 60 * 1000)));
+
+  const comparisonLimit = monthlyBudget
+    ? filter.mode === "month"
+      ? monthlyBudget.amount
+      : filter.mode === "year"
+        ? monthlyBudget.amount * 12
+        : filter.mode === "day"
+          ? Math.round(proratedDailyBudget!)
+          : Math.round(proratedDailyBudget! * rangeDays)
+    : null;
+  const comparisonIsProrated = filter.mode === "day" || filter.mode === "range";
+
+  const categoryTotals = new Map<string, number>();
+  for (const t of filteredTransactions) {
+    categoryTotals.set(t.category, (categoryTotals.get(t.category) ?? 0) + Math.abs(t.amount));
+  }
+  const donutSegments = assignChartColors(
+    Array.from(categoryTotals.entries())
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+  );
+
+  const dayGroups: { key: string; heading: string; total: number; items: typeof filteredTransactions }[] = [];
+  for (const t of filteredTransactions) {
+    const key = dayKey(t.date);
+    let group = dayGroups.find((g) => g.key === key);
+    if (!group) {
+      group = { key, heading: dayHeading(t.date, now), total: 0, items: [] };
+      dayGroups.push(group);
+    }
+    group.total += Math.abs(t.amount);
+    group.items.push(t);
+  }
+
+  const shareLines = [
+    `Cosfy expenses, ${filter.label}`,
+    "",
+    `Spent: ${formatINR(filteredSpent)}`,
+    ...(comparisonLimit ? [`Budget: ${formatINR(comparisonLimit)}${comparisonIsProrated ? " (prorated)" : ""}`] : []),
+    "",
+    ...donutSegments.map((c) => `${c.label}: ${formatINR(c.value)}`),
+    "",
+    ...filteredTransactions.map((t) => `${formatShortDate(t.date)}  ${t.description}  ${formatINR(Math.abs(t.amount))}`),
+  ];
+
   return (
     <PageContainer
-      title="Budgets"
+      title="Expenses"
       action={
         <PrimaryButton href="/budgets/create" data-tour="budgets-new" className="h-9 px-4 text-[12px]">
-          <Plus size={16} /> New
+          <Plus size={16} /> New budget
         </PrimaryButton>
       }
     >
@@ -109,6 +195,76 @@ export default async function BudgetsPage() {
           />
         </div>
       ) : null}
+
+      <div className="mt-6">
+        <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-3">Expense details</h2>
+        <ExpenseFilterBar
+          mode={displayMode}
+          date={sp.date}
+          start={sp.start}
+          end={sp.end}
+          month={filter.month}
+          year={filter.year}
+        />
+
+        <ExpenseShareCard periodLabel={filter.label} shareText={shareLines.join("\n")}>
+          <div className="rounded-card bg-cosfy-card border border-cosfy-border px-4 py-3.5 shadow-soft mb-4">
+            <p className="text-[11px] font-medium text-cosfy-muted mb-1">{filter.label}</p>
+            <MoneyAmount amount={filteredSpent} size="lg" />
+            {comparisonLimit ? (
+              <div className="mt-3">
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <span className="text-[12px] text-cosfy-muted">
+                    vs budget{comparisonIsProrated ? " (prorated)" : ""}
+                  </span>
+                  <span className="text-[12px] text-cosfy-muted">of {new Intl.NumberFormat("en-IN").format(comparisonLimit)}</span>
+                </div>
+                <ProgressBar value={filteredSpent} max={comparisonLimit} />
+                <p className="mt-1.5 text-[11px] font-semibold text-cosfy-muted">
+                  {filteredSpent <= comparisonLimit
+                    ? `${formatINR(comparisonLimit - filteredSpent)} left`
+                    : `${formatINR(filteredSpent - comparisonLimit)} over`}
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          {donutSegments.length > 0 ? (
+            <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4 mb-4">
+              <h3 className="text-[13px] font-bold text-cosfy-ink mb-3">Breakdown by category</h3>
+              <DonutChart segments={donutSegments} />
+            </div>
+          ) : null}
+
+          {filteredTransactions.length === 0 ? (
+            <EmptyState icon={Receipt} title="Nothing here" description="No expenses in this period." />
+          ) : (
+            <div className="space-y-4">
+              {dayGroups.map((group) => (
+                <div key={group.key}>
+                  <div className="flex items-baseline justify-between mb-2 px-0.5">
+                    <span className="text-[12px] font-bold text-cosfy-ink-soft">{group.heading}</span>
+                    <span className="text-[12px] font-semibold text-cosfy-muted">{formatINR(group.total)}</span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {group.items.map((t) => (
+                      <TransactionRow
+                        key={t.id}
+                        id={t.id}
+                        description={t.description}
+                        category={t.category as CategoryValue}
+                        paymentMode={t.paymentMode as PaymentModeValue}
+                        amount={t.amount}
+                        date={t.date}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ExpenseShareCard>
+      </div>
     </PageContainer>
   );
 }
