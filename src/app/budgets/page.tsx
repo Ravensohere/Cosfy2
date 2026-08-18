@@ -16,21 +16,28 @@ import { DonutChart } from "@/components/ui/DonutChart";
 import { assignChartColors } from "@/lib/chart-colors";
 import { formatShortDate, formatDate, formatINR } from "@/lib/format";
 import { resolveExpenseFilter, type ExpenseFilterMode } from "@/lib/expense-filter";
+import { istDateString, istMidnight } from "@/lib/ist-date";
 import type { CategoryValue, PaymentModeValue } from "@/lib/constants";
 
-function daysInMonth(year: number, month: number) {
-  return new Date(year, month + 1, 0).getDate();
+/** Days in the given "YYYY-MM" month — pure calendar arithmetic, timezone-irrelevant. */
+function daysInMonth(yearMonth: string) {
+  const [y, m] = yearMonth.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
 }
 
+/** IST calendar-day key for grouping — Date#getFullYear/getMonth/getDate read the
+ * runtime's local timezone (UTC on Vercel), which misfiles transactions near
+ * midnight IST, so group by the IST calendar date instead. */
 function dayKey(d: Date) {
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  return istDateString(d);
 }
 
 function dayHeading(d: Date, now: Date) {
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (dayKey(d) === dayKey(now)) return "Today";
-  if (dayKey(d) === dayKey(yesterday)) return "Yesterday";
+  const todayKey = istDateString(now);
+  const yesterdayKey = istDateString(new Date(now.getTime() - 24 * 60 * 60 * 1000));
+  const key = dayKey(d);
+  if (key === todayKey) return "Today";
+  if (key === yesterdayKey) return "Yesterday";
   return formatDate(d);
 }
 
@@ -50,8 +57,11 @@ export default async function BudgetsPage({
   const budgets = allBudgets.filter((b) => !b.endDate || b.endDate >= now);
   const pastBudgets = allBudgets.filter((b) => b.endDate && b.endDate < now);
 
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const currentMonth = istDateString(now).slice(0, 7);
+  const [currentY, currentM] = currentMonth.split("-").map(Number);
+  const nextMonth = currentM === 12 ? `${currentY + 1}-01` : `${currentY}-${String(currentM + 1).padStart(2, "0")}`;
+  const monthStart = istMidnight(`${currentMonth}-01`);
+  const monthEnd = istMidnight(`${nextMonth}-01`);
   const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   async function spentFor(budget: (typeof budgets)[number]) {
@@ -84,9 +94,7 @@ export default async function BudgetsPage({
   });
   const filteredSpent = filteredTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  const proratedDailyBudget = monthlyBudget
-    ? monthlyBudget.amount / daysInMonth(filter.start.getFullYear(), filter.start.getMonth())
-    : null;
+  const proratedDailyBudget = monthlyBudget ? monthlyBudget.amount / daysInMonth(filter.month) : null;
   const rangeDays = Math.max(1, Math.round((filter.end.getTime() - filter.start.getTime()) / (24 * 60 * 60 * 1000)));
 
   const comparisonLimit = monthlyBudget
