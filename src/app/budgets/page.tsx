@@ -138,7 +138,7 @@ export default async function BudgetsPage({
           "",
           "*By category*",
           "```",
-          ...donutSegments.map((c) => tableRow(truncate(c.label, 12), formatINR(c.value), 13)),
+          ...donutSegments.map((c) => tableRow(truncate(c.label, 15), formatINR(c.value), 16)),
           "```",
         ]
       : []),
@@ -148,7 +148,7 @@ export default async function BudgetsPage({
           "*Transactions*",
           "```",
           ...filteredTransactions.map((t) =>
-            tableRow(`${formatShortDate(t.date)}  ${truncate(t.description, 16)}`, formatINR(Math.abs(t.amount)), 24)
+            tableRow(`${formatShortDate(t.date)}  ${truncate(t.description, 16)}`, formatINR(Math.abs(t.amount)), 25)
           ),
           "```",
         ]
