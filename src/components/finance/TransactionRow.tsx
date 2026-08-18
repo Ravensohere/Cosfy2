@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition, type PointerEvent as ReactPointerEvent } from "react";
 import { Pencil, Trash2, ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
 import { IconTile } from "@/components/ui/IconTile";
 import { EditTransactionSheet } from "@/components/finance/EditTransactionSheet";
 import { formatDate, formatINR } from "@/lib/format";
@@ -72,7 +73,12 @@ export function TransactionRow({
 
   function handleDelete() {
     startTransition(async () => {
-      await deleteTransaction(id);
+      const result = await deleteTransaction(id);
+      if (!result.ok) {
+        toast.error(result.error ?? "Couldn't delete transaction");
+        return;
+      }
+      toast.success("Transaction deleted");
     });
   }
 

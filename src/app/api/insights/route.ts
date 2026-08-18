@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ insights });
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "AI request failed." }, { status: 502 });
+    console.error("[api/insights]", err);
+    return NextResponse.json({ error: "Couldn't generate insights right now. Try again shortly." }, { status: 502 });
   }
 }

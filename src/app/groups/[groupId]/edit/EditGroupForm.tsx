@@ -82,6 +82,7 @@ export function EditGroupForm({
         <div className="flex gap-2">
           <Input
             value={name}
+            placeholder="e.g. Goa trip"
             onChange={(e) => {
               setName(e.target.value);
               setNameSaved(false);

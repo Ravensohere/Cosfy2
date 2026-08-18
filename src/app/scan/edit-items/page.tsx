@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EditItemsForm } from "./EditItemsForm";
+
+export const metadata: Metadata = { title: "Edit scanned items" };
 
 export default async function EditBillItemsPage({
   searchParams,

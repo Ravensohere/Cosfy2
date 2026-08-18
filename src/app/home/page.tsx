@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -43,6 +44,11 @@ async function FinanceNews({ t }: { t: (key: Parameters<typeof translate>[1]) =>
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "Your daily money overview: spending, budgets, and net worth at a glance.",
+};
 
 export default async function HomePage({
   searchParams,

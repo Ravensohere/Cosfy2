@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       paymentMode: guessPaymentMode(extracted.merchant),
     });
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't read that image: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/screenshot]", err);
+    return NextResponse.json({ error: "Couldn't read that image. Try again or enter it manually." }, { status: 502 });
   }
 }

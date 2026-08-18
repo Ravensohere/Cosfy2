@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { HeartPulse, FileText, PieChart, ChevronRight } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -12,6 +13,11 @@ import { assignChartColors } from "@/lib/chart-colors";
 import { cn } from "@/lib/cn";
 
 const TREND_MONTHS = 6;
+
+export const metadata: Metadata = {
+  title: "AI Insights",
+  description: "Spending trends, category breakdowns, and money habits, powered by AI.",
+};
 
 export default async function InsightsPage() {
   const user = await getCurrentUser();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { GraduationCap, ChevronRight } from "lucide-react";
@@ -6,6 +7,11 @@ import { ChatWindow } from "@/components/chat/ChatWindow";
 import { getCurrentUser } from "@/lib/current-user";
 import { buildFinancialContext } from "@/lib/financial-context";
 import { pickContextualLesson } from "@/lib/lessons";
+
+export const metadata: Metadata = {
+  title: "Money coach",
+  description: "Chat with your AI money coach for personalized advice.",
+};
 
 export default async function CoachPage() {
   const user = await getCurrentUser();

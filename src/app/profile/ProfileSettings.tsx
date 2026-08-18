@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Bell, Trash2, FileText, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { IconTile } from "@/components/ui/IconTile";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
@@ -42,12 +43,26 @@ export function ProfileSettings({
   const [isPending, startTransition] = useTransition();
 
   function handleToggle(value: boolean) {
+    const previous = notifications;
     setNotifications(value);
-    startTransition(() => updateNotificationsPref(value));
+    startTransition(async () => {
+      try {
+        await updateNotificationsPref(value);
+      } catch {
+        setNotifications(previous);
+        toast.error("Couldn't update notification settings");
+      }
+    });
   }
 
   function handleDelete() {
-    startTransition(() => deleteAccount());
+    startTransition(async () => {
+      try {
+        await deleteAccount();
+      } catch {
+        toast.error("Couldn't delete account. Try again.");
+      }
+    });
   }
 
   return (
@@ -118,7 +133,9 @@ export function ProfileSettings({
         )}
       </div>
 
-      <p className="text-center text-[11px] text-cosfy-muted pt-2 pb-1">cosfy by ravenso</p>
+      <p className="text-center text-[11px] text-cosfy-muted pt-2 pb-1">
+        © {new Date().getFullYear()} Cosfy by Ravenso
+      </p>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Plus, Wallet, Receipt } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -40,6 +41,11 @@ function dayHeading(d: Date, now: Date) {
   if (key === yesterdayKey) return "Yesterday";
   return formatDate(d);
 }
+
+export const metadata: Metadata = {
+  title: "Expenses",
+  description: "Track spending against your budget, with breakdowns by day, range, month, or year.",
+};
 
 export default async function BudgetsPage({
   searchParams,

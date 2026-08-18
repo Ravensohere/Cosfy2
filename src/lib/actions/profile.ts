@@ -22,16 +22,18 @@ export async function updateLanguagePref(language: "en" | "hi") {
 export async function deleteAccount() {
   const user = await getCurrentUser();
 
-  await db.transaction.deleteMany({ where: { userId: user.id } });
-  await db.budget.deleteMany({ where: { userId: user.id } });
-  await db.goal.deleteMany({ where: { userId: user.id } });
-  await db.group.deleteMany({ where: { userId: user.id } });
-  await db.creditCard.deleteMany({ where: { userId: user.id } });
-  await db.loan.deleteMany({ where: { userId: user.id } });
-  await db.insurancePolicy.deleteMany({ where: { userId: user.id } });
-  await db.subscription.deleteMany({ where: { userId: user.id } });
-  await db.goldHolding.deleteMany({ where: { userId: user.id } });
-  await db.user.delete({ where: { id: user.id } });
+  await db.$transaction([
+    db.transaction.deleteMany({ where: { userId: user.id } }),
+    db.budget.deleteMany({ where: { userId: user.id } }),
+    db.goal.deleteMany({ where: { userId: user.id } }),
+    db.group.deleteMany({ where: { userId: user.id } }),
+    db.creditCard.deleteMany({ where: { userId: user.id } }),
+    db.loan.deleteMany({ where: { userId: user.id } }),
+    db.insurancePolicy.deleteMany({ where: { userId: user.id } }),
+    db.subscription.deleteMany({ where: { userId: user.id } }),
+    db.goldHolding.deleteMany({ where: { userId: user.id } }),
+    db.user.delete({ where: { id: user.id } }),
+  ]);
 
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);

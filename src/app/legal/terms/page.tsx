@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description: "Cosfy's terms of service and conditions of use.",
+};
 
 const LAST_UPDATED = "13 August 2026";
 
@@ -178,7 +184,9 @@ export default function TermsPage() {
         </p>
       </div>
 
-      <p className="text-center text-[11px] text-cosfy-muted mt-8">cosfy by ravenso</p>
+      <p className="text-center text-[11px] text-cosfy-muted mt-8">
+        © {new Date().getFullYear()} Cosfy by Ravenso
+      </p>
     </div>
   );
 }

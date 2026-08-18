@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { DonutChart } from "@/components/ui/DonutChart";
@@ -18,6 +19,11 @@ function Row({ label, amount, negative = false }: { label: string; amount: numbe
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Net worth",
+  description: "See your total assets and liabilities in one view.",
+};
 
 export default async function NetWorthPage() {
   const user = await getCurrentUser();

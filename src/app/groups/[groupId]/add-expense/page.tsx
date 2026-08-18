@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AddExpenseForm } from "./AddExpenseForm";
+
+export const metadata: Metadata = { title: "Add group expense" };
 
 export default async function AddGroupExpensePage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;

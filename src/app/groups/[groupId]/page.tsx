@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus, Pencil } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -12,6 +13,17 @@ import { PillChip } from "@/components/ui/PillChip";
 import { ShareGroupUpdateButton } from "@/components/finance/ShareGroupUpdateButton";
 import { computeMemberBalances, simplifyDebts } from "@/lib/balances";
 import { GroupTabs } from "./GroupTabs";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ groupId: string }>;
+}): Promise<Metadata> {
+  const { groupId } = await params;
+  const user = await getCurrentUser();
+  const group = await db.group.findFirst({ where: { id: groupId, userId: user.id }, select: { name: true } });
+  return { title: group?.name ?? "Group" };
+}
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;

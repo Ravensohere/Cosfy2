@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       paymentMode: parsed.paymentMode,
     });
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't transcribe that: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/voice]", err);
+    return NextResponse.json({ error: "Couldn't transcribe that. Try again or type it manually." }, { status: 502 });
   }
 }

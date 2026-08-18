@@ -81,7 +81,7 @@ export async function POST(req: Request) {
       doc: { id: doc.id, type: doc.type, subType: doc.subType, policyName: doc.policyName, provider: doc.provider },
     });
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't read that document: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/insurance-doc]", err);
+    return NextResponse.json({ error: "Couldn't read that document. Try again or enter it manually." }, { status: 502 });
   }
 }

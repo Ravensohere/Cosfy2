@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { ParticipantsForm } from "./ParticipantsForm";
+
+export const metadata: Metadata = { title: "Split participants" };
 
 export default async function ScanParticipantsPage() {
   const user = await getCurrentUser();

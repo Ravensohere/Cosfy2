@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const rows = parseCsvStatement(text);
     return NextResponse.json({ rows, format: "csv" });
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't read that file: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/statement]", err);
+    return NextResponse.json({ error: "Couldn't read that file. Try again or enter transactions manually." }, { status: 502 });
   }
 }

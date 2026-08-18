@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel } from "@/components/ui/Input";
 import { DatePickerField } from "@/components/ui/DatePickerField";
@@ -49,7 +50,9 @@ export function CreateGoalForm({ avgMonthlySurplus }: { avgMonthlySurplus: numbe
       });
       if (result && !result.ok) {
         setError(result.error);
+        return;
       }
+      toast.success("Goal created");
     });
   }
 

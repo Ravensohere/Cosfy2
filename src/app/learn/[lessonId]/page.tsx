@@ -1,7 +1,18 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PillChip } from "@/components/ui/PillChip";
 import { LESSONS } from "@/lib/lessons";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lessonId: string }>;
+}): Promise<Metadata> {
+  const { lessonId } = await params;
+  const lesson = LESSONS.find((l) => l.id === lessonId);
+  return { title: lesson?.title ?? "Lesson" };
+}
 
 export default async function LessonPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;

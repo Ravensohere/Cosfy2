@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Pencil, Camera } from "lucide-react";
+import { toast } from "sonner";
 import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
 import { Input } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
@@ -9,6 +10,7 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { CATEGORIES, PAYMENT_MODES, CATEGORY_ICON, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
 import { createTransaction } from "@/lib/actions/transactions";
 import { parseQuickAdd } from "@/lib/quick-add-parser";
+import { formatINR } from "@/lib/format";
 import { resolveIcon } from "@/lib/resolve-icon";
 import { useT } from "@/lib/i18n/LanguageProvider";
 import { ScanTransactionsPanel } from "@/components/quick-add/ScanTransactionsPanel";
@@ -63,16 +65,21 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
       return;
     }
     startTransition(async () => {
+      const description = parsed.description || (type === "income" ? "Income" : "Expense");
       const result = await createTransaction({
         amount: parsed.amount,
-        description: parsed.description || (type === "income" ? "Income" : "Expense"),
+        description,
         category: effectiveCategory,
         paymentMode: effectivePaymentMode,
       });
       if (!result.ok) {
         setError(result.error ?? `Couldn't add ${type}`);
+        toast.error(result.error ?? `Couldn't add ${type}`);
         return;
       }
+      toast.success(`${type === "income" ? "Income" : "Expense"} added`, {
+        description: `${formatINR(parsed.amount)} · ${description}`,
+      });
       handleClose();
     });
   }

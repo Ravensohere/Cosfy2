@@ -40,7 +40,7 @@ export default function TaxCalculatorPage() {
 
         <div>
           <p className="text-[12px] font-semibold text-cosfy-ink-soft mb-2">Regime</p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <PillChip variant={regime === "new" ? "active" : "inactive"} onClick={() => setRegime("new")}>
               New regime
             </PillChip>

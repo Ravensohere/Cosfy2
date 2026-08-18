@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { HeroCard } from "@/components/ui/HeroCard";
@@ -14,6 +15,17 @@ import { computeIncomeAndSpent } from "@/lib/transaction-totals";
 const SMALL_SPEND_THRESHOLD = 200;
 const SMALL_SPEND_MIN_COUNT = 5;
 const LEAK_DELTA_THRESHOLD = 300;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ yearMonth: string }>;
+}): Promise<Metadata> {
+  const { yearMonth } = await params;
+  if (!/^\d{4}-\d{2}$/.test(yearMonth)) return { title: "Report" };
+  const [year, month] = yearMonth.split("-").map(Number);
+  return { title: `${formatMonthYear(new Date(year, month - 1, 1))} report` };
+}
 
 export default async function MonthlyReportPage({ params }: { params: Promise<{ yearMonth: string }> }) {
   const { yearMonth } = await params;

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CalendarDays, CreditCard, Landmark, ShieldCheck, Repeat, Target, Tag } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -27,6 +28,11 @@ const URGENCY_STYLES = {
   soon: "text-cosfy-amber",
   upcoming: "text-cosfy-muted",
   paid: "text-cosfy-green",
+};
+
+export const metadata: Metadata = {
+  title: "Calendar",
+  description: "Upcoming bills, EMIs, premiums, and goal due dates.",
 };
 
 export default async function CalendarPage() {

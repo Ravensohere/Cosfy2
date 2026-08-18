@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Receipt } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -6,6 +7,11 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { TransactionRow } from "@/components/finance/TransactionRow";
 import { MonthWindowPicker } from "@/components/ui/MonthWindowPicker";
 import type { CategoryValue, PaymentModeValue } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "Transactions",
+  description: "All your income and expenses in one place.",
+};
 
 export default async function TransactionsPage({
   searchParams,

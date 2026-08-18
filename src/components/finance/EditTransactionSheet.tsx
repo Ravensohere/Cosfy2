@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
@@ -64,9 +65,12 @@ export function EditTransactionSheet({
         paymentMode,
       });
       if (!result.ok) {
-        setError(result.error ?? "Couldn't save changes");
+        const message = result.error ?? "Couldn't save changes";
+        setError(message);
+        toast.error(message);
         return;
       }
+      toast.success("Transaction updated");
       handleClose();
     });
   }
@@ -76,9 +80,12 @@ export function EditTransactionSheet({
     startTransition(async () => {
       const result = await deleteTransaction(id);
       if (!result.ok) {
-        setError(result.error ?? "Couldn't delete transaction");
+        const message = result.error ?? "Couldn't delete transaction";
+        setError(message);
+        toast.error(message);
         return;
       }
+      toast.success("Transaction deleted");
       handleClose();
     });
   }

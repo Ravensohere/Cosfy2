@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Landmark } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -6,6 +7,11 @@ import { db } from "@/lib/db";
 import { LoanList } from "@/components/loans/LoanList";
 import { AddLoanButton } from "@/components/loans/AddLoanButton";
 import { PrepaymentCalculatorCard } from "@/components/loans/PrepaymentCalculatorCard";
+
+export const metadata: Metadata = {
+  title: "Loans",
+  description: "Track your loans and EMIs, and plan prepayments.",
+};
 
 export default async function LoansPage() {
   const user = await getCurrentUser();

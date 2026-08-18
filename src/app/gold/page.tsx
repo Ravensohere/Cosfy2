@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Coins } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -6,6 +7,11 @@ import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { GoldList } from "@/components/gold/GoldList";
 import { AddGoldButton } from "@/components/gold/AddGoldButton";
+
+export const metadata: Metadata = {
+  title: "Gold",
+  description: "Track your physical, digital, and SGB gold investments.",
+};
 
 export default async function GoldPage() {
   const user = await getCurrentUser();

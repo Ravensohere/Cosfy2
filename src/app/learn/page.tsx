@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { GraduationCap, ChevronRight } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -8,6 +9,11 @@ import { buildFinancialContext } from "@/lib/financial-context";
 import { LESSONS, pickContextualLesson, type LessonCategory } from "@/lib/lessons";
 
 const CATEGORIES: LessonCategory[] = ["Basics", "Debt", "Saving", "Invest", "Tax"];
+
+export const metadata: Metadata = {
+  title: "Learn",
+  description: "Bite-sized lessons on budgeting, debt, saving, investing, and tax.",
+};
 
 export default async function LearnPage({
   searchParams,

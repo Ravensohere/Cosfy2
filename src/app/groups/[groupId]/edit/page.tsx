@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { computeMemberBalances } from "@/lib/balances";
 import { EditGroupForm } from "./EditGroupForm";
+
+export const metadata: Metadata = { title: "Edit group" };
 
 export default async function EditGroupPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;

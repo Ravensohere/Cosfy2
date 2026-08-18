@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
     return NextResponse.json(coupon);
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't read that coupon: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/coupon-photo]", err);
+    return NextResponse.json({ error: "Couldn't read that coupon. Try again or enter it manually." }, { status: 502 });
   }
 }

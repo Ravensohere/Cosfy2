@@ -110,7 +110,7 @@ export function AddLoanButton({ variant = "icon" }: { variant?: "icon" | "primar
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel>EMI due day</FieldLabel>
-              <Input type="number" min={1} max={31} value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
+              <Input type="number" min={1} max={31} placeholder="e.g. 5" value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
             </div>
             <div>
               <FieldLabel>Outstanding (optional)</FieldLabel>

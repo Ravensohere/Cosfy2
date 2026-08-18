@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { HeroCard } from "@/components/ui/HeroCard";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -11,6 +12,11 @@ function scoreTone(score: number) {
   if (score >= 40) return "text-cosfy-amber";
   return "text-cosfy-red";
 }
+
+export const metadata: Metadata = {
+  title: "Financial health score",
+  description: "See how healthy your finances are, and what to improve.",
+};
 
 export default async function HealthScorePage() {
   const user = await getCurrentUser();

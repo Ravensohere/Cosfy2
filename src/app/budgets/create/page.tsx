@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel } from "@/components/ui/Input";
@@ -63,7 +64,9 @@ export default function CreateBudgetPage() {
       });
       if (result && !result.ok) {
         setError(result.error);
+        return;
       }
+      toast.success("Budget created");
     });
   }
 

@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
     return NextResponse.json(bill);
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `Couldn't read that bill: ${detail.slice(0, 150)}` }, { status: 502 });
+    console.error("[import/bill-photo]", err);
+    return NextResponse.json({ error: "Couldn't read that bill. Try again or enter it manually." }, { status: 502 });
   }
 }

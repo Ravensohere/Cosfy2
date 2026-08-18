@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   Plus,
   Target,
@@ -26,6 +27,11 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ToolLink } from "@/components/ui/ToolLink";
 import { SweepRoundUpsCard } from "@/components/profile/SweepRoundUpsCard";
 import { getUnclaimedRoundUpTotal } from "@/lib/actions/round-up";
+
+export const metadata: Metadata = {
+  title: "Goals",
+  description: "Save toward what matters and track progress automatically.",
+};
 
 export default async function GoalsPage() {
   const user = await getCurrentUser();

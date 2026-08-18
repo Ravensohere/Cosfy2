@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Repeat } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -7,6 +8,11 @@ import { detectRecurringTransactions } from "@/lib/recurring-detector";
 import { SubscriptionList } from "@/components/subscriptions/SubscriptionList";
 import { AddSubscriptionButton } from "@/components/subscriptions/AddSubscriptionButton";
 import { DetectedSuggestions } from "@/components/subscriptions/DetectedSuggestions";
+
+export const metadata: Metadata = {
+  title: "Subscriptions",
+  description: "Track recurring subscriptions and catch ones you forgot about.",
+};
 
 export default async function SubscriptionsPage() {
   const user = await getCurrentUser();

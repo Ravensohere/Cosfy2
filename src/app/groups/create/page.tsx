@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PillChip } from "@/components/ui/PillChip";
 import { Input, FieldLabel } from "@/components/ui/Input";
@@ -39,7 +40,9 @@ export default function CreateGroupPage() {
       const result = await createGroup({ name: name.trim(), type, defaultSplit, memberNames: members });
       if (result && !result.ok) {
         setError(result.error);
+        return;
       }
+      toast.success("Group created");
     });
   }
 

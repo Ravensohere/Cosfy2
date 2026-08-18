@@ -25,7 +25,7 @@ export function GroupTabs({
 
   return (
     <div>
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <PillChip variant={tab === "expenses" ? "active" : "inactive"} onClick={() => setTab("expenses")}>
           Expenses
         </PillChip>

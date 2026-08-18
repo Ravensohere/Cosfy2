@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Plus, Tag } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -5,6 +6,11 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { CouponCard } from "@/components/coupons/CouponCard";
+
+export const metadata: Metadata = {
+  title: "Coupons",
+  description: "Track and use your saved coupons before they expire.",
+};
 
 export default async function CouponsPage() {
   const user = await getCurrentUser();

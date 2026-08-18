@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { HeroCard } from "@/components/ui/HeroCard";
 import { StatCard } from "@/components/ui/StatCard";
@@ -15,6 +16,11 @@ import { assignChartColors } from "@/lib/chart-colors";
 import { getNetWorthBreakdown } from "@/lib/actions/net-worth";
 import { resolveRange, monthBuckets, type RangePreset } from "@/lib/summary-range";
 import { PieChart } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Summary",
+  description: "Full spending summary for any custom time period.",
+};
 
 export default async function SummaryPage({
   searchParams,

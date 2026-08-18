@@ -1,6 +1,12 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { ImportHub } from "@/components/import/ImportHub";
+
+export const metadata: Metadata = {
+  title: "Import expenses",
+  description: "Pull expenses in from a bank SMS, screenshot, voice note, or bank statement.",
+};
 
 export default function ImportPage() {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus, Users } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
@@ -10,6 +11,11 @@ import { GroupCard } from "@/components/finance/GroupCard";
 import { computeMemberBalances } from "@/lib/balances";
 
 type Filter = "all" | "active" | "settled";
+
+export const metadata: Metadata = {
+  title: "Groups",
+  description: "Split bills and settle up with friends, family, or flatmates.",
+};
 
 export default async function GroupsPage({
   searchParams,
@@ -64,7 +70,7 @@ export default async function GroupsPage({
         />
       ) : (
         <>
-          <div className="flex gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
             <Link href="/groups?filter=all">
               <PillChip variant={filter === "all" ? "active" : "inactive"} type="button">
                 All

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { User } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -10,6 +11,11 @@ const GMAIL_STATUS_MESSAGES: Record<string, { text: string; tone: "success" | "e
   connected: { text: "Gmail connected. Tap \"Sync now\" below to pull in transactions.", tone: "success" },
   error: { text: "Couldn't connect Gmail. Try again.", tone: "error" },
   "not-configured": { text: "Gmail import isn't set up on the server yet.", tone: "error" },
+};
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description: "Manage your account, settings, and preferences.",
 };
 
 export default async function ProfilePage({

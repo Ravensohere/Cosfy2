@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Newspaper, ExternalLink } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -16,6 +17,11 @@ function timeAgo(pubDate: string | null): string | null {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
+
+export const metadata: Metadata = {
+  title: "Finance news",
+  description: "Latest personal finance news and headlines.",
+};
 
 export default async function NewsPage() {
   const headlines = await fetchFinanceHeadlines();

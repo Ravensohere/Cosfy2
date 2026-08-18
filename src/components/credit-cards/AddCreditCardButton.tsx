@@ -94,11 +94,11 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel>Statement day</FieldLabel>
-              <Input type="number" min={1} max={31} value={statementDay} onChange={(e) => setStatementDay(e.target.value)} />
+              <Input type="number" min={1} max={31} placeholder="e.g. 5" value={statementDay} onChange={(e) => setStatementDay(e.target.value)} />
             </div>
             <div>
               <FieldLabel>Due day</FieldLabel>
-              <Input type="number" min={1} max={31} value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
+              <Input type="number" min={1} max={31} placeholder="e.g. 20" value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
             </div>
           </div>
           <div>

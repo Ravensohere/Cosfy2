@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { User } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -10,6 +11,8 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { PersonSplitCard } from "@/components/finance/PersonSplitCard";
 import { FullSplitShareCard } from "@/components/finance/FullSplitShareCard";
 import { parseItemsBreakdown, computePersonItems } from "@/lib/split-breakdown";
+
+export const metadata: Metadata = { title: "Split result" };
 
 export default async function SplitResultPage({ params }: { params: Promise<{ groupExpenseId: string }> }) {
   const { groupExpenseId } = await params;

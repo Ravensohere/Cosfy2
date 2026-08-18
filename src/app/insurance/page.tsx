@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -6,6 +7,11 @@ import { db } from "@/lib/db";
 import { InsuranceList } from "@/components/insurance/InsuranceList";
 import { InsuranceDocumentList } from "@/components/insurance/InsuranceDocumentList";
 import { AddPolicyButton } from "@/components/insurance/AddPolicyButton";
+
+export const metadata: Metadata = {
+  title: "Insurance",
+  description: "Track your insurance policies, premiums, and documents.",
+};
 
 export default async function InsurancePage() {
   const user = await getCurrentUser();

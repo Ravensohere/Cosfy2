@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 import { AppShell } from "@/components/layout/AppShell";
 import { AppLockGate } from "@/components/layout/AppLockGate";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
@@ -11,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "cosfy",
+  title: { default: "Cosfy", template: "%s — Cosfy" },
   description: "Track spending, split bills, and build better money habits, built for India.",
 };
 
@@ -35,6 +36,17 @@ export default function RootLayout({
         <AppLockGate>
           <AppShell>{children}</AppShell>
         </AppLockGate>
+        <Toaster
+          position="top-center"
+          richColors
+          toastOptions={{
+            classNames: {
+              toast: "!rounded-card !border !border-cosfy-border !bg-cosfy-card !text-cosfy-ink !shadow-soft",
+              title: "!text-[13px] !font-bold",
+              description: "!text-[12px] !text-cosfy-muted",
+            },
+          }}
+        />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -6,6 +7,17 @@ import { DonutProgress } from "@/components/ui/DonutProgress";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { formatINR, formatDate } from "@/lib/format";
 import { AddContributionForm } from "./AddContributionForm";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ goalId: string }>;
+}): Promise<Metadata> {
+  const { goalId } = await params;
+  const user = await getCurrentUser();
+  const goal = await db.goal.findFirst({ where: { id: goalId, userId: user.id }, select: { name: true } });
+  return { title: goal?.name ?? "Goal" };
+}
 
 export default async function GoalDetailPage({ params }: { params: Promise<{ goalId: string }> }) {
   const { goalId } = await params;

@@ -62,6 +62,7 @@ export async function POST(req: Request) {
     const reply = await callGemini({ apiKey: process.env.GEMINI_API_KEY, systemPrompt, messages });
     return NextResponse.json({ reply, usedLiveData, sources });
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "AI request failed." }, { status: 502 });
+    console.error("[api/chat]", err);
+    return NextResponse.json({ error: "Couldn't reach the coach right now. Try again shortly." }, { status: 502 });
   }
 }

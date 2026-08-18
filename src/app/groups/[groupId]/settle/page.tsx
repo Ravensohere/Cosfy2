@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { computeMemberBalances, simplifyDebts } from "@/lib/balances";
 import { SettleList } from "./SettleList";
+
+export const metadata: Metadata = { title: "Settle up" };
 
 export default async function SettleGroupPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;

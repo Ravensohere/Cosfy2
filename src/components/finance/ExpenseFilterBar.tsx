@@ -64,7 +64,7 @@ export function ExpenseFilterBar({
 
   return (
     <div className="mb-4">
-      <div className="flex gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-3">
         {MODES.map((m) => (
           <PillChip key={m.value} variant={mode === m.value ? "active" : "inactive"} onClick={() => selectMode(m.value)}>
             {m.label}
