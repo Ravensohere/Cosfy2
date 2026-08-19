@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
@@ -10,6 +10,9 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SecondaryButton } from "@/components/ui/SecondaryButton";
 import { CATEGORIES, PAYMENT_MODES, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
 import { updateTransaction, deleteTransaction } from "@/lib/actions/transactions";
+import { getCardOptions } from "@/lib/actions/credit-cards";
+
+type CardOption = { id: string; name: string; last4: string | null; kind: string };
 
 export function EditTransactionSheet({
   open,
@@ -19,6 +22,7 @@ export function EditTransactionSheet({
   initialAmount,
   initialCategory,
   initialPaymentMode,
+  initialCardId,
 }: {
   open: boolean;
   onClose: () => void;
@@ -27,20 +31,28 @@ export function EditTransactionSheet({
   initialAmount: number;
   initialCategory: CategoryValue;
   initialPaymentMode: PaymentModeValue;
+  initialCardId?: string | null;
 }) {
   const [description, setDescription] = useState(initialDescription);
   const [amount, setAmount] = useState(String(Math.abs(initialAmount)));
   const [category, setCategory] = useState<CategoryValue>(initialCategory);
   const [paymentMode, setPaymentMode] = useState<PaymentModeValue>(initialPaymentMode);
+  const [cardId, setCardId] = useState<string | null>(initialCardId ?? null);
+  const [cards, setCards] = useState<CardOption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (open) getCardOptions().then(setCards);
+  }, [open]);
 
   function reset() {
     setDescription(initialDescription);
     setAmount(String(Math.abs(initialAmount)));
     setCategory(initialCategory);
     setPaymentMode(initialPaymentMode);
+    setCardId(initialCardId ?? null);
     setError(null);
     setConfirmingDelete(false);
   }
@@ -63,6 +75,7 @@ export function EditTransactionSheet({
         description: description.trim(),
         category,
         paymentMode,
+        cardId: paymentMode === "Card" && cardId ? cardId : undefined,
       });
       if (!result.ok) {
         const message = result.error ?? "Couldn't save changes";
@@ -124,6 +137,24 @@ export function EditTransactionSheet({
             ))}
           </div>
         </div>
+
+        {paymentMode === "Card" && cards.length > 0 ? (
+          <div>
+            <FieldLabel>Card</FieldLabel>
+            <div className="flex flex-wrap gap-2">
+              {cards.map((c) => (
+                <PillChip
+                  key={c.id}
+                  variant={cardId === c.id ? "active" : "inactive"}
+                  onClick={() => setCardId((cur) => (cur === c.id ? null : c.id))}
+                >
+                  {c.name}
+                  {c.last4 ? ` ••${c.last4}` : ""}
+                </PillChip>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
 

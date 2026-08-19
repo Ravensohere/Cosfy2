@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Cosfy's terms of service and conditions of use.",
 };
 
-const LAST_UPDATED = "13 August 2026";
+const LAST_UPDATED = "19 August 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -54,11 +54,13 @@ export default function TermsPage() {
 
       <Section title="2. What Cosfy does">
         <p>
-          Cosfy helps you log expenses, split bills, track savings goals and net worth, and get AI-assisted
-          insights (&quot;Kosh&quot;) based on data you provide or connect. Cosfy does not initiate, hold, or move money
-          on your behalf, and does not have write access to any bank account. All amounts, categories, and
-          summaries shown are for informational purposes only and may contain errors, including errors from
-          automated parsing of pasted SMS text or Gmail data, or from AI-generated responses.
+          Cosfy helps you log expenses, split bills, track savings goals and net worth, track spending across the
+          credit/debit cards you choose to add, look up general company and stock information, and get
+          AI-assisted insights (&quot;Kosh&quot;) based on data you provide or connect. Cosfy does not initiate, hold, or
+          move money on your behalf, does not have write access to any bank account, and cannot place trades or
+          make purchases. All amounts, categories, summaries, and research shown are for informational purposes
+          only and may contain errors, including errors from automated parsing of pasted SMS text or Gmail data,
+          or from AI-generated responses.
         </p>
       </Section>
 
@@ -94,9 +96,19 @@ export default function TermsPage() {
             response. This is used only to answer that question, not to build advertising profiles.
           </li>
           <li>
+            <strong className="text-cosfy-ink">Card details (optional):</strong> if you add a credit or debit
+            card to track spending, we store only a nickname you choose, the card network (e.g.
+            Visa/Mastercard/RuPay), issuing bank, and the last 4 digits, together with any due date, statement
+            date, or balance you enter yourself. We do not collect, store, or transmit your full card number,
+            CVV, expiry date, or PIN. This information cannot be used to move money or make a purchase — it
+            exists only so the App can group transactions you&apos;ve logged under a specific card and show you
+            spend totals and comparisons.
+          </li>
+          <li>
             <strong className="text-cosfy-ink">We do not request:</strong> location/GPS access, your device
             contacts, or any bank/UPI login credentials. Cosfy never asks for your net banking password, UPI
-            PIN, card CVV, or OTP, and will never legitimately request these — treat any such request as fraud.
+            PIN, card CVV, expiry date, or OTP, and will never legitimately request these — treat any such
+            request as fraud.
           </li>
         </ul>
         <p>
@@ -108,16 +120,34 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="4. Your responsibilities">
+      <Section title="4. Investment research and stock information">
+        <p>
+          Cosfy is <strong>not</strong> a SEBI-registered investment adviser, research analyst, stock broker,
+          depository participant, or portfolio manager. Any company, stock, or market information the App shows
+          you — including fundamentals, ratios, news, historical performance, or AI-generated commentary — is
+          provided for general informational and educational purposes only, drawn from publicly available data
+          and general analysis frameworks.
+        </p>
+        <p>
+          Nothing in the App, including any &quot;should I invest&quot;-style summary, is a recommendation,
+          solicitation, or advice to buy, sell, or hold any security, and none of it is personalized to your
+          financial situation, risk profile, or goals. This information may be incomplete, delayed, or
+          inaccurate, and past performance is never indicative of future results. You are solely responsible for
+          your own investment decisions, and should consult a SEBI-registered investment adviser before
+          investing. Cosfy cannot place trades, hold securities, or move money on your behalf.
+        </p>
+      </Section>
+
+      <Section title="5. Your responsibilities">
         <ul className="space-y-2 pl-1">
           <li>Keep your login credentials and device secure; you are responsible for activity under your account.</li>
-          <li>Only submit information you have the right to share (e.g. your own SMS/bill data).</li>
+          <li>Only submit information you have the right to share (e.g. your own SMS/bill/card data).</li>
           <li>Use the App lawfully and not to store or transmit fraudulent, infringing, or unlawful content.</li>
           <li>Independently verify any figure, category, or suggestion before relying on it financially.</li>
         </ul>
       </Section>
 
-      <Section title="5. AI-generated content">
+      <Section title="6. AI-generated content">
         <p>
           Kosh uses a third-party large language model and may produce incomplete, outdated, or incorrect
           responses. Kosh&apos;s output is provided &quot;as is&quot; for general informational purposes only, does not
@@ -126,7 +156,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="6. No warranty">
+      <Section title="7. No warranty">
         <p>
           The App is provided &quot;as is&quot; and &quot;as available&quot;, without warranties of any kind, whether express or
           implied, including accuracy, reliability, uninterrupted availability, or fitness for a particular
@@ -135,24 +165,24 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="7. Limitation of liability">
+      <Section title="8. Limitation of liability">
         <p>
           To the maximum extent permitted by law, Cosfy and Ravenso shall not be liable for any indirect,
           incidental, special, or consequential damages, or for any loss of data, profits, or financial loss,
           arising from your use of, or inability to use, the App, including reliance on any figure, category,
-          import, or AI-generated response. Our total liability for any claim relating to the App shall not
-          exceed the amount, if any, you paid us in the 12 months preceding the claim.
+          import, investment research, or AI-generated response. Our total liability for any claim relating to
+          the App shall not exceed the amount, if any, you paid us in the 12 months preceding the claim.
         </p>
       </Section>
 
-      <Section title="8. Account suspension and termination">
+      <Section title="9. Account suspension and termination">
         <p>
           We may suspend or terminate access if these Terms are violated, if required by law, or to protect the
           App or other users. You may stop using the App and delete your account at any time from Profile.
         </p>
       </Section>
 
-      <Section title="9. Changes to the App or these Terms">
+      <Section title="10. Changes to the App or these Terms">
         <p>
           We may update the App or these Terms from time to time. Material changes will be reflected by updating
           the &quot;Last updated&quot; date above, and where reasonably possible, an in-app notice. Continued use after
@@ -160,7 +190,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="10. Governing law">
+      <Section title="11. Governing law">
         <p>
           These Terms are governed by the laws of India, without regard to conflict-of-law principles, and any
           dispute shall be subject to the exclusive jurisdiction of the courts of [city/state — Ravenso to
@@ -168,7 +198,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <Section title="11. Contact">
+      <Section title="12. Contact">
         <p>
           Questions about these Terms, or requests to access/export/delete your data, can be sent to
           [support email — Ravenso to confirm], or via Profile &gt; Delete account for immediate erasure.

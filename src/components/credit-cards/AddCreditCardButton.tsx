@@ -2,13 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomSheet";
 import { Input, FieldLabel } from "@/components/ui/Input";
+import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { createCreditCard } from "@/lib/actions/credit-cards";
 
 export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "primary" }) {
   const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState<"Credit" | "Debit">("Credit");
   const [name, setName] = useState("");
   const [bank, setBank] = useState("");
   const [last4, setLast4] = useState("");
@@ -21,6 +24,7 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
   const [isPending, startTransition] = useTransition();
 
   function reset() {
+    setKind("Credit");
     setName("");
     setBank("");
     setLast4("");
@@ -44,16 +48,19 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
         name: name.trim(),
         bank: bank.trim() || undefined,
         last4: last4.trim() || undefined,
-        statementDay: parseInt(statementDay, 10) || 1,
-        dueDay: parseInt(dueDay, 10) || 1,
+        kind,
+        statementDay: kind === "Credit" ? parseInt(statementDay, 10) || 1 : undefined,
+        dueDay: kind === "Credit" ? parseInt(dueDay, 10) || 1 : undefined,
         currentDue: parseFloat(currentDue) || 0,
         rewardPointsBalance: rewardPointsBalance.trim() ? parseInt(rewardPointsBalance, 10) : undefined,
         cashbackYtd: cashbackYtd.trim() ? parseFloat(cashbackYtd) : undefined,
       });
       if (!result.ok) {
         setError(result.error ?? "Couldn't add card");
+        toast.error(result.error ?? "Couldn't add card");
         return;
       }
+      toast.success(`${kind} card added`);
       handleClose();
     });
   }
@@ -75,8 +82,19 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
         </PrimaryButton>
       )}
 
-      <BottomSheet open={open} onClose={handleClose} title="Add credit card">
+      <BottomSheet open={open} onClose={handleClose} title="Add a card">
         <div className="space-y-4">
+          <div>
+            <FieldLabel>Card type</FieldLabel>
+            <div className="flex gap-2">
+              <PillChip variant={kind === "Credit" ? "active" : "inactive"} onClick={() => setKind("Credit")}>
+                Credit
+              </PillChip>
+              <PillChip variant={kind === "Debit" ? "active" : "inactive"} onClick={() => setKind("Debit")}>
+                Debit
+              </PillChip>
+            </div>
+          </div>
           <div>
             <FieldLabel>Card name</FieldLabel>
             <Input placeholder="e.g. HDFC Regalia" value={name} onChange={(e) => setName(e.target.value)} />
@@ -91,20 +109,24 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
               <Input placeholder="4321" maxLength={4} value={last4} onChange={(e) => setLast4(e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <FieldLabel>Statement day</FieldLabel>
-              <Input type="number" min={1} max={31} placeholder="e.g. 5" value={statementDay} onChange={(e) => setStatementDay(e.target.value)} />
-            </div>
-            <div>
-              <FieldLabel>Due day</FieldLabel>
-              <Input type="number" min={1} max={31} placeholder="e.g. 20" value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
-            </div>
-          </div>
-          <div>
-            <FieldLabel>Current amount due (optional)</FieldLabel>
-            <Input type="number" placeholder="0" value={currentDue} onChange={(e) => setCurrentDue(e.target.value)} />
-          </div>
+          {kind === "Credit" ? (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <FieldLabel>Statement day</FieldLabel>
+                  <Input type="number" min={1} max={31} placeholder="e.g. 5" value={statementDay} onChange={(e) => setStatementDay(e.target.value)} />
+                </div>
+                <div>
+                  <FieldLabel>Due day</FieldLabel>
+                  <Input type="number" min={1} max={31} placeholder="e.g. 20" value={dueDay} onChange={(e) => setDueDay(e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Current amount due (optional)</FieldLabel>
+                <Input type="number" placeholder="0" value={currentDue} onChange={(e) => setCurrentDue(e.target.value)} />
+              </div>
+            </>
+          ) : null}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel>Reward points (optional)</FieldLabel>

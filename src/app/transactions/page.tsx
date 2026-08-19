@@ -61,6 +61,7 @@ export default async function TransactionsPage({
               paymentMode={t.paymentMode as PaymentModeValue}
               amount={t.amount}
               date={t.date}
+              cardId={t.cardId}
             />
           ))}
         </div>

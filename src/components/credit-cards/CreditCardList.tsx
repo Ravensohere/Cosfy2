@@ -33,9 +33,10 @@ function CreditCardRow({ card }: { card: CreditCard }) {
   const [editingRewards, setEditingRewards] = useState(false);
   const [points, setPoints] = useState(String(card.rewardPointsBalance ?? ""));
   const [cashback, setCashback] = useState(String(card.cashbackYtd ?? ""));
-  const due = nextDueDate(card.dueDay);
-  const days = daysUntil(due);
-  const urgency = dueUrgency(days, card.currentDue);
+  const hasDueTracking = card.kind === "Credit" && card.dueDay != null;
+  const due = hasDueTracking ? nextDueDate(card.dueDay!) : null;
+  const days = due ? daysUntil(due) : 0;
+  const urgency = due ? dueUrgency(days, card.currentDue) : "paid";
 
   function markPaid() {
     startTransition(async () => {
@@ -58,14 +59,27 @@ function CreditCardRow({ card }: { card: CreditCard }) {
 
   return (
     <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      <RenewalRowHeader
-        icon={CardIcon}
-        title={card.name}
-        subtitle={card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
-        statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(due)}`}
-        urgency={urgency}
-        amount={card.currentDue}
-      />
+      {due ? (
+        <RenewalRowHeader
+          icon={CardIcon}
+          title={card.name}
+          subtitle={card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
+          statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(due)}`}
+          urgency={urgency}
+          amount={card.currentDue}
+        />
+      ) : (
+        <div className="flex items-center gap-3">
+          <CardIcon size={20} className="text-cosfy-muted shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-[14px] text-cosfy-ink truncate">
+              {card.name}
+              {card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
+            </p>
+            <p className="text-[12px] text-cosfy-muted">Debit card</p>
+          </div>
+        </div>
+      )}
 
       {card.rewardPointsBalance || card.cashbackYtd ? (
         <p className="text-[12px] text-cosfy-muted mt-2 flex items-center gap-1">

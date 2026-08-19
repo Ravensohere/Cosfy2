@@ -292,6 +292,7 @@ export default async function BudgetsPage({
                         paymentMode={t.paymentMode as PaymentModeValue}
                         amount={t.amount}
                         date={t.date}
+                        cardId={t.cardId}
                       />
                     ))}
                   </div>

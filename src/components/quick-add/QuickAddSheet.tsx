@@ -9,6 +9,7 @@ import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { CATEGORIES, PAYMENT_MODES, CATEGORY_ICON, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
 import { createTransaction } from "@/lib/actions/transactions";
+import { getCardOptions } from "@/lib/actions/credit-cards";
 import { parseQuickAdd } from "@/lib/quick-add-parser";
 import { formatINR } from "@/lib/format";
 import { resolveIcon } from "@/lib/resolve-icon";
@@ -18,6 +19,7 @@ import { ScanTransactionsPanel } from "@/components/quick-add/ScanTransactionsPa
 const EXPENSE_CATEGORIES = CATEGORIES.filter((c) => c !== "Income");
 type EntryType = "expense" | "income";
 type SheetMode = "manual" | "scan";
+type CardOption = { id: string; name: string; last4: string | null; kind: string };
 
 export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mode, setMode] = useState<SheetMode>("manual");
@@ -25,10 +27,16 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
   const [text, setText] = useState("");
   const [category, setCategory] = useState<CategoryValue | null>(null);
   const [paymentMode, setPaymentMode] = useState<PaymentModeValue | null>(null);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const [cards, setCards] = useState<CardOption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useT();
+
+  useEffect(() => {
+    if (open) getCardOptions().then(setCards);
+  }, [open]);
 
   const parsed = useMemo(() => parseQuickAdd(text), [text]);
   const effectiveCategory = type === "income" ? "Income" : category ?? parsed.category;
@@ -44,6 +52,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
     setText("");
     setCategory(null);
     setPaymentMode(null);
+    setCardId(null);
     setError(null);
   }
 
@@ -71,6 +80,7 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
         description,
         category: effectiveCategory,
         paymentMode: effectivePaymentMode,
+        cardId: effectivePaymentMode === "Card" && cardId ? cardId : undefined,
       });
       if (!result.ok) {
         setError(result.error ?? `Couldn't add ${type}`);
@@ -167,6 +177,21 @@ export function QuickAddSheet({ open, onClose }: { open: boolean; onClose: () =>
                 </PillChip>
               ))}
             </div>
+
+            {effectivePaymentMode === "Card" && cards.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {cards.map((c) => (
+                  <PillChip
+                    key={c.id}
+                    variant={cardId === c.id ? "active" : "inactive"}
+                    onClick={() => setCardId((cur) => (cur === c.id ? null : c.id))}
+                  >
+                    {c.name}
+                    {c.last4 ? ` ••${c.last4}` : ""}
+                  </PillChip>
+                ))}
+              </div>
+            ) : null}
 
             {error ? <p className="text-[13px] text-cosfy-red">{error}</p> : null}
             <PrimaryButton fullWidth type="button" disabled={isPending} onClick={handleSubmit}>

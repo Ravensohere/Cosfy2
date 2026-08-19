@@ -21,6 +21,7 @@ export function TransactionRow({
   paymentMode,
   amount,
   date,
+  cardId,
 }: {
   id: string;
   description: string;
@@ -28,6 +29,7 @@ export function TransactionRow({
   paymentMode: PaymentModeValue;
   amount: number;
   date: Date;
+  cardId?: string | null;
 }) {
   const Icon = resolveIcon(CATEGORY_ICON[category] ?? "Receipt");
   const isIncome = amount > 0;
@@ -176,6 +178,7 @@ export function TransactionRow({
         initialAmount={amount}
         initialCategory={category}
         initialPaymentMode={paymentMode}
+        initialCardId={cardId}
       />
     </div>
   );

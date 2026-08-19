@@ -13,8 +13,9 @@ const createCardSchema = z.object({
     .trim()
     .regex(/^\d{0,4}$/, "Last 4 digits only")
     .optional(),
-  statementDay: z.number().int().min(1).max(31),
-  dueDay: z.number().int().min(1).max(31),
+  kind: z.enum(["Credit", "Debit"]).default("Credit"),
+  statementDay: z.number().int().min(1).max(31).optional(),
+  dueDay: z.number().int().min(1).max(31).optional(),
   currentDue: z.number().min(0),
   rewardPointsBalance: z.number().int().min(0).optional(),
   cashbackYtd: z.number().min(0).optional(),
@@ -49,6 +50,15 @@ export async function updateCreditCardRewards(id: string, rewardPointsBalance: n
   });
   revalidatePath("/credit-cards");
   return { ok: true as const };
+}
+
+export async function getCardOptions() {
+  const user = await getCurrentUser();
+  return db.creditCard.findMany({
+    where: { userId: user.id },
+    select: { id: true, name: true, last4: true, kind: true },
+    orderBy: { name: "asc" },
+  });
 }
 
 export async function deleteCreditCard(id: string) {

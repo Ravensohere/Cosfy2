@@ -96,12 +96,15 @@ model CreditCard {
   name                String
   bank                String?
   last4               String?
-  statementDay        Int
-  dueDay              Int
+  kind                String   @default("Credit")
+  statementDay        Int?
+  dueDay              Int?
   currentDue          Float    @default(0)
   rewardPointsBalance Int?
   cashbackYtd         Float?
   createdAt           DateTime @default(now())
+
+  transactions Transaction[]
 
   @@index([userId])
 }
@@ -189,19 +192,22 @@ model GoldHolding {
 }
 
 model Transaction {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   userId         String
-  user           User     @relation(fields: [userId], references: [id])
+  user           User        @relation(fields: [userId], references: [id])
   amount         Float
   description    String
   category       String
   paymentMode    String
-  date           DateTime @default(now())
-  source         String   @default("manual")
-  roundUpClaimed Boolean  @default(false)
-  createdAt      DateTime @default(now())
+  cardId         String?
+  card           CreditCard? @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  date           DateTime    @default(now())
+  source         String      @default("manual")
+  roundUpClaimed Boolean     @default(false)
+  createdAt      DateTime    @default(now())
 
   @@index([userId, date])
+  @@index([cardId])
 }
 
 model Group {

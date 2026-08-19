@@ -11,6 +11,7 @@ const createTransactionSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(120),
   category: z.enum(CATEGORIES),
   paymentMode: z.enum(PAYMENT_MODES),
+  cardId: z.string().trim().min(1).optional(),
 });
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -19,6 +20,7 @@ function revalidateMoneyScreens() {
   revalidatePath("/home");
   revalidatePath("/transactions");
   revalidatePath("/budgets");
+  revalidatePath("/credit-cards");
 }
 
 export async function createTransaction(input: CreateTransactionInput) {
@@ -28,8 +30,13 @@ export async function createTransaction(input: CreateTransactionInput) {
   }
 
   const user = await getCurrentUser();
-  const { amount, description, category, paymentMode } = parsed.data;
+  const { amount, description, category, paymentMode, cardId } = parsed.data;
   const signedAmount = category === "Income" ? Math.abs(amount) : -Math.abs(amount);
+
+  if (cardId) {
+    const card = await db.creditCard.findFirst({ where: { id: cardId, userId: user.id } });
+    if (!card) return { ok: false as const, error: "Card not found" };
+  }
 
   await db.transaction.create({
     data: {
@@ -38,6 +45,7 @@ export async function createTransaction(input: CreateTransactionInput) {
       description,
       category,
       paymentMode,
+      cardId: cardId ?? null,
       source: "manual",
     },
   });
@@ -53,12 +61,17 @@ export async function updateTransaction(id: string, input: CreateTransactionInpu
   }
 
   const user = await getCurrentUser();
-  const { amount, description, category, paymentMode } = parsed.data;
+  const { amount, description, category, paymentMode, cardId } = parsed.data;
   const signedAmount = category === "Income" ? Math.abs(amount) : -Math.abs(amount);
+
+  if (cardId) {
+    const card = await db.creditCard.findFirst({ where: { id: cardId, userId: user.id } });
+    if (!card) return { ok: false as const, error: "Card not found" };
+  }
 
   const result = await db.transaction.updateMany({
     where: { id, userId: user.id },
-    data: { amount: signedAmount, description, category, paymentMode },
+    data: { amount: signedAmount, description, category, paymentMode, cardId: cardId ?? null },
   });
   if (result.count === 0) return { ok: false as const, error: "Transaction not found" };
 

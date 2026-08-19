@@ -15,6 +15,7 @@ import {
   CalendarDays,
   Tag,
   PieChart,
+  LineChart,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
@@ -116,7 +117,8 @@ export default async function GoalsPage() {
           <ToolLink href="/gold" icon={Coins} label="Gold" />
           <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
           <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
-          <ToolLink href="/credit-cards" icon={CreditCard} label="Credit card due dates" />
+          <ToolLink href="/credit-cards" icon={CreditCard} label="Cards & spending" />
+          <ToolLink href="/stocks" icon={LineChart} label="Research a stock" />
           <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
           <ToolLink href="/summary" icon={PieChart} label="Full summary" />
           <ToolLink href="/news" icon={Newspaper} label="Finance news" />

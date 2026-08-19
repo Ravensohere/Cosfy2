@@ -48,7 +48,7 @@ export default async function CalendarPage() {
 
   const entries: CalendarEntry[] = [
     ...creditCards
-      .filter((c) => c.currentDue > 0)
+      .filter((c): c is typeof c & { dueDay: number } => c.currentDue > 0 && c.dueDay != null)
       .map((c) => ({ label: `${c.name} bill`, date: nextDueDate(c.dueDay), amount: c.currentDue, icon: CreditCard, href: "/credit-cards" })),
     ...loans.map((l) => ({ label: `${l.name} EMI`, date: nextDueDate(l.dueDay), amount: l.emiAmount, icon: Landmark, href: "/loans" })),
     ...policies.map((p) => ({ label: `${p.policyName} renewal`, date: p.nextRenewalDate, amount: p.premiumAmount, icon: ShieldCheck, href: "/insurance" })),

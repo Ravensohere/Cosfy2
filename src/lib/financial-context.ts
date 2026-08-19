@@ -105,11 +105,13 @@ export async function buildFinancialContext(userId: string): Promise<FinancialCo
     targetDate: g.targetDate,
   }));
 
-  const creditCardStatus = creditCards.map((c) => {
-    const due = nextDueDate(c.dueDay);
-    const days = daysUntil(due);
-    return { name: c.name, due: c.currentDue, urgency: dueUrgency(days, c.currentDue), daysUntilDue: days };
-  });
+  const creditCardStatus = creditCards
+    .filter((c): c is typeof c & { dueDay: number } => c.dueDay != null)
+    .map((c) => {
+      const due = nextDueDate(c.dueDay);
+      const days = daysUntil(due);
+      return { name: c.name, due: c.currentDue, urgency: dueUrgency(days, c.currentDue), daysUntilDue: days };
+    });
 
   return {
     spentThisMonth,
