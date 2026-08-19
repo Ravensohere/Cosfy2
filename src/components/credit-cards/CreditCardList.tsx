@@ -1,15 +1,11 @@
-"use client";
-
-import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { CreditCard } from "@prisma/client";
-import { CreditCard as CardIcon, Trash2, Gift } from "lucide-react";
-import { RenewalRowHeader } from "@/components/ui/RenewalRowHeader";
+import { ChevronRight } from "lucide-react";
+import { CardVisual } from "@/components/credit-cards/CardVisual";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
-import { SecondaryButton } from "@/components/ui/SecondaryButton";
-import { Input } from "@/components/ui/Input";
-import { nextDueDate, daysUntil, dueUrgency } from "@/lib/credit-card-status";
+import { nextDueDate, daysUntil, dueUrgency, URGENCY_STYLES } from "@/lib/credit-card-status";
 import { formatShortDate } from "@/lib/format";
-import { updateCreditCardDue, updateCreditCardRewards, deleteCreditCard } from "@/lib/actions/credit-cards";
+import { cn } from "@/lib/cn";
 
 const URGENCY_LABEL = {
   overdue: (days: number) => `Overdue by ${Math.abs(days)}d`,
@@ -29,93 +25,33 @@ export function CreditCardList({ cards }: { cards: CreditCard[] }) {
 }
 
 function CreditCardRow({ card }: { card: CreditCard }) {
-  const [isPending, startTransition] = useTransition();
-  const [editingRewards, setEditingRewards] = useState(false);
-  const [points, setPoints] = useState(String(card.rewardPointsBalance ?? ""));
-  const [cashback, setCashback] = useState(String(card.cashbackYtd ?? ""));
   const hasDueTracking = card.kind === "Credit" && card.dueDay != null;
   const due = hasDueTracking ? nextDueDate(card.dueDay!) : null;
   const days = due ? daysUntil(due) : 0;
   const urgency = due ? dueUrgency(days, card.currentDue) : "paid";
 
-  function markPaid() {
-    startTransition(async () => {
-      await updateCreditCardDue(card.id, 0);
-    });
-  }
-
-  function saveRewards() {
-    startTransition(async () => {
-      await updateCreditCardRewards(card.id, parseInt(points, 10) || 0, parseFloat(cashback) || 0);
-      setEditingRewards(false);
-    });
-  }
-
-  function remove() {
-    startTransition(async () => {
-      await deleteCreditCard(card.id);
-    });
-  }
-
   return (
-    <div className="rounded-card bg-cosfy-card border border-cosfy-border p-4">
-      {due ? (
-        <RenewalRowHeader
-          icon={CardIcon}
-          title={card.name}
-          subtitle={card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
-          statusLine={`${URGENCY_LABEL[urgency](days)} · ${formatShortDate(due)}`}
-          urgency={urgency}
-          amount={card.currentDue}
-        />
-      ) : (
-        <div className="flex items-center gap-3">
-          <CardIcon size={20} className="text-cosfy-muted shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[14px] text-cosfy-ink truncate">
-              {card.name}
-              {card.last4 ? <span className="text-cosfy-muted font-normal"> •• {card.last4}</span> : null}
-            </p>
-            <p className="text-[12px] text-cosfy-muted">Debit card</p>
-          </div>
-        </div>
-      )}
-
-      {card.rewardPointsBalance || card.cashbackYtd ? (
-        <p className="text-[12px] text-cosfy-muted mt-2 flex items-center gap-1">
-          <Gift size={12} /> {card.rewardPointsBalance ?? 0} pts · <MoneyAmount amount={card.cashbackYtd ?? 0} size="sm" /> cashback YTD
-        </p>
-      ) : null}
-
-      {editingRewards ? (
-        <div className="grid grid-cols-2 gap-2 mt-3">
-          <Input type="number" className="h-9" placeholder="Points" value={points} onChange={(e) => setPoints(e.target.value)} />
-          <Input
-            type="number"
-            className="h-9"
-            placeholder="Cashback YTD"
-            value={cashback}
-            onChange={(e) => setCashback(e.target.value)}
-          />
-          <SecondaryButton className="col-span-2 h-9 text-[12px]" onClick={saveRewards} disabled={isPending}>
-            Save rewards
-          </SecondaryButton>
-        </div>
-      ) : null}
-
-      <div className="flex gap-2 mt-3">
-        {card.currentDue > 0 ? (
-          <SecondaryButton className="flex-1 h-9 text-[12px]" onClick={markPaid} disabled={isPending}>
-            Mark as paid
-          </SecondaryButton>
-        ) : null}
-        <SecondaryButton className="h-9 text-[12px] px-3" onClick={() => setEditingRewards((v) => !v)} disabled={isPending}>
-          <Gift size={14} />
-        </SecondaryButton>
-        <SecondaryButton className="h-9 text-[12px] px-3" onClick={remove} disabled={isPending}>
-          <Trash2 size={14} />
-        </SecondaryButton>
+    <Link
+      href={`/credit-cards/${card.id}`}
+      className="flex items-center gap-3 rounded-card bg-cosfy-card border border-cosfy-border p-3"
+    >
+      <div className="w-[104px] shrink-0">
+        <CardVisual bank={card.bank} name={card.name} last4={card.last4} network={card.network} kind={card.kind} />
       </div>
-    </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-[14px] text-cosfy-ink truncate">{card.name}</p>
+        {due ? (
+          <>
+            <p className={cn("text-[12px] font-semibold", URGENCY_STYLES[urgency])}>
+              {URGENCY_LABEL[urgency](days)} · {formatShortDate(due)}
+            </p>
+            <MoneyAmount amount={card.currentDue} size="sm" />
+          </>
+        ) : (
+          <p className="text-[12px] text-cosfy-muted">Debit card</p>
+        )}
+      </div>
+      <ChevronRight size={18} className="text-cosfy-muted shrink-0" />
+    </Link>
   );
 }

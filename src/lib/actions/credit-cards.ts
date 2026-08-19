@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
+import { CARD_NETWORKS } from "@/lib/card-theme";
 
 const createCardSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(60),
@@ -13,6 +14,7 @@ const createCardSchema = z.object({
     .trim()
     .regex(/^\d{0,4}$/, "Last 4 digits only")
     .optional(),
+  network: z.enum(CARD_NETWORKS).optional(),
   kind: z.enum(["Credit", "Debit"]).default("Credit"),
   statementDay: z.number().int().min(1).max(31).optional(),
   dueDay: z.number().int().min(1).max(31).optional(),
@@ -39,6 +41,7 @@ export async function updateCreditCardDue(id: string, currentDue: number) {
   const user = await getCurrentUser();
   await db.creditCard.updateMany({ where: { id, userId: user.id }, data: { currentDue } });
   revalidatePath("/credit-cards");
+  revalidatePath(`/credit-cards/${id}`);
   return { ok: true as const };
 }
 
@@ -49,7 +52,13 @@ export async function updateCreditCardRewards(id: string, rewardPointsBalance: n
     data: { rewardPointsBalance, cashbackYtd },
   });
   revalidatePath("/credit-cards");
+  revalidatePath(`/credit-cards/${id}`);
   return { ok: true as const };
+}
+
+export async function getCreditCard(id: string) {
+  const user = await getCurrentUser();
+  return db.creditCard.findFirst({ where: { id, userId: user.id } });
 }
 
 export async function getCardOptions() {

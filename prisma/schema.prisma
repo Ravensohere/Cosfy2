@@ -96,6 +96,7 @@ model CreditCard {
   name                String
   bank                String?
   last4               String?
+  network             String?
   kind                String   @default("Credit")
   statementDay        Int?
   dueDay              Int?

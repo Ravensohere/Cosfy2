@@ -7,7 +7,9 @@ import { BottomSheet, BOTTOM_SHEET_TRANSITION_MS } from "@/components/ui/BottomS
 import { Input, FieldLabel } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { CardVisual } from "@/components/credit-cards/CardVisual";
 import { createCreditCard } from "@/lib/actions/credit-cards";
+import { CARD_NETWORKS, type CardNetwork } from "@/lib/card-theme";
 
 export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "primary" }) {
   const [open, setOpen] = useState(false);
@@ -15,6 +17,7 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
   const [name, setName] = useState("");
   const [bank, setBank] = useState("");
   const [last4, setLast4] = useState("");
+  const [network, setNetwork] = useState<CardNetwork | null>(null);
   const [statementDay, setStatementDay] = useState("1");
   const [dueDay, setDueDay] = useState("15");
   const [currentDue, setCurrentDue] = useState("");
@@ -28,6 +31,7 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
     setName("");
     setBank("");
     setLast4("");
+    setNetwork(null);
     setStatementDay("1");
     setDueDay("15");
     setCurrentDue("");
@@ -48,6 +52,7 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
         name: name.trim(),
         bank: bank.trim() || undefined,
         last4: last4.trim() || undefined,
+        network: network ?? undefined,
         kind,
         statementDay: kind === "Credit" ? parseInt(statementDay, 10) || 1 : undefined,
         dueDay: kind === "Credit" ? parseInt(dueDay, 10) || 1 : undefined,
@@ -84,6 +89,13 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
 
       <BottomSheet open={open} onClose={handleClose} title="Add a card">
         <div className="space-y-4">
+          <CardVisual
+            bank={bank.trim() || null}
+            name={name.trim() || "Your card"}
+            last4={last4.trim() || null}
+            network={network}
+            kind={kind}
+          />
           <div>
             <FieldLabel>Card type</FieldLabel>
             <div className="flex gap-2">
@@ -107,6 +119,16 @@ export function AddCreditCardButton({ variant = "icon" }: { variant?: "icon" | "
             <div>
               <FieldLabel>Last 4 digits</FieldLabel>
               <Input placeholder="4321" maxLength={4} value={last4} onChange={(e) => setLast4(e.target.value)} />
+            </div>
+          </div>
+          <div>
+            <FieldLabel>Network</FieldLabel>
+            <div className="flex flex-wrap gap-2">
+              {CARD_NETWORKS.map((n) => (
+                <PillChip key={n} variant={network === n ? "active" : "inactive"} onClick={() => setNetwork(n)}>
+                  {n}
+                </PillChip>
+              ))}
             </div>
           </div>
           {kind === "Credit" ? (
