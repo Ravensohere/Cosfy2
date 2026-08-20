@@ -78,6 +78,7 @@ model User {
   goldHoldings      GoldHolding[]
   gmailImports      GmailImportRecord[]
   coupons           Coupon[]
+  receipts          Receipt[]
 }
 
 model Coupon {
@@ -218,6 +219,8 @@ model Transaction {
   paymentMode    String
   cardId         String?
   card           CreditCard? @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  receiptId      String?
+  receipt        Receipt?    @relation(fields: [receiptId], references: [id], onDelete: SetNull)
   date           DateTime    @default(now())
   source         String      @default("manual")
   roundUpClaimed Boolean     @default(false)
@@ -225,6 +228,23 @@ model Transaction {
 
   @@index([userId, date])
   @@index([cardId])
+  @@index([receiptId])
+}
+
+// One row per scanned bill/receipt — groups the individual line items a
+// receipt gets split into (see extractTransactionsFromImage) under the
+// merchant and total they actually came from, so "5 items from BigBasket"
+// doesn't read as 5 unrelated purchases a month later.
+model Receipt {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  merchant     String
+  total        Float
+  scannedAt    DateTime      @default(now())
+  transactions Transaction[]
+
+  @@index([userId, scannedAt])
 }
 
 model Group {

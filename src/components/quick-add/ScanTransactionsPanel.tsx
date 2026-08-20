@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Camera, Trash2 } from "lucide-react";
+import { Camera, Trash2, Store } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { PillChip } from "@/components/ui/PillChip";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { CATEGORIES, PAYMENT_MODES, type CategoryValue, type PaymentModeValue } from "@/lib/constants";
-import { createTransactionsBulk } from "@/lib/actions/transactions";
+import { createTransactionsBulk, createReceiptWithTransactions } from "@/lib/actions/transactions";
+import { formatINR } from "@/lib/format";
 
 type ScannedTransaction = {
   description: string;
@@ -28,6 +29,7 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
+  const [merchant, setMerchant] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -35,6 +37,7 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
   async function handleFile(file: File) {
     setError(null);
     setRows([]);
+    setMerchant(null);
     setPreview(URL.createObjectURL(file));
     setIsScanning(true);
 
@@ -49,6 +52,7 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
       }
       const scanned: ScannedTransaction[] = data.transactions ?? [];
       setRows(scanned.map((t) => ({ ...t, id: newId(), include: true })));
+      setMerchant(typeof data.merchant === "string" ? data.merchant : null);
     } catch {
       setError("Couldn't reach the server. Try again.");
     } finally {
@@ -66,6 +70,9 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
   }
 
   const included = rows.filter((r) => r.include);
+  // Grouping only makes sense once at least 2 items are still selected —
+  // if the user deselected down to one, it's just a normal transaction.
+  const groupUnderMerchant = merchant && included.length > 1;
 
   function handleAdd() {
     setError(null);
@@ -73,15 +80,16 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
       setError("Select at least one transaction");
       return;
     }
+    const items = included.map((r) => ({
+      amount: r.isCredit ? Math.abs(r.amount) : -Math.abs(r.amount),
+      description: r.description,
+      category: r.category,
+      paymentMode: r.paymentMode,
+    }));
     startTransition(async () => {
-      const result = await createTransactionsBulk(
-        included.map((r) => ({
-          amount: r.isCredit ? Math.abs(r.amount) : -Math.abs(r.amount),
-          description: r.description,
-          category: r.category,
-          paymentMode: r.paymentMode,
-        }))
-      );
+      const result = groupUnderMerchant
+        ? await createReceiptWithTransactions({ merchant, items })
+        : await createTransactionsBulk(items);
       if (!result.ok) {
         setError(result.error ?? "Couldn't add transactions");
         return;
@@ -119,6 +127,15 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
 
       {rows.length > 0 ? (
         <div className="space-y-3">
+          {groupUnderMerchant ? (
+            <div className="flex items-center gap-2 rounded-card bg-cosfy-lime-pale border border-cosfy-lime-soft px-3 py-2.5">
+              <Store size={15} className="text-cosfy-lime-ink shrink-0" />
+              <p className="text-[12.5px] text-cosfy-lime-ink flex-1">
+                All {included.length} items will be grouped as <strong>one receipt from {merchant}</strong>, total{" "}
+                {formatINR(included.reduce((sum, r) => sum + Math.abs(r.amount), 0))}.
+              </p>
+            </div>
+          ) : null}
           <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-0.5">
             {rows.map((row) => (
               <div key={row.id} className="rounded-card bg-cosfy-card-soft p-3 space-y-2">
@@ -165,7 +182,11 @@ export function ScanTransactionsPanel({ onDone }: { onDone: () => void }) {
             ))}
           </div>
           <PrimaryButton fullWidth type="button" disabled={isPending || included.length === 0} onClick={handleAdd}>
-            {isPending ? "Adding…" : `Add ${included.length} transaction${included.length === 1 ? "" : "s"}`}
+            {isPending
+              ? "Adding…"
+              : groupUnderMerchant
+                ? `Add receipt from ${merchant} (${included.length} items)`
+                : `Add ${included.length} transaction${included.length === 1 ? "" : "s"}`}
           </PrimaryButton>
         </div>
       ) : null}

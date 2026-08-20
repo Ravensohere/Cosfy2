@@ -116,3 +116,43 @@ export async function createTransactionsBulk(rows: z.infer<typeof bulkRowSchema>
   revalidateMoneyScreens();
   return { ok: true as const, count: parsedRows.length };
 }
+
+const receiptSchema = z.object({
+  merchant: z.string().trim().min(1).max(80),
+  items: z.array(bulkRowSchema).min(1),
+});
+
+// Used when a scanned bill/receipt clearly came from one shop: creates a
+// Receipt row plus one Transaction per line item, linked to it, so the app
+// can show "N items from {merchant}" instead of N disconnected purchases.
+export async function createReceiptWithTransactions(input: z.infer<typeof receiptSchema>) {
+  const parsed = receiptSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const user = await getCurrentUser();
+  const { merchant, items } = parsed.data;
+  const total = items.reduce((sum, r) => sum + Math.abs(r.amount), 0);
+
+  await db.receipt.create({
+    data: {
+      userId: user.id,
+      merchant,
+      total,
+      transactions: {
+        create: items.map((r) => ({
+          userId: user.id,
+          amount: r.amount,
+          description: r.description,
+          category: r.category,
+          paymentMode: r.paymentMode,
+          source: "import",
+        })),
+      },
+    },
+  });
+
+  revalidateMoneyScreens();
+  return { ok: true as const, count: items.length };
+}

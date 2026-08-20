@@ -39,11 +39,12 @@ export async function POST(req: Request) {
   const dataUrl = `data:${file.type || "image/jpeg"};base64,${base64}`;
 
   try {
-    const transactions = await extractTransactionsFromImage(apiKey, dataUrl);
+    const { transactions, merchant } = await extractTransactionsFromImage(apiKey, dataUrl);
     if (transactions.length === 0) {
       return NextResponse.json({ error: "Couldn't find any transactions in that image." }, { status: 422 });
     }
     return NextResponse.json({
+      merchant,
       transactions: transactions.map((t) => ({
         description: t.description,
         amount: t.amount,

@@ -75,27 +75,37 @@ export async function extractBillFromImage(apiKey: string, dataUrl: string): Pro
 }
 
 export type VisionTransaction = { description: string; amount: number; isCredit: boolean };
+export type VisionTransactionScan = {
+  transactions: VisionTransaction[];
+  // Set only when every item came from one shop/bill, so the caller can
+  // group them under one receipt instead of N unrelated transactions.
+  merchant: string | null;
+};
 
 const TRANSACTIONS_PROMPT =
   "Extract every distinct expense or income entry visible in this image. It may be a single receipt/bill with line items, " +
   "a screenshot of a payment notification, or a screenshot listing multiple payment/transaction records (bank, UPI, or wallet app history). " +
-  'Respond with strict JSON only: {"transactions": [{"description": string, "amount": number, "isCredit": boolean}]}. ' +
-  "For a receipt or bill, each line item is its own transaction and its price is the amount. " +
-  "For a list of transaction records, each row is its own transaction with its own amount. " +
+  'Respond with strict JSON only: {"merchant": string | null, "transactions": [{"description": string, "amount": number, "isCredit": boolean}]}. ' +
+  "If this is a single receipt/bill from one shop, set \"merchant\" to that shop's name; otherwise (a list of unrelated payment records) set it to null. " +
+  "For a receipt or bill, each line item is its own transaction and its price is the amount. Receipts often print items as cryptic abbreviated " +
+  "SKU codes (e.g. \"BBI SPL NAMKEEN 99\", \"KO CHK MSLA 250G\") — expand these into a short, plain-language product name a person would " +
+  "recognize months later (e.g. \"Balaji namkeen\", \"Chicken masala 250g\"), not the raw receipt text. " +
+  "For a screenshot listing separate payment/transaction records, keep each row's real merchant/payee name as its description, unchanged. " +
   "isCredit is true only for money received (refund, salary, deposit, credit); false for money spent. " +
   "If the image isn't legible or has no transactions, return an empty array.";
 
-export async function extractTransactionsFromImage(apiKey: string, dataUrl: string): Promise<VisionTransaction[]> {
+export async function extractTransactionsFromImage(apiKey: string, dataUrl: string): Promise<VisionTransactionScan> {
+  const empty: VisionTransactionScan = { transactions: [], merchant: null };
   const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) return [];
+  if (!match) return empty;
   const [, mimeType, base64Data] = match;
 
   const content = await callGeminiJSON({ apiKey, prompt: TRANSACTIONS_PROMPT, mimeType, base64Data });
 
   try {
     const parsed = JSON.parse(content);
-    if (!Array.isArray(parsed.transactions)) return [];
-    return parsed.transactions
+    if (!Array.isArray(parsed.transactions)) return empty;
+    const transactions = parsed.transactions
       .filter((t: unknown): t is Record<string, unknown> => typeof t === "object" && t !== null)
       .map((t: Record<string, unknown>) => ({
         description: typeof t.description === "string" && t.description.trim() ? t.description.trim() : "Transaction",
@@ -103,8 +113,15 @@ export async function extractTransactionsFromImage(apiKey: string, dataUrl: stri
         isCredit: Boolean(t.isCredit),
       }))
       .filter((t: VisionTransaction) => t.amount > 0);
+
+    // Only worth grouping as one receipt if there's more than one item —
+    // a single transaction doesn't need a parent.
+    const merchant =
+      transactions.length > 1 && typeof parsed.merchant === "string" && parsed.merchant.trim() ? parsed.merchant.trim() : null;
+
+    return { transactions, merchant };
   } catch {
-    return [];
+    return empty;
   }
 }
 
