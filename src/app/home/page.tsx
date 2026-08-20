@@ -102,7 +102,9 @@ export default async function HomePage({
     <div className="px-5 pt-6 pb-28 md:px-10 md:pt-10 md:max-w-2xl md:mx-auto">
       <div className="flex items-center justify-between mb-6" data-tour="home-greeting">
         <div className="flex items-center gap-3">
-          <CosfyMascot mood={mascotMood} size={44} />
+          <Link href="/coach" aria-label="Ask Kosh" className="shrink-0">
+            <CosfyMascot mood={mascotMood} size={44} interactive={false} />
+          </Link>
           <div>
             {user.preferredName ? (
               <>
