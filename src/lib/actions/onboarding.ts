@@ -22,3 +22,9 @@ export async function completeOnboarding(notificationsEnabled: boolean) {
   });
   redirect("/onboarding/personalize");
 }
+
+export async function acceptTerms() {
+  const user = await getCurrentUser();
+  await db.user.update({ where: { id: user.id }, data: { termsAcceptedAt: new Date() } });
+  redirect("/onboarding/welcome");
+}

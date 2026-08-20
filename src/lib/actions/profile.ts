@@ -3,19 +3,33 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/current-user";
 import { COOKIE_NAME } from "@/middleware";
 
+const notificationsPrefSchema = z.boolean();
+const languagePrefSchema = z.enum(["en", "hi"]);
+
 export async function updateNotificationsPref(enabled: boolean) {
+  const parsed = notificationsPrefSchema.safeParse(enabled);
+  if (!parsed.success) {
+    return { ok: false as const, error: "Invalid input" };
+  }
+
   const user = await getCurrentUser();
-  await db.user.update({ where: { id: user.id }, data: { notificationsEnabled: enabled } });
+  await db.user.update({ where: { id: user.id }, data: { notificationsEnabled: parsed.data } });
   revalidatePath("/profile");
 }
 
 export async function updateLanguagePref(language: "en" | "hi") {
+  const parsed = languagePrefSchema.safeParse(language);
+  if (!parsed.success) {
+    return { ok: false as const, error: "Invalid input" };
+  }
+
   const user = await getCurrentUser();
-  await db.user.update({ where: { id: user.id }, data: { language } });
+  await db.user.update({ where: { id: user.id }, data: { language: parsed.data } });
   revalidatePath("/", "layout");
 }
 

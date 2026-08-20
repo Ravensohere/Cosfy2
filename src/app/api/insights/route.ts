@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { callGemini } from "@/lib/gemini";
+import { getCurrentUser } from "@/lib/current-user";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const MONTHLY_BULLETS_PROMPT =
   "You are a finance analyst for Cosfy, a personal budgeting app. Given category-wise spend for this month vs last month (in INR), write 3-4 short bullet insights: what went up, what went down, and one concrete actionable tip. Keep each bullet under 20 words. No markdown headers, just short lines starting with -.";
@@ -11,6 +13,15 @@ export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "AI insights aren't set up yet. Set GEMINI_API_KEY on the server." }, { status: 503 });
+  }
+
+  const user = await getCurrentUser();
+  const rl = await checkRateLimit("insights", user.id, { requests: 20, windowSeconds: 60 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests, try again shortly." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
   }
 
   const body = await req.json().catch(() => null);

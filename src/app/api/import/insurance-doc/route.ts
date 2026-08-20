@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { callGemini } from "@/lib/gemini";
 import { extractInsuranceDocFromText, extractInsuranceDocFromImage } from "@/lib/insurance-doc-parse";
 import { SYSTEM_PROMPT } from "@/app/api/chat/route";
+import { validateUpload } from "@/lib/validate-upload";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -15,10 +17,24 @@ export async function POST(req: Request) {
     );
   }
 
+  const user = await getCurrentUser();
+  const rl = await checkRateLimit("import-insurance-doc", user.id, { requests: 10, windowSeconds: 60 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests, try again shortly." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
+  }
+
   const formData = await req.formData().catch(() => null);
   const file = formData?.get("file");
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file uploaded." }, { status: 400 });
+  }
+
+  const validation = validateUpload(file, "document");
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
   const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
@@ -49,7 +65,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await getCurrentUser();
     const doc = await db.insuranceDocument.create({
       data: {
         userId: user.id,

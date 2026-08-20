@@ -129,8 +129,12 @@ export async function confirmBillSplit(input: z.infer<typeof confirmSplitSchema>
         const you = group.members.find((m) => m.isCurrentUser);
         if (!you) throw new Error("Could not identify you in this group");
         payerMemberId = you.id;
+        const groupMemberIds = new Set(group.members.map((m) => m.id));
         for (const p of participants) {
-          if (p.memberId) wizardIdToMemberId.set(p.id, p.memberId);
+          if (p.memberId) {
+            if (!groupMemberIds.has(p.memberId)) throw new Error("Invalid participant");
+            wizardIdToMemberId.set(p.id, p.memberId);
+          }
         }
       } else {
         const newGroup = await tx.group.create({

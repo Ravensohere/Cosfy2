@@ -52,7 +52,7 @@ export default function PersonalizePage() {
         {isPending ? "Saving…" : "Continue"}
       </PrimaryButton>
 
-      <Link href="/onboarding/welcome" className="w-full text-center text-[13px] font-semibold text-cosfy-muted py-3">
+      <Link href="/onboarding/terms" className="w-full text-center text-[13px] font-semibold text-cosfy-muted py-3">
         Skip for now
       </Link>
     </div>

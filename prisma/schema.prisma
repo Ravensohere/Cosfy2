@@ -44,6 +44,12 @@ model User {
   preferredName String?
   age           Int?
 
+  // legal
+  termsAcceptedAt DateTime?
+
+  // goals/tools card order, user-customized (list of tool keys)
+  toolsOrder String[] @default([])
+
   // Gmail auto-import
   gmailConnected       Boolean   @default(false)
   gmailEmail           String?

@@ -61,8 +61,13 @@ export async function disableAppLock() {
 }
 
 export async function unlockApp(pin: string) {
+  const parsed = pinSchema.safeParse(pin);
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0]?.message ?? "Invalid PIN" };
+  }
+
   const user = await getCurrentUser();
-  if (!user.appLockPinHash || !verifyPin(pin, user.appLockPinHash)) {
+  if (!user.appLockPinHash || !verifyPin(parsed.data, user.appLockPinHash)) {
     return { ok: false as const, error: "Incorrect PIN" };
   }
 

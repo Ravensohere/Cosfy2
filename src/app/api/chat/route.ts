@@ -3,6 +3,7 @@ import { fetchFinanceNews, wantsLiveNews } from "@/lib/finance-news";
 import { callGemini } from "@/lib/gemini";
 import { getCurrentUser } from "@/lib/current-user";
 import { buildFinancialContext, toPromptSummary } from "@/lib/financial-context";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const SYSTEM_PROMPT = `You are Kosh, Cosfy's AI money coach, a friend who happens to be good with money, built into a personal budgeting app for India. If asked your name, you're Kosh.
 Talk the way a sharp friend would over chai, not like a support ticket system. Warm, direct, a little casual. React to what the person actually said before jumping to advice. Skip corporate hedging and skip sounding like you're filling out a form: no "I understand your concern," no numbered interrogations, no restating their question back at them.
@@ -29,6 +30,14 @@ export async function POST(req: Request) {
   let systemPrompt = SYSTEM_PROMPT;
 
   const user = await getCurrentUser();
+  const rl = await checkRateLimit("chat", user.id, { requests: 20, windowSeconds: 60 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests, try again shortly." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
+  }
+
   const context = await buildFinancialContext(user.id);
 
   systemPrompt += `\n\nAbout the person you're talking to: ${

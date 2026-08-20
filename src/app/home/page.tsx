@@ -59,6 +59,9 @@ export default async function HomePage({
   if (!user.onboardingCompleted) {
     redirect("/onboarding/goal");
   }
+  if (!user.termsAcceptedAt) {
+    redirect("/onboarding/terms");
+  }
 
   const { m } = await searchParams;
   const monthStart = parseMonthParam(m);

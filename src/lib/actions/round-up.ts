@@ -21,6 +21,12 @@ export async function updateRoundUpSettings(input: RoundUpSettingsInput) {
   }
 
   const user = await getCurrentUser();
+
+  if (parsed.data.roundUpGoalId) {
+    const goal = await db.goal.findFirst({ where: { id: parsed.data.roundUpGoalId, userId: user.id } });
+    if (!goal) return { ok: false as const, error: "Goal not found" };
+  }
+
   await db.user.update({ where: { id: user.id }, data: parsed.data });
   revalidatePath("/profile");
   revalidatePath("/goals");

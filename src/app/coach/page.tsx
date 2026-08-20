@@ -18,6 +18,9 @@ export default async function CoachPage() {
   if (!user.onboardingCompleted) {
     redirect("/onboarding/goal");
   }
+  if (!user.termsAcceptedAt) {
+    redirect("/onboarding/terms");
+  }
   const name = user.preferredName ? `, ${user.preferredName}` : "";
   const context = await buildFinancialContext(user.id);
   const mood: MascotMood = !context.hasEnoughData

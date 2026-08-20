@@ -1,22 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Plus,
-  Target,
-  Calculator,
-  MessageSquareText,
-  CreditCard,
-  Sparkles,
-  Newspaper,
-  Landmark,
-  ShieldCheck,
-  Repeat,
-  Coins,
-  TrendingUp,
-  CalendarDays,
-  Tag,
-  PieChart,
-  LineChart,
-} from "lucide-react";
+import { Plus, Target } from "lucide-react";
 import { getCurrentUser } from "@/lib/current-user";
 import { db } from "@/lib/db";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -25,7 +8,7 @@ import { HeroCard } from "@/components/ui/HeroCard";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { GoalCard } from "@/components/finance/GoalCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { ToolLink } from "@/components/ui/ToolLink";
+import { ToolsGrid } from "@/components/finance/ToolsGrid";
 import { SweepRoundUpsCard } from "@/components/profile/SweepRoundUpsCard";
 import { getUnclaimedRoundUpTotal } from "@/lib/actions/round-up";
 
@@ -106,23 +89,11 @@ export default async function GoalsPage() {
       ) : null}
 
       <div className="mt-6" data-tour="goals-tools">
-        <h2 className="text-[15px] font-extrabold text-cosfy-ink mb-2">Tools</h2>
-        <div className="rounded-card bg-cosfy-card border border-cosfy-border divide-y divide-cosfy-border overflow-hidden">
-          <ToolLink href="/net-worth" icon={TrendingUp} label="Net worth" />
-          <ToolLink href="/calendar" icon={CalendarDays} label="Cash-flow calendar" />
-          <ToolLink href="/loans" icon={Landmark} label="Loans & EMIs" />
-          <ToolLink href="/insurance" icon={ShieldCheck} label="Insurance" />
-          <ToolLink href="/subscriptions" icon={Repeat} label="Subscriptions" />
-          <ToolLink href="/coupons" icon={Tag} label="Coupons" />
-          <ToolLink href="/gold" icon={Coins} label="Gold" />
-          <ToolLink href="/tax-calculator" icon={Calculator} label="Salary tax calculator" />
-          <ToolLink href="/import" icon={MessageSquareText} label="Import expenses" />
-          <ToolLink href="/credit-cards" icon={CreditCard} label="Cards & spending" />
-          <ToolLink href="/stocks" icon={LineChart} label="Research a stock" />
-          <ToolLink href="/insights" icon={Sparkles} label="AI spending insights" />
-          <ToolLink href="/summary" icon={PieChart} label="Full summary" />
-          <ToolLink href="/news" icon={Newspaper} label="Finance news" />
+        <div className="flex items-baseline justify-between mb-2">
+          <h2 className="text-[15px] font-extrabold text-cosfy-ink">Tools</h2>
+          <p className="text-[11px] text-cosfy-muted">Hold the grip to reorder</p>
         </div>
+        <ToolsGrid savedOrder={user.toolsOrder} />
       </div>
     </PageContainer>
   );

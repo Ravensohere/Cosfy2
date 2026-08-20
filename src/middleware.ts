@@ -1,32 +1,40 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { COOKIE_NAME, signSessionUid, verifySessionCookie, sessionCookieOptions } from "@/lib/session-cookie";
 
-export const COOKIE_NAME = "cosfy_uid";
+export { COOKIE_NAME };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  if (process.env.NODE_ENV === "production") {
+    const proto = request.headers.get("x-forwarded-proto");
+    if (proto && proto !== "https") {
+      const url = request.nextUrl.clone();
+      url.protocol = "https:";
+      return NextResponse.redirect(url, 308);
+    }
+  }
+
   const existing = request.cookies.get(COOKIE_NAME)?.value;
-  if (existing) {
+  const verifiedUid = await verifySessionCookie(existing);
+  if (verifiedUid) {
     return NextResponse.next();
   }
 
   const uid = crypto.randomUUID();
+  const cookieValue = await signSessionUid(uid);
 
   // Forward the new cookie on the current request's headers too, so server
   // components rendered during this same request already see it via cookies().
+  // Strip any stale/tampered cosfy_uid first so the forwarded header doesn't
+  // carry two values for the same cookie name.
   const requestHeaders = new Headers(request.headers);
   const existingCookieHeader = requestHeaders.get("cookie") ?? "";
-  requestHeaders.set(
-    "cookie",
-    existingCookieHeader ? `${existingCookieHeader}; ${COOKIE_NAME}=${uid}` : `${COOKIE_NAME}=${uid}`
-  );
+  const otherCookies = existingCookieHeader
+    .split("; ")
+    .filter((c) => c && !c.startsWith(`${COOKIE_NAME}=`));
+  requestHeaders.set("cookie", [...otherCookies, `${COOKIE_NAME}=${cookieValue}`].join("; "));
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
-  response.cookies.set(COOKIE_NAME, uid, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-  });
+  response.cookies.set(COOKIE_NAME, cookieValue, sessionCookieOptions());
   return response;
 }
 

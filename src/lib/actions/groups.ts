@@ -66,6 +66,15 @@ export async function addGroupExpense(input: z.infer<typeof addExpenseSchema>) {
   const group = await db.group.findFirst({ where: { id: groupId, userId: user.id }, include: { members: true } });
   if (!group) return { ok: false as const, error: "Group not found" };
 
+  const memberIds = new Set(group.members.map((m) => m.id));
+  if (!memberIds.has(paidByMemberId)) return { ok: false as const, error: "Invalid payer" };
+  if (selectedMemberIds?.some((id) => !memberIds.has(id))) {
+    return { ok: false as const, error: "Invalid participant" };
+  }
+  if (shares && Object.keys(shares).some((id) => !memberIds.has(id))) {
+    return { ok: false as const, error: "Invalid participant" };
+  }
+
   let finalShares: Record<string, number>;
 
   if (splitType === "Equal") {
@@ -115,8 +124,16 @@ export async function recordSettlement(input: z.infer<typeof settlementSchema>) 
   }
 
   const user = await getCurrentUser();
-  const group = await db.group.findFirst({ where: { id: parsed.data.groupId, userId: user.id } });
+  const group = await db.group.findFirst({
+    where: { id: parsed.data.groupId, userId: user.id },
+    include: { members: true },
+  });
   if (!group) return { ok: false as const, error: "Group not found" };
+
+  const memberIds = new Set(group.members.map((m) => m.id));
+  if (!memberIds.has(parsed.data.fromMemberId) || !memberIds.has(parsed.data.toMemberId)) {
+    return { ok: false as const, error: "Invalid member" };
+  }
 
   await db.settlement.create({ data: parsed.data });
 
