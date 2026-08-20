@@ -8,6 +8,16 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+// Fallback rate-limit ledger used only when Upstash isn't configured (see
+// src/lib/rate-limit.ts) — one row per allowed request, pruned as it's read.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  bucketKey String
+  createdAt DateTime @default(now())
+
+  @@index([bucketKey, createdAt])
+}
+
 model User {
   id                   String   @id
   onboardingGoals      String[] @default([])
