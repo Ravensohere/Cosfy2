@@ -157,8 +157,9 @@ export default async function HomePage({
         <StatCard label={t("home.surplus")} amount={surplus} />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mt-6 max-w-[300px] mx-auto" data-tour="home-quick-actions">
+      <div className="grid grid-cols-4 gap-2 mt-6 max-w-[380px] mx-auto" data-tour="home-quick-actions">
         <QuickActionLink href="/scan/edit-items" icon="Receipt" label="Split bill" />
+        <QuickActionLink href="/import" icon="MessageSquareText" label="Import" />
         <QuickActionLink href="/groups" icon="Users" label="Groups" />
         <QuickActionLink href="/coupons" icon="Tag" label="Coupons" />
       </div>

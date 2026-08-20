@@ -62,6 +62,11 @@ export function parseCsvStatement(csv: string): StatementRow[] {
   const debitIdx = header.findIndex((h) => h.includes("debit") || h.includes("withdrawal"));
   const creditIdx = header.findIndex((h) => h.includes("credit") || h.includes("deposit"));
   const amountIdx = header.findIndex((h) => h.includes("amount"));
+  // Many exports (e.g. card statements) use one signed/unsigned "Amount"
+  // column plus a separate Dr/Cr or Debit/Credit indicator column, rather
+  // than splitting into two amount columns — without this, every row falls
+  // through as a bare positive number and gets miscategorized as Income.
+  const typeIdx = header.findIndex((h) => h.includes("type") || h.includes("dr/cr") || h === "dr" || h === "cr");
 
   const rows: StatementRow[] = [];
 
@@ -78,7 +83,11 @@ export function parseCsvStatement(csv: string): StatementRow[] {
     } else if (creditIdx >= 0 && fields[creditIdx] && parseAmount(fields[creditIdx]) > 0) {
       amount = parseAmount(fields[creditIdx]);
     } else if (amountIdx >= 0) {
-      amount = parseAmount(fields[amountIdx]);
+      const raw = parseAmount(fields[amountIdx]);
+      const typeVal = typeIdx >= 0 ? fields[typeIdx]?.toLowerCase() ?? "" : "";
+      if (/\b(debit|dr|withdrawal)\b/.test(typeVal)) amount = -Math.abs(raw);
+      else if (/\b(credit|cr|deposit)\b/.test(typeVal)) amount = Math.abs(raw);
+      else amount = raw;
     }
     if (!amount) continue;
 

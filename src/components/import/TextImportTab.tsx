@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/Input";
 import { TransactionReviewCard } from "@/components/import/TransactionReviewCard";
+import { SmsShareHint } from "@/components/import/SmsShareHint";
 import { parseSms } from "@/lib/sms-parser";
 
 export function TextImportTab() {
@@ -23,6 +24,7 @@ export function TextImportTab() {
 
   return (
     <div className="space-y-4">
+      <SmsShareHint />
       <div>
         <p className="text-[12px] font-semibold text-cosfy-ink-soft mb-2">Paste the bank SMS</p>
         <Textarea
