@@ -6,15 +6,18 @@ const isProd = process.env.NODE_ENV === "production";
 // Server-side fetches (Gemini, AlphaVantage, Gmail API, etc.) aren't subject
 // to CSP, so they don't need to be listed here.
 const GOOGLE_AUTH_ORIGINS = "https://apis.google.com https://accounts.google.com https://*.googleapis.com";
-const FIREBASE_FRAME_ORIGINS = "https://*.firebaseapp.com https://accounts.google.com";
+// Phone sign-in's invisible reCAPTCHA loads its script/frames from these —
+// required per Firebase's own CSP guidance for Firebase Auth phone/reCAPTCHA.
+const RECAPTCHA_ORIGINS = "https://www.google.com https://www.gstatic.com https://www.recaptcha.net";
+const FIREBASE_FRAME_ORIGINS = "https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://www.recaptcha.net";
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${GOOGLE_AUTH_ORIGINS}`,
+  `script-src 'self' 'unsafe-inline' ${GOOGLE_AUTH_ORIGINS} ${RECAPTCHA_ORIGINS}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
-  `connect-src 'self' ${GOOGLE_AUTH_ORIGINS}`,
+  `connect-src 'self' ${GOOGLE_AUTH_ORIGINS} ${RECAPTCHA_ORIGINS}`,
   `frame-src 'self' ${FIREBASE_FRAME_ORIGINS}`,
   "object-src 'none'",
   "base-uri 'self'",
